@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.dateBase.entity;
+package tech.erubin.annyeong_eat.bot.entity;
 
 import lombok.*;
 
@@ -10,12 +10,12 @@ import javax.persistence.*;
 @Getter
 @ToString
 @NoArgsConstructor
-public class DishOptionally{
+public class DishOptionally extends AbstractEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private int id;
 
     @Column(name = "name")
     private String name;
@@ -24,15 +24,15 @@ public class DishOptionally{
     private String type;
 
     @Column(name = "cost_price")
-    private Double costPrice;
+    private double costPrice;
 
     @Column(name = "price")
-    private Double price;
+    private double price;
 
     @Column(name = "grams")
-    private Integer grams;
+    private int grams;
 
-    public DishOptionally(String name, String type, Double price) {
+    public DishOptionally(String name, String type, double price) {
         this.name = name;
         this.type = type;
         this.costPrice = 0.00;

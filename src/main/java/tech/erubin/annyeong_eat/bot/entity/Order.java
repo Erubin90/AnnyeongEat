@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.dateBase.entity;
+package tech.erubin.annyeong_eat.bot.entity;
 
 import lombok.*;
 
@@ -12,12 +12,12 @@ import java.util.List;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Order{
+public class Order extends AbstractEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private int id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "client_id")
@@ -36,16 +36,16 @@ public class Order{
     private String paymentMethod;
 
     @Column(name = "payment_status")
-    private Integer paymentStatus;
+    private int paymentStatus;
 
     @Column(name = "order_status")
     private String orderStatus;
 
     @Column(name = "waiter_id")
-    private Integer waiterId;
+    private int waiterId;
 
     @Column(name = "delivery_id")
-    private Integer deliveryId;
+    private int deliveryId;
 
     @Column(name = "time_accept")
     private Timestamp timeAccept;

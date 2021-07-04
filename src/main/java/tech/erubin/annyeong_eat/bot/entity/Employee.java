@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.dateBase.entity;
+package tech.erubin.annyeong_eat.bot.entity;
 
 import lombok.*;
 
@@ -10,11 +10,11 @@ import javax.persistence.*;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Employee {
+public class Employee extends AbstractEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private int id;
 
     @Column(name = "name")
     private String name;
@@ -22,8 +22,8 @@ public class Employee {
     @Column(name = "surname")
     private String surname;
 
-    @Column(name = "telegram_name")
-    private String telegramName;
+    @Column(name = "telegram_user_id")
+    private String telegramUserId;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -34,9 +34,11 @@ public class Employee {
     @Column(name = "status")
     private String status;
 
-    public Employee(String name, String surname, String role) {
+    public Employee(String name, String surname, String telegramUserId, String phoneNumber, String role) {
         this.name = name;
         this.surname = surname;
+        this.telegramUserId = telegramUserId;
+        this.phoneNumber = phoneNumber;
         this.role = role;
         this.status = "работает";
     }

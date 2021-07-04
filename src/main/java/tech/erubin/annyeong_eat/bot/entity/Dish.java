@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.dateBase.entity;
+package tech.erubin.annyeong_eat.bot.entity;
 
 import lombok.*;
 
@@ -11,12 +11,12 @@ import java.util.List;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Dish{
+public class Dish extends AbstractEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private int id;
 
     @Column(name = "name")
     private String name;
@@ -25,19 +25,19 @@ public class Dish{
     private String type;
 
     @Column(name = "cost_price")
-    private Double costPrice;
+    private double costPrice;
 
     @Column(name = "price")
-    private Double price;
+    private double price;
 
     @Column(name = "grams")
-    private Integer grams;
+    private int grams;
 
     @OneToMany(mappedBy = "dishId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Cheque> chequeList;
 
-    public Dish(String name, String type, Double price) {
+    public Dish(String name, String type, double price) {
         this.name = name;
         this.type = type;
         this.costPrice = 0.00;

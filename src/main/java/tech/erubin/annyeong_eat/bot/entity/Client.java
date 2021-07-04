@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.dateBase.entity;
+package tech.erubin.annyeong_eat.bot.entity;
 
 import lombok.*;
 
@@ -11,12 +11,12 @@ import java.util.List;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Client {
+public class Client extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private int id;
 
     @Column(name = "name")
     private String name;
@@ -24,7 +24,7 @@ public class Client {
     @Column(name = "surname")
     private String surname;
 
-    @Column(name = "telegram_name")
+    @Column(name = "telegram_user_id")
     private String telegramName;
 
     @Column(name = "phone_number")

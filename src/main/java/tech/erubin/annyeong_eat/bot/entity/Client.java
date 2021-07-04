@@ -25,7 +25,7 @@ public class Client extends AbstractEntity {
     private String surname;
 
     @Column(name = "telegram_user_id")
-    private String telegramName;
+    private String telegramUserId;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -37,10 +37,10 @@ public class Client extends AbstractEntity {
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Order> orderList;
 
-    public Client(String name, String surname, String telegramName, String phoneNumber) {
+    public Client(String name, String surname, String telegramUserId, String phoneNumber) {
         this.name = name;
         this.surname = surname;
-        this.telegramName = telegramName;
+        this.telegramUserId = telegramUserId;
         this.phoneNumber = phoneNumber;
         this.status = "активный";
     }

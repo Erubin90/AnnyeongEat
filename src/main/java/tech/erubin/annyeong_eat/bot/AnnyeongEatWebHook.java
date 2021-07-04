@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnnyenogEatWebHook extends TelegramWebhookBot {
+public class AnnyeongEatWebHook extends TelegramWebhookBot {
 
     private String botUsername;
     private String botToken;

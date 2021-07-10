@@ -1,6 +1,5 @@
 package tech.erubin.annyeong_eat.telegramBot.service.botService;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +17,6 @@ import java.util.List;
 
 @Service
 @NoArgsConstructor
-@AllArgsConstructor
 public class UpdateService {
     @Autowired
     private EmployeeServiceImpl employeeService;
@@ -39,7 +37,7 @@ public class UpdateService {
 
     public BotApiMethod<Message> handleUpdate(Update update) {
         String userId = update.getMessage().getFrom().getId().toString();
-        SendMessage botApiMethod = null;
+        SendMessage sendMessage = new SendMessage();
 
         Employee employee = employeeService.getEmployeeByTelegramUserId(userId);
         Client client = clientService.getClientByTelegramUserId(userId);
@@ -52,12 +50,12 @@ public class UpdateService {
             case "регистр":
             case "null":
                 System.out.println("регистр - null");
-                botApiMethod = registrationService.startClient(update, client);
+                sendMessage = registrationService.startClient(update, client);
                 break;
             case "заказ":
                 break;
         }
-        return botApiMethod;
+        return sendMessage;
     }
 
     private String getStateTypeClient(Client client) {

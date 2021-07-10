@@ -49,12 +49,12 @@ public class Client extends AbstractEntity {
         this.telegramUserId = telegramUserId;
         this.phoneNumber = phoneNumber;
         this.status = "регистрация";
-        this.state = "незарегестрирован";
+        this.state = "не зарегестрирован";
     }
 
     public Client(String telegramUserId) {
         this.telegramUserId = telegramUserId;
         this.status = "регистрация";
-        this.state = "незарегестрирован";
+        this.state = "не зарегестрирован";
     }
 }

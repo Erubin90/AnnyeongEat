@@ -1,5 +1,6 @@
 package tech.erubin.annyeong_eat.telegramBot.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,6 +10,7 @@ import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 
 @RestController
 public class ControllerBot {
+    @Autowired
     private final AnnyeongEatWebHook bot;
 
     public ControllerBot(AnnyeongEatWebHook bot) {
@@ -17,7 +19,10 @@ public class ControllerBot {
 
     @PostMapping("/")
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
-        return bot.onWebhookUpdateReceived(update);
+        if (update.getMessage()!= null) {
+            return bot.onWebhookUpdateReceived(update);
+        }
+        return null;
     }
 
 }

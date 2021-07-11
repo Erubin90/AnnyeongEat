@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.service.entityService.ServiceInterface;
+package tech.erubin.annyeong_eat.telegramBot.service.ServiceInterface;
 
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;

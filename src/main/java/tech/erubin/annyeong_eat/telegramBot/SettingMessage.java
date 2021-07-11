@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Getter
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
-@Getter
 public class SettingMessage {
     @Value("${regular.errorTrigger}")
     private String regularError;
@@ -65,50 +65,7 @@ public class SettingMessage {
     @Value("${message.introductory}")
     private String messageIntroductory;
 
-
-
-    public Map<String, String> getNoErrorMessage(){
-        return Map.of(
-                nameFlag, nameNoError,
-                surnameFlag, surnameNoError,
-                phoneNumberFlag, phoneNumberNoError,
-                cityFlag, cityNoError);
-    }
-
     public List<String> getFlags(){
         return List.of(nameFlag, surnameFlag, phoneNumberFlag, cityFlag);
-    }
-
-    public Map<String, String> getErrorMessage(){
-        return Map.of(
-                "IsBlank", messageErrorBlank,
-                "RussianChar", messageErrorNoRussianChars,
-                "мат", messageErrorObsceneWord,
-                "IsNumber", messageErrorNumber,
-                "неразрешенные символы", messageErrorNoCorrectChar,
-                "большая длина", messageErrorBigLength,
-                "маленькая длина", messageErrorLittleLength
-        );
-    }
-
-    @Override
-    public String toString() {
-        return "SettingMessage{" +
-                "regularError='" + regularError + '\'' +
-                ", messageErrorBlank='" + messageErrorBlank + '\'' +
-                ", messageErrorObsceneWord='" + messageErrorObsceneWord + '\'' +
-                ", messageErrorEnglish='" + messageErrorNoRussianChars + '\'' +
-                ", messageErrorNumber='" + messageErrorNumber + '\'' +
-                ", messageErrorNoCorrectChar='" + messageErrorNoCorrectChar + '\'' +
-                ", nameFlag='" + nameFlag + '\'' +
-                ", surnameFlag='" + surnameFlag + '\'' +
-                ", phoneNumberFlag='" + phoneNumberFlag + '\'' +
-                ", cityFlag='" + cityFlag + '\'' +
-                ", nameNoError='" + nameNoError + '\'' +
-                ", surnameNoError='" + surnameNoError + '\'' +
-                ", phoneNumberNoError='" + phoneNumberNoError + '\'' +
-                ", cityNoError='" + cityNoError + '\'' +
-                ", messageIntroductory='" + messageIntroductory + '\'' +
-                '}';
     }
 }

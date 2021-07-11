@@ -1,19 +1,19 @@
-package tech.erubin.annyeong_eat.telegramBot.service.entityService;
+package tech.erubin.annyeong_eat.telegramBot.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tech.erubin.annyeong_eat.telegramBot.entity.Cheque;
 import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.repository.ChequeRepository;
-import tech.erubin.annyeong_eat.telegramBot.service.entityService.ServiceInterface.ChequeService;
+import tech.erubin.annyeong_eat.telegramBot.service.ServiceInterface.ChequeService;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class ChequeServiceImpl implements ChequeService {
 
-    @Autowired
     private ChequeRepository repository;
 
     @Override

@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-@Getter
 @Component
-@PropertySource("classpath:message.properties")
+@PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
+@Getter
 public class SettingMessage {
     @Value("${regular.errorTrigger}")
     private String regularError;
@@ -21,14 +21,23 @@ public class SettingMessage {
     @Value("${message.error.obsceneWord}")
     private String messageErrorObsceneWord;
 
-    @Value("${message.error.english}")
-    private String messageErrorEnglish;
+    @Value("${message.error.noRussianChars}")
+    private String messageErrorNoRussianChars;
 
     @Value("${message.error.number}")
     private String messageErrorNumber;
 
     @Value("${message.error.noCorrectChar}")
     private String messageErrorNoCorrectChar;
+
+    @Value("${message.error.bigLength}")
+    private String messageErrorBigLength;
+
+    @Value("${message.error.littleLength}")
+    private String messageErrorLittleLength;
+
+    @Value("${message.error.formatPhoneNumber}")
+    private String messageErrorFormatPhoneNumber;
 
     @Value("${name.flag}")
     private String nameFlag;
@@ -57,6 +66,8 @@ public class SettingMessage {
     @Value("${message.introductory}")
     private String messageIntroductory;
 
+
+
     public Map<String, String> getNoErrorMessage(){
         return Map.of(
                 nameFlag, nameNoError,
@@ -71,12 +82,34 @@ public class SettingMessage {
 
     public Map<String, String> getErrorMessage(){
         return Map.of(
-                "пустое сообщение", messageErrorBlank,
-                "английские буквы", messageErrorEnglish,
+                "IsBlank", messageErrorBlank,
+                "RussianChar", messageErrorNoRussianChars,
                 "мат", messageErrorObsceneWord,
-                "используются числа", messageErrorNumber,
-                "неразрешенные символы", messageErrorNoCorrectChar
+                "IsNumber", messageErrorNumber,
+                "неразрешенные символы", messageErrorNoCorrectChar,
+                "большая длина", messageErrorBigLength,
+                "маленькая длина", messageErrorLittleLength
         );
     }
 
+    @Override
+    public String toString() {
+        return "SettingMessage{" +
+                "regularError='" + regularError + '\'' +
+                ", messageErrorBlank='" + messageErrorBlank + '\'' +
+                ", messageErrorObsceneWord='" + messageErrorObsceneWord + '\'' +
+                ", messageErrorEnglish='" + messageErrorNoRussianChars + '\'' +
+                ", messageErrorNumber='" + messageErrorNumber + '\'' +
+                ", messageErrorNoCorrectChar='" + messageErrorNoCorrectChar + '\'' +
+                ", nameFlag='" + nameFlag + '\'' +
+                ", surnameFlag='" + surnameFlag + '\'' +
+                ", phoneNumberFlag='" + phoneNumberFlag + '\'' +
+                ", cityFlag='" + cityFlag + '\'' +
+                ", nameNoError='" + nameNoError + '\'' +
+                ", surnameNoError='" + surnameNoError + '\'' +
+                ", phoneNumberNoError='" + phoneNumberNoError + '\'' +
+                ", cityNoError='" + cityNoError + '\'' +
+                ", messageIntroductory='" + messageIntroductory + '\'' +
+                '}';
+    }
 }

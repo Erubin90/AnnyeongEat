@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.service;
+package tech.erubin.annyeong_eat.telegramBot.service.entityServises;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -6,7 +6,7 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Cheque;
 import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.repository.ChequeRepository;
-import tech.erubin.annyeong_eat.telegramBot.service.ServiceInterface.ChequeService;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface.ChequeService;
 
 import java.util.List;
 

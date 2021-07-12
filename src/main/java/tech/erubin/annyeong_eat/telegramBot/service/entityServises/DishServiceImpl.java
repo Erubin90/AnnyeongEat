@@ -1,10 +1,10 @@
-package tech.erubin.annyeong_eat.telegramBot.service;
+package tech.erubin.annyeong_eat.telegramBot.service.entityServises;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.repository.DishRepository;
-import tech.erubin.annyeong_eat.telegramBot.service.ServiceInterface.DishService;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface.DishService;
 
 import java.util.List;
 

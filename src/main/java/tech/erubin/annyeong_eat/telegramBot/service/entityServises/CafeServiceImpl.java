@@ -1,10 +1,10 @@
-package tech.erubin.annyeong_eat.telegramBot.service;
+package tech.erubin.annyeong_eat.telegramBot.service.entityServises;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tech.erubin.annyeong_eat.telegramBot.entity.Cafe;
 import tech.erubin.annyeong_eat.telegramBot.repository.CafeRepository;
-import tech.erubin.annyeong_eat.telegramBot.service.ServiceInterface.CafeService;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface.CafeService;
 
 import java.util.List;
 import java.util.Set;
@@ -13,9 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CafeServiceImpl implements CafeService {
-
     CafeRepository repository;
-
 
     @Override
     public List<Cafe> getAllCafe() {

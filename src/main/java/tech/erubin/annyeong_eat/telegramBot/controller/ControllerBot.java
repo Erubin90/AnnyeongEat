@@ -17,10 +17,7 @@ public class ControllerBot {
 
     @PostMapping("/")
     public BotApiMethod<?> onUpdateReceived(@RequestBody Update update) {
-        if (update.getMessage()!= null) {
-            return bot.onWebhookUpdateReceived(update);
-        }
-        return null;
+        return bot.onWebhookUpdateReceived(update);
     }
 
 }

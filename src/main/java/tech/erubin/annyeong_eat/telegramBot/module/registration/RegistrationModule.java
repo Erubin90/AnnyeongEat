@@ -7,22 +7,22 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.messages.TextMessages;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.ButtonServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.ReplyButtonServiceImpl;
 
 @Component
 public class RegistrationModule {
     private ClientServiceImpl clientService;
     private CheckMessageRegistrationModule checkMessage;
-    private ButtonServiceImpl button;
+    private ReplyButtonServiceImpl replyButton;
 
     private String regularError;
     private String introductoryMessage;
 
     public RegistrationModule(ClientServiceImpl clientService, CheckMessageRegistrationModule checkMessage,
-                              ButtonServiceImpl button, TextMessages textMessages) {
+                              ReplyButtonServiceImpl replyButton, TextMessages textMessages) {
         this.clientService = clientService;
         this.checkMessage = checkMessage;
-        this.button = button;
+        this.replyButton = replyButton;
         regularError = textMessages.getRegularError();
         introductoryMessage = textMessages.getMessageStartClientRegistration();
     }
@@ -59,7 +59,7 @@ public class RegistrationModule {
                     client.setPhoneNumber(message.getText());
                     client.setState("регистрация города");
                     sendMessage.enableMarkdown(true);
-                    sendMessage.setReplyMarkup(button.clientRegistrationCity());
+                    sendMessage.setReplyMarkup(replyButton.clientRegistrationCity());
                 }
                 break;
             case "регистрация города":
@@ -68,11 +68,11 @@ public class RegistrationModule {
                     client.setCity(message.getText());
                     client.setStatus("главное меню");
                     client.setState("главное меню");
-                    sendMessage.setReplyMarkup(button.clientMainMenu());
+                    sendMessage.setReplyMarkup(replyButton.clientMainMenu());
                 }
                 if (sendMessage.getReplyMarkup() == null) {
                     sendMessage.enableMarkdown(true);
-                    sendMessage.setReplyMarkup(button.clientRegistrationCity());
+                    sendMessage.setReplyMarkup(replyButton.clientRegistrationCity());
                 }
                 break;
         }

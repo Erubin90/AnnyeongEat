@@ -7,7 +7,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.entity.Employee;
 import tech.erubin.annyeong_eat.telegramBot.module.mainMenu.MainMenuModule;
-import tech.erubin.annyeong_eat.telegramBot.module.order.OrderModule;
+import tech.erubin.annyeong_eat.telegramBot.module.order.DeliveryModule;
+import tech.erubin.annyeong_eat.telegramBot.module.order.DishesModule;
 import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationModule;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.EmployeeServiceImpl;
@@ -18,16 +19,18 @@ public class TelegramFacade {
     private ClientServiceImpl clientService;
     private RegistrationModule registrationModule;
     private MainMenuModule mainMenuModule;
-    private OrderModule orderModule;
+    private DeliveryModule deliveryModule;
+    private DishesModule dishesModule;
 
     public TelegramFacade(EmployeeServiceImpl employeeService, ClientServiceImpl clientService,
                           RegistrationModule registrationModule, MainMenuModule mainMenuModule,
-                          OrderModule orderModule) {
+                          DeliveryModule deliveryModule, DishesModule dishesModule) {
         this.employeeService = employeeService;
         this.clientService = clientService;
         this.registrationModule = registrationModule;
         this.mainMenuModule = mainMenuModule;
-        this.orderModule = orderModule;
+        this.deliveryModule = deliveryModule;
+        this.dishesModule = dishesModule;
     }
 
     public BotApiMethod<?> handleUpdate(Update update) {
@@ -53,9 +56,11 @@ public class TelegramFacade {
             case "главное меню":
                 return mainMenuModule.startClient(update, client);
             case "оформление заказа":
-                return orderModule.startClient(update, client);
+                return deliveryModule.startClient(update, client);
+            case "выбор блюд":
+                return dishesModule.startClient(update, client);
             default:
-                return new SendMessage(update.getMessage().getChatId().toString(), "хрен знает что");
+                return new SendMessage(update.getMessage().getChatId().toString(), "Ошибка clientActions()");
         }
     }
 }

@@ -3,7 +3,7 @@ package tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.service
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 
-public interface ButtonService {
+public interface ReplyButtonService {
     ReplyKeyboardMarkup clientRegistrationCity();
 
     ReplyKeyboardMarkup clientMainMenu();

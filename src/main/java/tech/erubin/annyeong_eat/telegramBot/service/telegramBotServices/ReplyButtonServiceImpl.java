@@ -7,18 +7,18 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.messages.ButtonNames;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.CafeServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.serviceInterface.ButtonService;
+import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.serviceInterface.ReplyButtonService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @Service
-public class ButtonServiceImpl implements ButtonService {
+public class ReplyButtonServiceImpl implements ReplyButtonService {
     CafeServiceImpl cafeService;
     ButtonNames buttonNames;
 
-    public ButtonServiceImpl(CafeServiceImpl cafeService, ButtonNames buttonNames) {
+    public ReplyButtonServiceImpl(CafeServiceImpl cafeService, ButtonNames buttonNames) {
         this.cafeService = cafeService;
         this.buttonNames = buttonNames;
     }

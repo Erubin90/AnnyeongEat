@@ -58,7 +58,7 @@ public class RegistrationModule {
                 text = checkMessage.checkPhoneNumber(sourceText);
                 if (!text.contains(regularError)) {
                     if (sourceText.length() == 12) {
-                        sourceText = "8" + sourceText.substring(1, 11);
+                        sourceText = "8" + sourceText.substring(2, 11);
                     }
                     client.setPhoneNumber(sourceText);
                     client.setState("регистрация города");

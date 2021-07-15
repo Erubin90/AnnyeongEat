@@ -13,33 +13,33 @@ import java.util.List;
 public class MainMenuButtonNames {
 
     @Value("${mainMenu.button.client.order}")
-    private String mainMenuButtonClientOrder;
+    private String clientOrder;
 
     @Value("${mainMenu.button.client.checkOrder}")
-    private String mainMenuButtonClientCheckOrder;
+    private String checkOrder;
 
     @Value("${mainMenu.button.client.help}")
-    private String mainMenuButtonClientHelp;
+    private String help;
 
     @Value("${mainMenu.button.client.info}")
-    private String mainMenuButtonClientInfo;
+    private String clientInfo;
 
     @Value("${button.back}")
-    private String buttonBack;
+    private String back;
 
     public List<String> getMainMenuClientButton(){
-        return List.of(mainMenuButtonClientOrder, mainMenuButtonClientCheckOrder, mainMenuButtonClientInfo, mainMenuButtonClientHelp);
+        return List.of(clientOrder, checkOrder, clientInfo, help);
     }
 
     public List<String> getHelpClientButton(){
-        return List.of(buttonBack);
+        return List.of(back);
     }
 
     public List<String> getCheckOrderButton(){
-        return List.of(buttonBack);
+        return List.of(back);
     }
 
     public List<String> getProfileInfoButton(){
-        return List.of(buttonBack);
+        return List.of(back);
     }
 }

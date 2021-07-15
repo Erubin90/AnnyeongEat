@@ -15,7 +15,5 @@ public interface EmployeeService {
 
     void deleteEmployee(Employee employee);
 
-    Employee createEmployee(String name, String surname, String telegramName, String phoneNumber, String role);
-
     Employee createEmployee();
 }

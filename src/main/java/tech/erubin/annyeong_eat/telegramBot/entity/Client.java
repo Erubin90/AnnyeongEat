@@ -9,9 +9,8 @@ import java.util.List;
 @Table(name = "clients")
 @Setter
 @Getter
-@ToString
 @NoArgsConstructor
-public class Client extends AbstractEntity {
+public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,15 +41,6 @@ public class Client extends AbstractEntity {
     @OneToMany(mappedBy = "clientId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Order> orderList;
-
-    public Client(String name, String surname, String telegramUserId, String phoneNumber) {
-        this.name = name;
-        this.surname = surname;
-        this.telegramUserId = telegramUserId;
-        this.phoneNumber = phoneNumber;
-        this.status = "регистрация";
-        this.state = "не зарегестрирован";
-    }
 
     public Client(String telegramUserId) {
         this.telegramUserId = telegramUserId;

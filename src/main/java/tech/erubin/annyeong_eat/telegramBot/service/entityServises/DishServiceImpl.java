@@ -1,6 +1,6 @@
 package tech.erubin.annyeong_eat.telegramBot.service.entityServises;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.repository.DishRepository;
@@ -9,9 +9,8 @@ import tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterf
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class DishServiceImpl implements DishService {
-
-    @Autowired
     private DishRepository repository;
 
     @Override
@@ -35,7 +34,17 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public Dish createDish(String name, String type, Double price) {
-        return new Dish(name, type, price);
+    public List<Dish> getDishByType(String type) {
+        return repository.findDishByType(type);
+    }
+
+    @Override
+    public Dish getDishByTag(String tag) {
+        return repository.findDishByTag(tag);
+    }
+
+    @Override
+    public Dish createDish() {
+        return new Dish();
     }
 }

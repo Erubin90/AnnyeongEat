@@ -2,7 +2,6 @@ package tech.erubin.annyeong_eat.telegramBot.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -29,8 +28,11 @@ public class ConfigAnnyeongEatWebHook {
     @Value("${telegrambot.botPath}")
     private String botPath;
 
-    @Autowired
     private TelegramFacade telegramFacade;
+
+    public ConfigAnnyeongEatWebHook(TelegramFacade telegramFacade) {
+        this.telegramFacade = telegramFacade;
+    }
 
     @Bean
     public AnnyeongEatWebHook getAnnyeongEatWebHook() {

@@ -10,9 +10,12 @@ public interface OrderService {
 
     Order getOrderById(int id);
 
+    Order getOrder(Client client);
+
     void saveOrder(Order order);
 
     void deleteOrder(Order order);
 
-    Order createOrder(Client client, String orderName, String address, String comment, String paymentMethod);
+    Order createOrder(Client client);
+
 }

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
@@ -24,7 +23,6 @@ public class MainMenuModule {
         Message message = update.getMessage();
         String sourceText = message.getText();
         String chatId = message.getChatId().toString();
-        int messageId = message.getMessageId();
         String sate = client.getState();
         String text = "Ошибка MainMenuModule.startClient";
 
@@ -32,11 +30,11 @@ public class MainMenuModule {
             case "главное меню":
                 switch (sourceText) {
                     case "Сделать заказ":
-                        text = "";
-                        client.setStatus("выбор блюд");
-                        client.setState("выбор блюд");
+                        text = "Выберите кафе";
+                        client.setStatus("оформление заказа");
+                        client.setState("выбор кафе");
                         sendMessage.enableMarkdown(true);
-                        sendMessage.setReplyMarkup(replyButton.clientOrderRegistration());
+                        sendMessage.setReplyMarkup(replyButton.clientOrderCafe(client));
                         break;
                     case "Статус заказа":
                         text = "Просмотр статуса заказа";
@@ -50,14 +48,17 @@ public class MainMenuModule {
                         sendMessage.enableMarkdown(true);
                         sendMessage.setReplyMarkup(replyButton.clientHelp());
                         break;
-                    case "Посмотреть профиль":
+                    case "Профиль":
                         text = "просмотр профиля";
                         client.setState("посмотреть профиль");
                         sendMessage.enableMarkdown(true);
                         sendMessage.setReplyMarkup(replyButton.clientProfileInfo(client));
                         break;
                     default:
-                        return new DeleteMessage(chatId, messageId);
+                        text = "Воспользуйтесь кнопками";
+                        sendMessage.enableMarkdown(true);
+                        sendMessage.setReplyMarkup(replyButton.clientMainMenu());
+                        break;
                 }
                 break;
             case "статус заказа":
@@ -91,10 +92,6 @@ public class MainMenuModule {
                         break;
                 }
                 break;
-        }
-        if (sendMessage.getReplyMarkup() == null) {
-            sendMessage.enableMarkdown(true);
-            sendMessage.setReplyMarkup(replyButton.clientMainMenu());
         }
         sendMessage.setChatId(chatId);
         sendMessage.setText(text);

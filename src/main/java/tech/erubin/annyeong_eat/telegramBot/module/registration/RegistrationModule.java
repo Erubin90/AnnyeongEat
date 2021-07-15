@@ -6,25 +6,26 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.messages.TextMessages;
+import tech.erubin.annyeong_eat.telegramBot.module.CheckMessage;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.ReplyButtonServiceImpl;
 
 @Component
 public class RegistrationModule {
     private ClientServiceImpl clientService;
-    private CheckMessageRegistrationModule checkMessage;
+    private CheckMessage checkMessage;
     private ReplyButtonServiceImpl replyButton;
 
     private String regularError;
     private String introductoryMessage;
 
-    public RegistrationModule(ClientServiceImpl clientService, CheckMessageRegistrationModule checkMessage,
+    public RegistrationModule(ClientServiceImpl clientService, CheckMessage checkMessage,
                               ReplyButtonServiceImpl replyButton, TextMessages textMessages) {
         this.clientService = clientService;
         this.checkMessage = checkMessage;
         this.replyButton = replyButton;
         regularError = textMessages.getRegularError();
-        introductoryMessage = textMessages.getMessageStartClientRegistration();
+        introductoryMessage = textMessages.getStartClientRegistration();
     }
 
     public SendMessage startClient(Update update, Client client){
@@ -42,7 +43,7 @@ public class RegistrationModule {
             case "регистрация имени":
                 text = checkMessage.checkName(sourceText);
                 if (!text.contains(regularError)) {
-                    client.setName(message.getText());
+                    client.setName(sourceText);
                     client.setState("регистрация фамилии");
                 }
                 break;
@@ -56,7 +57,10 @@ public class RegistrationModule {
             case "регистрация номера":
                 text = checkMessage.checkPhoneNumber(sourceText);
                 if (!text.contains(regularError)) {
-                    client.setPhoneNumber(message.getText());
+                    if (sourceText.length() == 12) {
+                        sourceText = "8" + sourceText.substring(1, 11);
+                    }
+                    client.setPhoneNumber(sourceText);
                     client.setState("регистрация города");
                     sendMessage.enableMarkdown(true);
                     sendMessage.setReplyMarkup(replyButton.clientRegistrationCity());
@@ -65,7 +69,7 @@ public class RegistrationModule {
             case "регистрация города":
                 text = checkMessage.checkCity(sourceText);
                 if (!text.contains(regularError)) {
-                    client.setCity(message.getText());
+                    client.setCity(sourceText);
                     client.setStatus("главное меню");
                     client.setState("главное меню");
                     sendMessage.setReplyMarkup(replyButton.clientMainMenu());

@@ -13,5 +13,5 @@ public interface DishOptionallyService {
 
     void deleteDishOptionally(DishOptionally dishOptionally);
 
-    DishOptionally createDishOptionally(String name, String type, Double price);
+    DishOptionally createDishOptionally();
 }

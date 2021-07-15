@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Employee extends AbstractEntity{
+public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -37,12 +37,8 @@ public class Employee extends AbstractEntity{
     @Column(name = "condition")
     private String condition;
 
-    public Employee(String name, String surname, String telegramUserId, String phoneNumber, String role) {
-        this.name = name;
-        this.surname = surname;
+    public Employee(String telegramUserId) {
         this.telegramUserId = telegramUserId;
-        this.phoneNumber = phoneNumber;
-        this.role = role;
         this.status = "работает";
     }
 }

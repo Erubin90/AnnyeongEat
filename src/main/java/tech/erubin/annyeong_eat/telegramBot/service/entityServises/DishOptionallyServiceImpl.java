@@ -35,7 +35,7 @@ public class DishOptionallyServiceImpl implements DishOptionallyService {
     }
 
     @Override
-    public DishOptionally createDishOptionally(String name, String type, Double price) {
-        return new DishOptionally(name, type, price);
+    public DishOptionally createDishOptionally() {
+        return new DishOptionally();
     }
 }

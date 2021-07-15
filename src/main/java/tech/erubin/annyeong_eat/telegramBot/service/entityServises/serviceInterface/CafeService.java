@@ -13,9 +13,13 @@ public interface CafeService {
 
     Cafe getCafeById(int id);
 
+    Cafe getCafeByName(String name);
+
+    List<String> getCafeNameByCity(String city);
+
     void saveCafe(Cafe cafe);
 
     void deleteCafe(Cafe cafe);
 
-    Cafe createCafe(String name, String city, String address);
+    Cafe createCafe();
 }

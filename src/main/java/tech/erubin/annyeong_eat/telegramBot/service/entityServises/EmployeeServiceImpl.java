@@ -40,11 +40,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee createEmployee(String name, String surname, String telegramName, String phoneNumber, String role) {
-        return new Employee(name, surname, telegramName, phoneNumber, role);
-    }
-
-    @Override
     public Employee createEmployee() {
         return new Employee();
     }

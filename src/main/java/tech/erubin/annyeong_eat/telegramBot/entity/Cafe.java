@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "cafeterias")
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Cafe extends AbstractEntity {
+public class Cafe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +30,11 @@ public class Cafe extends AbstractEntity {
     @Column(name = "address")
     private String address;
 
-    public Cafe(String name, String city, String address) {
-        this.name = name;
-        this.city = city;
-        this.address = address;
-    }
+    @OneToMany(mappedBy = "cafeId",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<Dish> dishesMenu;
+
+    @OneToMany(mappedBy = "cafeId",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<Order> orderList;
 }

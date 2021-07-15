@@ -11,7 +11,7 @@ import javax.persistence.Entity;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Cheque extends AbstractEntity {
+public class Cheque {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,10 +46,4 @@ public class Cheque extends AbstractEntity {
 
     @Column(name = "count_dish_opt3")
     private int countDishOpt3;
-
-    public Cheque(Order order, Dish dish, int countDishes) {
-        this.orderId = order;
-        this.dishId = dish;
-        this.countDishes = countDishes;
-    }
 }

@@ -40,11 +40,6 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client createClient(String name, String surname, String telegramUserId, String phoneNumber) {
-        return new Client(name, surname, telegramUserId, phoneNumber);
-    }
-
-    @Override
     public Client createClient(String telegramUserId) {
         return new Client(telegramUserId);
     }

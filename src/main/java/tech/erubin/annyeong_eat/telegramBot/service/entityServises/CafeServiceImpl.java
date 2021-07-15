@@ -32,6 +32,18 @@ public class CafeServiceImpl implements CafeService {
     }
 
     @Override
+    public Cafe getCafeByName(String name) {
+        return repository.findCafeByName(name);
+    }
+
+    @Override
+    public List<String> getCafeNameByCity(String city) {
+        return repository.findAllByCity(city).stream()
+                .map(Cafe::getName)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public void saveCafe(Cafe cafe) {
         repository.save(cafe);
     }
@@ -42,7 +54,7 @@ public class CafeServiceImpl implements CafeService {
     }
 
     @Override
-    public Cafe createCafe(String name, String city, String address) {
-        return new Cafe(name, city, address);
+    public Cafe createCafe() {
+        return new Cafe();
     }
 }

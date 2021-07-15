@@ -4,19 +4,21 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 
 public interface ReplyButtonService {
+    //Registration Module
     ReplyKeyboardMarkup clientRegistrationCity();
 
+    //Main Menu Module
     ReplyKeyboardMarkup clientMainMenu();
-
-    ReplyKeyboardMarkup clientOrderRegistration();
-
     ReplyKeyboardMarkup clientCheckOrder();
-
     ReplyKeyboardMarkup clientHelp();
-
     ReplyKeyboardMarkup clientProfileInfo(Client client);
 
-    ReplyKeyboardMarkup clientRefactorProfile();
-
-    ReplyKeyboardMarkup clear();
+    //Order Module
+    ReplyKeyboardMarkup clientOrderCafe(Client client);
+    ReplyKeyboardMarkup clientOrderMenu();
+    ReplyKeyboardMarkup clientOrderAddress(Client client);
+    ReplyKeyboardMarkup clientOrderPhoneNumber(Client client);
+    ReplyKeyboardMarkup clientOrderPayment();
+    ReplyKeyboardMarkup clientOrderConfirmation();
+    ReplyKeyboardMarkup clientOrderEdition();
 }

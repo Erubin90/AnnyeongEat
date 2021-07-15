@@ -1,8 +1,6 @@
 package tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface;
 
 import tech.erubin.annyeong_eat.telegramBot.entity.Cheque;
-import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
-import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 
 import java.util.List;
 
@@ -16,5 +14,5 @@ public interface ChequeService {
 
     void deleteCheque(Cheque cheque);
 
-    Cheque createCheque(Order order, Dish dish, Integer countDishes);
+    Cheque createCheque();
 }

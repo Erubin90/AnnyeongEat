@@ -10,9 +10,8 @@ import java.util.List;
 @Table(name = "orders")
 @Setter
 @Getter
-@ToString
 @NoArgsConstructor
-public class Order extends AbstractEntity{
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,11 +22,18 @@ public class Order extends AbstractEntity{
     @JoinColumn(name = "client_id")
     private Client clientId;
 
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name = "cafe_id")
+    private Cafe cafeId;
+
     @Column(name = "order_name")
     private String orderName;
 
     @Column(name = "address")
     private String address;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
     @Column(name = "comment")
     private String comment;
@@ -66,11 +72,9 @@ public class Order extends AbstractEntity{
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Cheque> chequeList;
 
-    public Order(Client clientId, String orderName, String address, String comment, String paymentMethod) {
+    public Order(Client clientId, String orderName) {
         this.clientId = clientId;
         this.orderName = orderName;
-        this.address = address;
-        this.comment = comment;
-        this.paymentMethod = paymentMethod;
+        this.orderStatus = "оформление";
     }
 }

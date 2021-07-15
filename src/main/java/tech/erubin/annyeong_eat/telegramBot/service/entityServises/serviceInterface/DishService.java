@@ -13,5 +13,9 @@ public interface DishService {
 
     void deleteDish(Dish dish);
 
-    Dish createDish(String name, String type, Double price);
+    List<Dish> getDishByType(String type);
+
+    Dish getDishByTag(String tag);
+
+    Dish createDish();
 }

@@ -14,20 +14,60 @@ public class CheckMessage{
     CafeServiceImpl cafeService;
 
     //    message.error.obsceneWord = message.error.obsceneWord
+    public String checkName(String sourceText) {
+        StringBuilder resultText = createStringBuilder();
+        resultText.append(checkIsNumber(sourceText));
+        resultText.append(checkObsceneWord());
+        resultText.append(checkLength(sourceText, 2, 20));
+        resultText.append(checkNoCorrectCharNameAndSurname(sourceText));
+        resultText.append(checkRussianChar(sourceText));
+        return checkCorrectlyName(resultText);
+    }
 
-    public StringBuilder createStringBuilder(){
+    public String checkSurname(String sourceText) {
+        StringBuilder resultText = createStringBuilder();
+        resultText.append(checkIsNumber(sourceText));
+        resultText.append(checkObsceneWord());
+        resultText.append(checkLength(sourceText, 2, 32));
+        resultText.append(checkNoCorrectCharNameAndSurname(sourceText));
+        resultText.append(checkRussianChar(sourceText));
+        return checkCorrectlySurname(resultText);
+    }
+
+    public String checkPhoneNumber(String sourceText) {
+        StringBuilder resultText = createStringBuilder();
+        resultText.append(checkLength(sourceText, 12, 12));
+        resultText.append(checkNoCorrectCharPhoneNumber(sourceText));
+        resultText.append(checkFormatPhoneNumber(sourceText));
+        return checkCorrectlyPhoneNumber(resultText);
+    }
+
+    public String checkCity(String sourceText) {
+        StringBuilder resultText = createStringBuilder();
+        resultText.append(checkNameCity(sourceText));
+        return checkCorrectlyCity(resultText);
+    }
+
+    public String checkAddress(String sourceText) {
+        StringBuilder resultText = createStringBuilder();
+        resultText.append(checkRussianCharAddress(sourceText));
+        resultText.append(checkNoCorrectCharAddress(sourceText));
+        return checkCorrectlyAddress(resultText);
+    }
+
+    private StringBuilder createStringBuilder(){
         return new StringBuilder().append(message.getRegularError());
     }
 
-    public String checkIsNumber(String sourceText) {
+    private String checkIsNumber(String sourceText) {
         if (sourceText.matches(".*\\d+.*")){
              return message.getErrorNumber();
         }
         return "";
     }
 
-    public String checkRussianChar(String sourceText) {
-        if (sourceText.matches("([А-Яа-яёЁ]+)[- ]{0,1}([А-Яа-яёЁ]+)")) {
+    private String checkRussianChar(String sourceText) {
+        if (sourceText.matches("([А-Яа-яёЁ]+)[ -]{0,1}([А-Яа-яёЁ]+)")) {
             return "";
         }
         else {
@@ -35,8 +75,17 @@ public class CheckMessage{
         }
     }
 
-    public String checkNoCorrectCharNameAndSurname(String sourceText) {
-        if (sourceText.matches(".*[@#$%^&*+!(){};:<>?~`_|/\"\\[\\]\\n\\t\\f\\r].*")) {
+    private String checkRussianCharAddress(String sourceText) {
+        if (sourceText.matches("[А-Яа-яёЁ 0-9.,-]+")) {
+            return "";
+        }
+        else {
+            return message.getErrorNoRussianChars();
+        }
+    }
+
+    private String checkNoCorrectCharNameAndSurname(String sourceText) {
+        if (sourceText.matches(".*[@#$%^&*+!(){};:<>?~`_|/,\"\\[\\]\\n\\t\\f\\r]?[- ]{2,}.*")) {
             return message.getErrorNoCorrectChar();
         }
         else {
@@ -44,7 +93,7 @@ public class CheckMessage{
         }
     }
 
-    public String checkNoCorrectCharPhoneNumber(String sourceText) {
+    private String checkNoCorrectCharPhoneNumber(String sourceText) {
         if (sourceText.matches("[0-9+]+")) {
             return "";
         }
@@ -54,41 +103,51 @@ public class CheckMessage{
 
     }
 
-    public String checkLength(String text, int minLength, int maxLength) {
+    private String checkNoCorrectCharAddress(String sourceText) {
+        if (sourceText.matches(".*[@#$%^&*+!(){};:<>?~`_|/\"\\[\\]\\n\\t\\f\\r].*")) {
+            return message.getErrorNoCorrectChar();
+        }
+        else {
+            return "";
+        }
+    }
+
+    private String checkLength(String text, int minLength, int maxLength) {
         int lengthText = text.length();
         if (lengthText < minLength) {
-            return String.format(message.getMessageErrorLittleLength(), minLength);
+            return String.format(message.getErrorLittleLength(), minLength);
         }
         if (lengthText > maxLength){
-            return String.format(message.getMessageErrorBigLength(), maxLength);
+            return String.format(message.getErrorBigLength(), maxLength);
         }
         return "";
     }
 
-    public String checkFormatPhoneNumber(String sourcePhoneNumber){
-        if (sourcePhoneNumber.matches("(\\+7)\\d{10}")){
+    private String checkFormatPhoneNumber(String sourcePhoneNumber){
+        if (sourcePhoneNumber.matches("(\\+79)\\d{9}") ||
+            sourcePhoneNumber.matches("89\\d{9}")){
             return "";
         }
         else {
-            return message.getMessageErrorFormatPhoneNumber();
+            return message.getErrorFormatPhoneNumber();
         }
     }
 
-    public String checkNameCity(String sourceCity) {
+    private String checkNameCity(String sourceCity) {
         Set<String> correctCity = cafeService.getAllCity();
         if (correctCity.contains(sourceCity)) {
             return "";
         }
         else {
-            return message.getMessageErrorNameCity();
+            return message.getErrorNameCity();
         }
     }
 
-    public String checkObsceneWord() {
+    private String checkObsceneWord() {
         return "";
     }
 
-    public String checkCorrectlyName(StringBuilder resultText){
+    private String checkCorrectlyName(StringBuilder resultText){
         if (resultText.toString().equals(message.getRegularError())){
             return message.getNameNoError();
         }
@@ -97,7 +156,7 @@ public class CheckMessage{
         }
     }
 
-    public String checkCorrectlySurname(StringBuilder resultText){
+    private String checkCorrectlySurname(StringBuilder resultText){
         if (resultText.toString().equals(message.getRegularError())){
             return message.getSurnameNoError();
         }
@@ -106,7 +165,7 @@ public class CheckMessage{
         }
     }
 
-    public String checkCorrectlyPhoneNumber(StringBuilder resultText){
+    private String checkCorrectlyPhoneNumber(StringBuilder resultText){
         if (resultText.toString().equals(message.getRegularError())){
             return message.getPhoneNumberNoError();
         }
@@ -116,6 +175,15 @@ public class CheckMessage{
     }
 
     public String checkCorrectlyCity(StringBuilder resultText){
+        if (resultText.toString().equals(message.getRegularError())){
+            return message.getCityNoError();
+        }
+        else {
+            return resultText.toString();
+        }
+    }
+
+    public String checkCorrectlyAddress(StringBuilder resultText){
         if (resultText.toString().equals(message.getRegularError())){
             return message.getCityNoError();
         }

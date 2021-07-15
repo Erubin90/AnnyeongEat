@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Getter
 @ToString
 @NoArgsConstructor
-public class DishOptionally extends AbstractEntity{
+public class DishOptionally {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,8 +20,9 @@ public class DishOptionally extends AbstractEntity{
     @Column(name = "name")
     private String name;
 
-    @Column(name = "type")
-    private String type;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name = "dish_id")
+    private Dish dishesId;
 
     @Column(name = "cost_price")
     private double costPrice;
@@ -31,12 +32,4 @@ public class DishOptionally extends AbstractEntity{
 
     @Column(name = "grams")
     private int grams;
-
-    public DishOptionally(String name, String type, double price) {
-        this.name = name;
-        this.type = type;
-        this.costPrice = 0.00;
-        this.price = price;
-        this.grams = 0;
-    }
 }

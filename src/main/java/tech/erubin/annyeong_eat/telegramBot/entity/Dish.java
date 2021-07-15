@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @ToString
 @NoArgsConstructor
-public class Dish extends AbstractEntity{
+public class Dish {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +20,12 @@ public class Dish extends AbstractEntity{
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "tag")
+    private String tag;
+
+    @Column(name = "comment")
+    private String comment;
 
     @Column(name = "type")
     private String type;
@@ -37,11 +43,11 @@ public class Dish extends AbstractEntity{
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Cheque> chequeList;
 
-    public Dish(String name, String type, double price) {
-        this.name = name;
-        this.type = type;
-        this.costPrice = 0.00;
-        this.price = price;
-        this.grams = 0;
-    }
+    @OneToMany(mappedBy = "dishesId",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<DishOptionally> dishOptionallyList;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name = "cafe_id")
+    private Cafe cafeId;
 }

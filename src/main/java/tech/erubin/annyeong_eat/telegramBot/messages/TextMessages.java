@@ -31,16 +31,16 @@ public class TextMessages {
     private String errorNoCorrectChar = "NoCorrectChar ";
 
     @Value("${message.error.bigLength}")
-    private String messageErrorBigLength = "BigLength %s ";
+    private String errorBigLength = "BigLength %s ";
 
     @Value("${message.error.littleLength}")
-    private String messageErrorLittleLength = "LittleLength %s ";
+    private String errorLittleLength = "LittleLength %s ";
 
     @Value("${message.error.formatPhoneNumber}")
-    private String messageErrorFormatPhoneNumber = "FormatPhoneNumber ";
+    private String errorFormatPhoneNumber = "FormatPhoneNumber ";
 
     @Value("${message.error.nameCity}")
-    private String messageErrorNameCity = "NameCity ";
+    private String errorNameCity = "NameCity ";
 
     //noError Message's
     @Value("${name.noError}")
@@ -55,12 +55,15 @@ public class TextMessages {
     @Value("${city.noError}")
     private String cityNoError = "ok";
 
+    @Value("${address.noError}")
+    private String AddressNoError = "ok";
+
     //Introduction message
     @Value("${message.start.client.registration}")
-    private String messageStartClientRegistration;
+    private String startClientRegistration;
 
     @Value("${message.start.client.mainMenu}")
-    private String messageStartMainClientMenu;
+    private String startMainClientMenu;
 
     //    public Map<String, String> getMainMenuClientMessage() {
 //        return Map.of(mainMenuButtonClientOrder, "Оформление заказа",

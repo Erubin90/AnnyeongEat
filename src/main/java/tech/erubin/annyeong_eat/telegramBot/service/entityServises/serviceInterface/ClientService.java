@@ -15,7 +15,5 @@ public interface ClientService {
 
     void deleteClient(Client client);
 
-    Client createClient(String name, String surname, String telegramUserId, String phoneNumber);
-
     Client createClient(String telegramUserId);
 }

@@ -1,7 +1,6 @@
-package tech.erubin.annyeong_eat.telegramBot.messages;
+package tech.erubin.annyeong_eat.telegramBot.module.mainMenu;
 
 import lombok.Getter;
-import lombok.ToString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -9,10 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Getter
-@ToString
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
-public class ButtonNames {
+public class MainMenuButtonNames {
 
     @Value("${mainMenu.button.client.order}")
     private String mainMenuButtonClientOrder;

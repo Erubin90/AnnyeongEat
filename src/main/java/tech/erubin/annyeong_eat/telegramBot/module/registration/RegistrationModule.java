@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.module.CheckMessage;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
@@ -45,6 +46,7 @@ public class RegistrationModule {
                 }
                 return returnSendMessage(sendMessage, client, text);
             case "регистрация имени":
+                sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
                 text = checkMessage.checkName(sourceText);
                 if (!text.contains(textMessage.getErrorTrigger())) {
                     text = textMessage.getNameNoError();

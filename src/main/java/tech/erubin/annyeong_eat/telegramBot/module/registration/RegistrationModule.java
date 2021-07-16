@@ -71,7 +71,7 @@ public class RegistrationModule {
                     client.setState("главное меню");
                     client.setStatus("главное меню");
                     sendMessage.enableMarkdown(true);
-                    sendMessage.setReplyMarkup(replyButton.clientRegistrationCity());
+                    sendMessage.setReplyMarkup(replyButton.clientMainMenu());
                 }
                 return returnSendMessage(sendMessage, client, text);
         }

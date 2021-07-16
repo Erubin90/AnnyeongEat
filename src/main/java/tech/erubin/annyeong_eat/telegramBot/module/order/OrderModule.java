@@ -66,7 +66,7 @@ public class OrderModule {
                 sendMessage.setReplyMarkup(buttonService.clientOrderMenu(order));
                 List<String> typeDishes = buttonName.getTypeDishesInCafe(order);
                 if (typeDishes.contains(sourceText)) {
-                    text = textMessage.getDishesByTypeInTargetMenu(sourceText);
+                    text = textMessage.getDishesByTypeInTargetMenu(order, sourceText);
                 }
                 else if (buttonName.getBack().equals(sourceText)) {
                     text = "поменять кафе";

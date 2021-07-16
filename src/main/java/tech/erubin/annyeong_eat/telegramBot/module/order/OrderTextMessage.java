@@ -38,8 +38,8 @@ public class OrderTextMessage {
         this.orderService = orderService;
     }
 
-    public String getDishesByTypeInTargetMenu(String type) {
-        List<Dish> dishByType = dishService.getDishByType(type);
+    public String getDishesByTypeInTargetMenu(Order order, String type) {
+        List<Dish> dishByType = order.getCafeId().getDishesMenu();
         List<String> dishName = dishByType.stream()
                 .map(Dish::getName)
                 .collect(Collectors.toList());
@@ -67,9 +67,9 @@ public class OrderTextMessage {
     }
 
     public String getFullOrder(Order order) {
-        StringBuilder fullOrder = new StringBuilder(order.getOrderName() + "\n\n");
+        StringBuilder fullOrder = new StringBuilder(order.getOrderName() + ":\n\n");
         List<Cheque> chequeList = order.getChequeList();
-        if (!chequeList.isEmpty()) {
+        if (chequeList != null) {
             for (Cheque cheque : chequeList) {
                 Dish dish = cheque.getDishId();
                 fullOrder.append(dish.getName())

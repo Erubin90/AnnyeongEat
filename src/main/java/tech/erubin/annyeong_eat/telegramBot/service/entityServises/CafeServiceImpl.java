@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CafeServiceImpl implements CafeService {
-    CafeRepository repository;
+    private CafeRepository repository;
 
     @Override
     public List<Cafe> getAllCafe() {

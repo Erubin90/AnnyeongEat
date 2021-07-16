@@ -9,6 +9,7 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.DishOptionallyServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.DishServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServises.OrderServiceImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,16 +17,25 @@ import java.util.stream.Collectors;
 @Getter
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
-public class TextMessageOrderModule {
-    DishOptionallyServiceImpl dishOptionallyService;
-    DishServiceImpl dishService;
+public class OrderTextMessage {
+    private DishOptionallyServiceImpl dishOptionallyService;
+    private DishServiceImpl dishService;
+    private OrderServiceImpl orderService;
 
     @Value("${regular.errorTrigger}")
-    private String errorTrigger;
+    private String errorTrigger = "error";
 
-    public TextMessageOrderModule(DishOptionallyServiceImpl dishOptionallyService, DishServiceImpl dishService) {
+    @Value("${address.noError}")
+    private String AddressNoError = "ok";
+
+    @Value("${order.message.client.emptyReceipt}")
+    private String emptyReceipt;
+
+    public OrderTextMessage(DishOptionallyServiceImpl dishOptionallyService, DishServiceImpl dishService,
+                            OrderServiceImpl orderService) {
         this.dishOptionallyService = dishOptionallyService;
         this.dishService = dishService;
+        this.orderService = orderService;
     }
 
     public String getDishesByTypeInTargetMenu(String type) {
@@ -70,8 +80,7 @@ public class TextMessageOrderModule {
             return fullOrder.toString();
         }
         else {
-
-            return "Вы ничего не выбрали из блюд";
+            return emptyReceipt;
         }
     }
 }

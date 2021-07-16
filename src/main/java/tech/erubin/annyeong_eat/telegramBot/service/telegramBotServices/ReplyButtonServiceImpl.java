@@ -8,8 +8,8 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.module.mainMenu.MainMenuButtonNames;
 import tech.erubin.annyeong_eat.telegramBot.module.order.OrderButtonNames;
+import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationButtonName;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.CafeServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.OrderServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.serviceInterface.ReplyButtonService;
 
 import java.util.*;
@@ -17,14 +17,14 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class ReplyButtonServiceImpl implements ReplyButtonService {
-    CafeServiceImpl cafeService;
-    OrderServiceImpl orderService;
-    MainMenuButtonNames mainMenuButtonNames;
-    OrderButtonNames orderButtonNames;
+    private CafeServiceImpl cafeService;
+    private RegistrationButtonName registrationButtonName;
+    private MainMenuButtonNames mainMenuButtonNames;
+    private OrderButtonNames orderButtonNames;
 
     public ReplyKeyboardMarkup clientRegistrationCity() {
-        Set<String> buttonNames = cafeService.getAllCity();
-        return getReplyKeyboardMarkup(buttonNames);
+        List<List<String>> buttonNames = registrationButtonName.getCityList();
+        return getReplyKeyboardMarkup(buttonNames, true);
     }
 
     @Override
@@ -61,13 +61,13 @@ public class ReplyButtonServiceImpl implements ReplyButtonService {
             buttonName.add(List.of(cafeName));
         }
         buttonName.add(back);
-        return getReplyKeyboardMarkup(buttonName);
+        return getReplyKeyboardMarkup(buttonName, false);
     }
 
     @Override
-    public ReplyKeyboardMarkup clientOrderMenu() {
-        List<List<String>> buttonNames = orderButtonNames.getMenuRows();
-        return getReplyKeyboardMarkup(buttonNames);
+    public ReplyKeyboardMarkup clientOrderMenu(Order order) {
+        List<List<String>> buttonNames = orderButtonNames.getMenuRows(order);
+        return getReplyKeyboardMarkup(buttonNames, false);
     }
 
     @Override
@@ -107,19 +107,19 @@ public class ReplyButtonServiceImpl implements ReplyButtonService {
     @Override
     public ReplyKeyboardMarkup clientOrderPayment() {
         List<List<String>> buttonNames = orderButtonNames.getPaymentRows();
-        return getReplyKeyboardMarkup(buttonNames);
+        return getReplyKeyboardMarkup(buttonNames, false);
     }
 
     @Override
     public ReplyKeyboardMarkup clientOrderConfirmation() {
         List<List<String>> buttonNames = orderButtonNames.getConfirmRows();
-        return getReplyKeyboardMarkup(buttonNames);
+        return getReplyKeyboardMarkup(buttonNames, false);
     }
 
     @Override
-    public ReplyKeyboardMarkup clientOrderEdition() {
-        List<List<String>> buttonNames = orderButtonNames.getEditionRows();
-        return getReplyKeyboardMarkup(buttonNames);
+    public ReplyKeyboardMarkup clientFixOrder() {
+        List<List<String>> buttonNames = orderButtonNames.getFixOrderRows();
+        return getReplyKeyboardMarkup(buttonNames, false);
     }
 
     private ReplyKeyboardMarkup getReplyKeyboardMarkup(Collection<String> buttonNames) {
@@ -132,24 +132,14 @@ public class ReplyButtonServiceImpl implements ReplyButtonService {
         return new ReplyKeyboardMarkup(keyboardRows, true, false, false);
     }
 
-    private ReplyKeyboardMarkup getReplyKeyboardMarkup(List<List<String>> buttonNames) {
+    private ReplyKeyboardMarkup getReplyKeyboardMarkup(List<List<String>> buttonNames, boolean oneTimeKeyboard) {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         for (List<String> buttonName : buttonNames) {
             KeyboardRow row = new KeyboardRow();
             row.addAll(buttonName);
             keyboardRows.add(row);
         }
-        return new ReplyKeyboardMarkup(keyboardRows, true, false, false);
-    }
-
-    private List<KeyboardRow> getKeyboardManyButtonRows(List<String> buttonNames) {
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        for (String buttonName : buttonNames) {
-            KeyboardRow row = new KeyboardRow();
-            row.add(buttonName);
-            keyboardRows.add(row);
-        }
-        return keyboardRows;
+        return new ReplyKeyboardMarkup(keyboardRows, true, oneTimeKeyboard, false);
     }
 
     private List<KeyboardRow> getKeyboardManyButtonRows(Set<String> buttonNames) {

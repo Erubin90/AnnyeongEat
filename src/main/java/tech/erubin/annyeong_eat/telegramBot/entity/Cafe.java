@@ -15,7 +15,6 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class Cafe {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

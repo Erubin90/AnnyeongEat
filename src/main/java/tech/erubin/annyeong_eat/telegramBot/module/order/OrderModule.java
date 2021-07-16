@@ -20,14 +20,15 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 public class OrderModule {
-    OrderButtonNames buttonName;
-    TextMessageOrderModule textMessage;
+    private OrderButtonNames buttonName;
+    private OrderTextMessage textMessage;
 
-    CheckMessage checkMessage;
-    ReplyButtonServiceImpl buttonService;
-    ClientServiceImpl clientService;
-    OrderServiceImpl orderService;
-    CafeServiceImpl cafeService;
+    private CheckMessage checkMessage;
+
+    private ReplyButtonServiceImpl buttonService;
+    private ClientServiceImpl clientService;
+    private OrderServiceImpl orderService;
+    private CafeServiceImpl cafeService;
 
 
     public BotApiMethod<?> startClient(Update update, Client client){
@@ -37,7 +38,7 @@ public class OrderModule {
         String sate = client.getState();
         String text = "Команда " + sourceText + " необработана в DishesModule.startClient";
         Order order = orderService.getOrder(client);
-        System.err.println(sourceText);
+        Cafe cafe = order.getCafeId();
         switch (sate) {
             case "выбор кафе":
                 List<String> cafeName = cafeService.getCafeNameByCity(client.getCity());
@@ -46,9 +47,9 @@ public class OrderModule {
                 if (cafeName.contains(sourceText)){
                     text = "Доро пожаловать в " + sourceText;
                     client.setState("меню");
-                    Cafe cafe = cafeService.getCafeByName(sourceText);
+                    cafe = cafeService.getCafeByName(sourceText);
                     order.setCafeId(cafe);
-                    sendMessage.setReplyMarkup(buttonService.clientOrderMenu());
+                    sendMessage.setReplyMarkup(buttonService.clientOrderMenu(order));
                 }
                 else if (buttonName.getBack().equals(sourceText)) {
                     client.setState("главное меню");
@@ -62,21 +63,10 @@ public class OrderModule {
                 return returnSendMessage(sendMessage, client, order, text);
             case "меню":
                 sendMessage.enableMarkdown(true);
-                sendMessage.setReplyMarkup(buttonService.clientOrderMenu());
-                if (buttonName.getSnacks().equals(sourceText)) {
-                    text = textMessage.getDishesByTypeInTargetMenu(buttonName.getSnacks());
-                }
-                else if (buttonName.getCoups().equals(sourceText)) {
-                    text = textMessage.getDishesByTypeInTargetMenu(buttonName.getCoups());
-                }
-                else if (buttonName.getSalads().equals(sourceText)) {
-                    text = textMessage.getDishesByTypeInTargetMenu(buttonName.getSalads());
-                }
-                else if (buttonName.getDrinks().equals(sourceText)) {
-                    text = textMessage.getDishesByTypeInTargetMenu(buttonName.getDrinks());
-                }
-                else if (buttonName.getVeganMenu().equals(sourceText)) {
-                    text = textMessage.getDishesByTypeInTargetMenu(buttonName.getVeganMenu());
+                sendMessage.setReplyMarkup(buttonService.clientOrderMenu(order));
+                List<String> typeDishes = buttonName.getTypeDishesInCafe(order);
+                if (typeDishes.contains(sourceText)) {
+                    text = textMessage.getDishesByTypeInTargetMenu(sourceText);
                 }
                 else if (buttonName.getBack().equals(sourceText)) {
                     text = "поменять кафе";
@@ -100,7 +90,7 @@ public class OrderModule {
                 if (sourceText.equals(buttonName.getBack())) {
                     text = "меню";
                     client.setState("меню");
-                    sendMessage.setReplyMarkup(buttonService.clientOrderMenu());
+                    sendMessage.setReplyMarkup(buttonService.clientOrderMenu(order));
                 }
                 else {
                     text = checkMessage.checkAddress(sourceText);
@@ -125,6 +115,8 @@ public class OrderModule {
                     if (!checkText.contains(textMessage.getErrorTrigger())) {
                         text = "Выбирете способ оплаты";
                         client.setState("способ оплаты");
+                        if (sourceText.length() == 12)
+                            order.setPhoneNumber("8" + sourceText.substring(2,12));
                         order.setPhoneNumber(sourceText);
                         sendMessage.setReplyMarkup(buttonService.clientOrderPayment());
                     }
@@ -133,14 +125,15 @@ public class OrderModule {
             case "способ оплаты":
                 sendMessage.enableMarkdown(true);
                 sendMessage.setReplyMarkup(buttonService.clientOrderPayment());
-                if (sourceText.equals(buttonName.getCards()) ||
-                        sourceText.equals(buttonName.getCash())) {
+                List<String> paymentMethod = buttonName.getPaymentMethod();
+                if (paymentMethod.contains(sourceText)) {
                     text = textMessage.getFullOrder(order);
                     order.setPaymentMethod(sourceText);
                     client.setState("подтверждение заказа");
                     sendMessage.setReplyMarkup(buttonService.clientOrderConfirmation());
                 }
                 else if (sourceText.equals(buttonName.getBack())) {
+                    text = "выберите номер";
                     client.setState("доставка номер");
                     sendMessage.setReplyMarkup(buttonService.clientOrderPhoneNumber(client));
                 }
@@ -152,10 +145,19 @@ public class OrderModule {
                 sendMessage.enableMarkdown(true);
                 sendMessage.setReplyMarkup(buttonService.clientOrderConfirmation());
                 if (buttonName.getConfirm().equals(sourceText)) {
+                    text = "главное меню";
                     order.setOrderStatus("оформлен");
                     client.setState("главное меню");
                     client.setStatus("главное меню");
                     sendMessage.setReplyMarkup(buttonService.clientMainMenu());
+                }
+                else if (buttonName.getBack().equals(sourceText)) {
+                    text = "Выберите способ оплаты";
+                    client.setState("способ оплаты");
+                    sendMessage.setReplyMarkup(buttonService.clientOrderPayment());
+                }
+                else {
+                    text = "Используйте кнопку чтоб подтвердить заказ";
                 }
                 return returnSendMessage(sendMessage, client, order, text);
         }

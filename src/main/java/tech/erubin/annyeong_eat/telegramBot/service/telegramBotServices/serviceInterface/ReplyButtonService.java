@@ -2,6 +2,7 @@ package tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.service
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
+import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 
 public interface ReplyButtonService {
     //Registration Module
@@ -15,10 +16,12 @@ public interface ReplyButtonService {
 
     //Order Module
     ReplyKeyboardMarkup clientOrderCafe(Client client);
-    ReplyKeyboardMarkup clientOrderMenu();
+    ReplyKeyboardMarkup clientOrderMenu(Order order);
     ReplyKeyboardMarkup clientOrderAddress(Client client);
     ReplyKeyboardMarkup clientOrderPhoneNumber(Client client);
     ReplyKeyboardMarkup clientOrderPayment();
     ReplyKeyboardMarkup clientOrderConfirmation();
-    ReplyKeyboardMarkup clientOrderEdition();
+    ReplyKeyboardMarkup clientFixOrder();
+
+    //All Module
 }

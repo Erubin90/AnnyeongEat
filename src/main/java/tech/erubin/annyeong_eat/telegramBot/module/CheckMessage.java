@@ -2,123 +2,101 @@ package tech.erubin.annyeong_eat.telegramBot.module;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import tech.erubin.annyeong_eat.telegramBot.messages.TextMessages;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.CafeServiceImpl;
-
-import java.util.Set;
+import tech.erubin.annyeong_eat.telegramBot.module.order.OrderTextMessage;
+import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationTextMessage;
 
 @Component
 @AllArgsConstructor
 public class CheckMessage{
-    TextMessages message;
-    CafeServiceImpl cafeService;
+    private RegistrationTextMessage registrationMessage;
+    private OrderTextMessage orderMessage;
 
     //    message.error.obsceneWord = message.error.obsceneWord
     public String checkName(String sourceText) {
-        StringBuilder resultText = createStringBuilder();
+        StringBuilder resultText = new StringBuilder();
         resultText.append(checkIsNumber(sourceText));
         resultText.append(checkObsceneWord());
         resultText.append(checkLength(sourceText, 2, 20));
         resultText.append(checkNoCorrectCharNameAndSurname(sourceText));
-        resultText.append(checkRussianChar(sourceText));
+        resultText.append(checkFormNameAndSurname(sourceText));
         return checkCorrectlyName(resultText);
     }
 
     public String checkSurname(String sourceText) {
-        StringBuilder resultText = createStringBuilder();
+        StringBuilder resultText = new StringBuilder();
         resultText.append(checkIsNumber(sourceText));
         resultText.append(checkObsceneWord());
         resultText.append(checkLength(sourceText, 2, 32));
         resultText.append(checkNoCorrectCharNameAndSurname(sourceText));
-        resultText.append(checkRussianChar(sourceText));
+        resultText.append(checkFormNameAndSurname(sourceText));
         return checkCorrectlySurname(resultText);
     }
 
     public String checkPhoneNumber(String sourceText) {
-        StringBuilder resultText = createStringBuilder();
-        resultText.append(checkLength(sourceText, 12, 12));
+        StringBuilder resultText = new StringBuilder();
+        resultText.append(checkLength(sourceText, 11, 12));
         resultText.append(checkNoCorrectCharPhoneNumber(sourceText));
         resultText.append(checkFormatPhoneNumber(sourceText));
         return checkCorrectlyPhoneNumber(resultText);
     }
 
-    public String checkCity(String sourceText) {
-        StringBuilder resultText = createStringBuilder();
-        resultText.append(checkNameCity(sourceText));
-        return checkCorrectlyCity(resultText);
-    }
-
     public String checkAddress(String sourceText) {
-        StringBuilder resultText = createStringBuilder();
-        resultText.append(checkRussianCharAddress(sourceText));
+        StringBuilder resultText = new StringBuilder();
+        resultText.append(checkFormAddress(sourceText));
         resultText.append(checkNoCorrectCharAddress(sourceText));
+        resultText.append(checkLength(sourceText,5,100));
         return checkCorrectlyAddress(resultText);
-    }
-
-    private StringBuilder createStringBuilder(){
-        return new StringBuilder().append(message.getRegularError());
     }
 
     private String checkIsNumber(String sourceText) {
         if (sourceText.matches(".*\\d+.*")){
-             return message.getErrorNumber();
+             return registrationMessage.getErrorNumber();
         }
         return "";
     }
 
-    private String checkRussianChar(String sourceText) {
-        if (sourceText.matches("([А-Яа-яёЁ]+)[ -]{0,1}([А-Яа-яёЁ]+)")) {
+    private String checkFormNameAndSurname(String sourceText) {
+        if (sourceText.matches("([А-Яа-яёЁ]+)[- ]?([А-Яа-яёЁ]+)[- ]?([А-Яа-яёЁ]+)")) {
             return "";
         }
-        else {
-            return message.getErrorNoRussianChars();
-        }
+        return registrationMessage.getErrorFalseTextForm();
     }
 
-    private String checkRussianCharAddress(String sourceText) {
-        if (sourceText.matches("[А-Яа-яёЁ 0-9.,-]+")) {
+    private String checkFormAddress(String sourceText) {
+        if (sourceText.matches("[А-Яа-я0-9 ,./-]+")) {
             return "";
         }
-        else {
-            return message.getErrorNoRussianChars();
-        }
+        return registrationMessage.getErrorFalseTextForm();
     }
 
     private String checkNoCorrectCharNameAndSurname(String sourceText) {
-        if (sourceText.matches(".*[@#$%^&*+!(){};:<>?~`_|/,\"\\[\\]\\n\\t\\f\\r]?[- ]{2,}.*")) {
-            return message.getErrorNoCorrectChar();
+        if (sourceText.matches(".*[@#$%^&*+!(){};:<>?~`_|/,\"\\[\\]\\n\\t\\f\\r].*")) {
+            return registrationMessage.getErrorNoCorrectChar();
         }
-        else {
-            return "";
-        }
+        return "";
     }
 
     private String checkNoCorrectCharPhoneNumber(String sourceText) {
         if (sourceText.matches("[0-9+]+")) {
             return "";
         }
-        else {
-            return message.getErrorNoCorrectChar();
-        }
-
+        return registrationMessage.getErrorNoCorrectChar();
     }
 
     private String checkNoCorrectCharAddress(String sourceText) {
-        if (sourceText.matches(".*[@#$%^&*+!(){};:<>?~`_|/\"\\[\\]\\n\\t\\f\\r].*")) {
-            return message.getErrorNoCorrectChar();
+        if (sourceText.matches(".*[@#$%^&*+!(){};:<>?~`_|\"\\[\\]\\n\\t\\f\\r].*")) {
+            return registrationMessage.getErrorNoCorrectChar();
         }
-        else {
-            return "";
-        }
+        return "";
     }
 
     private String checkLength(String text, int minLength, int maxLength) {
         int lengthText = text.length();
         if (lengthText < minLength) {
-            return String.format(message.getErrorLittleLength(), minLength);
+            return String.format(registrationMessage.getErrorLittleLength(), minLength);
         }
         if (lengthText > maxLength){
-            return String.format(message.getErrorBigLength(), maxLength);
+            return String.format(registrationMessage.getErrorBigLength(), maxLength);
         }
         return "";
     }
@@ -128,19 +106,7 @@ public class CheckMessage{
             sourcePhoneNumber.matches("89\\d{9}")){
             return "";
         }
-        else {
-            return message.getErrorFormatPhoneNumber();
-        }
-    }
-
-    private String checkNameCity(String sourceCity) {
-        Set<String> correctCity = cafeService.getAllCity();
-        if (correctCity.contains(sourceCity)) {
-            return "";
-        }
-        else {
-            return message.getErrorNameCity();
-        }
+        return registrationMessage.getErrorFormatPhoneNumber();
     }
 
     private String checkObsceneWord() {
@@ -148,8 +114,8 @@ public class CheckMessage{
     }
 
     private String checkCorrectlyName(StringBuilder resultText){
-        if (resultText.toString().equals(message.getRegularError())){
-            return message.getNameNoError();
+        if (!resultText.toString().contains(registrationMessage.getErrorTrigger())){
+            return registrationMessage.getNameNoError();
         }
         else {
             return resultText.toString();
@@ -157,8 +123,8 @@ public class CheckMessage{
     }
 
     private String checkCorrectlySurname(StringBuilder resultText){
-        if (resultText.toString().equals(message.getRegularError())){
-            return message.getSurnameNoError();
+        if (!resultText.toString().contains(registrationMessage.getErrorTrigger())){
+            return registrationMessage.getSurnameNoError();
         }
         else {
             return resultText.toString();
@@ -166,26 +132,17 @@ public class CheckMessage{
     }
 
     private String checkCorrectlyPhoneNumber(StringBuilder resultText){
-        if (resultText.toString().equals(message.getRegularError())){
-            return message.getPhoneNumberNoError();
+        if (!resultText.toString().contains(registrationMessage.getErrorTrigger())){
+            return registrationMessage.getPhoneNumberNoError();
         }
         else {
             return resultText.toString();
         }
     }
 
-    public String checkCorrectlyCity(StringBuilder resultText){
-        if (resultText.toString().equals(message.getRegularError())){
-            return message.getCityNoError();
-        }
-        else {
-            return resultText.toString();
-        }
-    }
-
-    public String checkCorrectlyAddress(StringBuilder resultText){
-        if (resultText.toString().equals(message.getRegularError())){
-            return message.getCityNoError();
+    private String checkCorrectlyAddress(StringBuilder resultText){
+        if (!resultText.toString().contains(orderMessage.getErrorTrigger())){
+            return orderMessage.getAddressNoError();
         }
         else {
             return resultText.toString();

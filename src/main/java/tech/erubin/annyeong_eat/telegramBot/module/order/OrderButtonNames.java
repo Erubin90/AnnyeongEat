@@ -4,38 +4,26 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import tech.erubin.annyeong_eat.telegramBot.entity.Cheque;
+import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
+import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
 public class OrderButtonNames {
-
     @Value("${button.back}")
     private String back;
 
     @Value("${button.next}")
     private String next;
 
-    @Value("${order.button.client.snacks}")
-    private String snacks;
-
-    @Value("${order.button.client.coups}")
-    private String coups;
-
-    @Value("${order.button.client.salads}")
-    private String salads;
-
-    @Value("${order.button.client.drinks}")
-    private String drinks;
-
-    @Value("${order.button.client.veganMenu}")
-    private String veganMenu;
-
     @Value("${order.button.client.cash}")
-    private String Cash;
+    private String cash;
 
     @Value("${order.button.client.cards}")
     private String cards;
@@ -62,18 +50,65 @@ public class OrderButtonNames {
         return List.of(back, next);
     }
 
-    public List<List<String>> getMenuRows() {
+    public List<String> getPaymentMethod(){
+        return List.of(cash, cards);
+    }
+
+    public List<String> getBackAndBasketAndNextButton(Order order) {
+        List<Cheque> cheques = order.getChequeList();
+        String basket = "\uD83D\uDED2 %s";
+        if (cheques == null) {
+            basket = String.format(basket, 0);
+        }
+        else {
+            Double sum = cheques
+                    .stream()
+                    .map(x -> x.getDishId().getPrice() * x.getCountDishes() +
+                            x.getDishOpt1() * x.getCountDishOpt1() +
+                            x.getDishOpt1() * x.getCountDishOpt1() +
+                            x.getDishOpt1() * x.getCountDishOpt1())
+                    .reduce(Double::sum)
+                    .get();
+            basket = String.format(basket, sum);
+        }
+        return List.of(back, basket, next);
+    }
+
+    public List<String> getTypeDishesInCafe(Order order) {
+        return order.getCafeId().getDishesMenu()
+                .stream()
+                .map(Dish::getType)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<List<String>> getMenuRows(Order order) {
         List<List<String>> orderMenuRows = new ArrayList<>();
-        orderMenuRows.add(List.of(snacks, coups));
-        orderMenuRows.add(List.of(salads, drinks));
-        orderMenuRows.add(List.of(veganMenu));
-        orderMenuRows.add(getBackAndNextButton());
+        List<String> typeDishes = getTypeDishesInCafe(order);
+        List<String> littleButtonName = typeDishes.stream()
+                .filter(x -> x.length() < 15)
+                .collect(Collectors.toList());
+        int size = littleButtonName.size();
+        boolean bigButtonNameFlag = typeDishes.removeAll(littleButtonName);
+
+        for (int i = 0; i < size - size % 2; i += 2) {
+            orderMenuRows.add(List.of(littleButtonName.get(i), littleButtonName.get(i + 1)));
+        }
+        if (size % 2 == 1) {
+            orderMenuRows.add(List.of(littleButtonName.get(size - 1)));
+        }
+        if (bigButtonNameFlag) {
+            for (String type : typeDishes) {
+                orderMenuRows.add(List.of(type));
+            }
+        }
+        orderMenuRows.add(getBackAndBasketAndNextButton(order));
         return orderMenuRows;
     }
 
     public List<List<String>> getPaymentRows() {
         List<List<String>> orderPayment = new ArrayList<>();
-        orderPayment.add(List.of(Cash));
+        orderPayment.add(List.of(cash));
         orderPayment.add(List.of(cards));
         orderPayment.add(List.of(back));
         return orderPayment;
@@ -82,10 +117,11 @@ public class OrderButtonNames {
     public List<List<String>> getConfirmRows() {
         List<List<String>> orderConfirm = new ArrayList<>();
         orderConfirm.add(List.of(confirm));
+        orderConfirm.add(List.of(back));
         return orderConfirm;
     }
 
-    public List<List<String>> getEditionRows() {
+    public List<List<String>> getFixOrderRows() {
         List<List<String>> orderEdition = new ArrayList<>();
         orderEdition.add(List.of(editionMenu, editionAddress));
         orderEdition.add(List.of(editionPhoneNumber, editionPayment));

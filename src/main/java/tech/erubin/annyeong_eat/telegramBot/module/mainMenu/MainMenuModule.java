@@ -6,17 +6,15 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
-import tech.erubin.annyeong_eat.telegramBot.messages.TextMessages;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.ReplyButtonServiceImpl;
 
 @Component
 @AllArgsConstructor
 public class MainMenuModule {
-    ClientServiceImpl clientService;
-    MainMenuButtonNames buttonNames;
-    ReplyButtonServiceImpl replyButton;
-    TextMessages textMessages;
+    private ClientServiceImpl clientService;
+    private MainMenuButtonNames buttonNames;
+    private ReplyButtonServiceImpl replyButton;
 
     public BotApiMethod<?> startClient(Update update, Client client) {
         SendMessage sendMessage = new SendMessage();

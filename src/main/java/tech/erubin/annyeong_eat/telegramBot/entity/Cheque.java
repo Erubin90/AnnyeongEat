@@ -10,9 +10,7 @@ import javax.persistence.Entity;
 @Setter
 @Getter
 @ToString
-@NoArgsConstructor
 public class Cheque {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -46,4 +44,11 @@ public class Cheque {
 
     @Column(name = "count_dish_opt3")
     private int countDishOpt3;
+
+    public Cheque() {
+        countDishes = 0;
+        countDishOpt1 = 0;
+        countDishOpt2 = 0;
+        countDishOpt3 = 0;
+    }
 }

@@ -11,7 +11,6 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor
 public class DishOptionally {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

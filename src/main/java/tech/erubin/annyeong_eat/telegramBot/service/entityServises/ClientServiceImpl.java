@@ -11,7 +11,6 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ClientServiceImpl implements ClientService {
-
     private ClientRepository repository;
 
     @Override

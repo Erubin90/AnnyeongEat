@@ -1,6 +1,6 @@
 package tech.erubin.annyeong_eat.telegramBot.service.entityServises;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tech.erubin.annyeong_eat.telegramBot.entity.Employee;
 import tech.erubin.annyeong_eat.telegramBot.repository.EmployeeRepository;
@@ -9,9 +9,8 @@ import tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterf
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
-
-    @Autowired
     private EmployeeRepository repository;
 
     @Override

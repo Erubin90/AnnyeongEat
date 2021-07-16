@@ -11,7 +11,6 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ChequeServiceImpl implements ChequeService {
-
     private ChequeRepository repository;
 
     @Override

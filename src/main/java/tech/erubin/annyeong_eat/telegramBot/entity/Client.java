@@ -11,7 +11,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class Client {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

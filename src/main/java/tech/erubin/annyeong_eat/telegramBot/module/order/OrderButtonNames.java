@@ -68,7 +68,7 @@ public class OrderButtonNames {
                             x.getDishOpt1() * x.getCountDishOpt1() +
                             x.getDishOpt1() * x.getCountDishOpt1())
                     .reduce(Double::sum)
-                    .get();
+                    .orElse(0.0);
             basket = String.format(basket, sum);
         }
         return List.of(back, basket, next);

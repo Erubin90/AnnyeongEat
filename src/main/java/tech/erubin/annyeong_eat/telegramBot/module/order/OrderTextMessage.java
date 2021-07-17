@@ -52,8 +52,14 @@ public class OrderTextMessage {
                 .collect(Collectors.toList());
         StringBuilder text = new StringBuilder(type + ":\n");
         for (int i = 0; i < dishName.size(); i++) {
-            String str = String.format("%s %s ₽ %s\n", dishName.get(i), dishPrice.get(i), dishTag.get(i));
-            text.append(str);
+            text.append(dishName.get(i));
+            for (int j = 0; j < (32 - dishName.get(i).length() - dishPrice.get(i).toString().length() - 1); j++){
+                text.append(" ");
+            }
+            text.append(dishPrice.get(i))
+                    .append("₽\n")
+                    .append(dishTag.get(i))
+                    .append("\n");
         }
         return text.toString();
     }
@@ -73,6 +79,12 @@ public class OrderTextMessage {
                 Dish dish = cheque.getDishId();
                 fullOrder.append(dish.getName())
                         .append(" ")
+                        .append(cheque.getCountDishes())
+                        .append(" x ")
+                        .append(dish.getPrice())
+                        .append(" = ")
+                        .append(cheque.getCountDishes() * dish.getPrice())
+                        .append("₽\n")
                         .append(dish.getTag())
                         .append("\n");
             }

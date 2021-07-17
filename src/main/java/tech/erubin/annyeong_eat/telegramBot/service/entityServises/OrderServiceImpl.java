@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
-    private OrderRepository repository;
+    private final OrderRepository repository;
 
     @Override
     public List<Order> getAllOrder() {

@@ -12,7 +12,6 @@ import java.util.List;
 @Table(name = "cafeterias")
 @Setter
 @Getter
-@ToString
 @NoArgsConstructor
 public class Cafe {
     @Id

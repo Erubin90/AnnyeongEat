@@ -18,5 +18,7 @@ public interface ChequeService {
 
     void deleteCheque(Cheque cheque);
 
-    Cheque createCheque();
+    void deleteAllChequesByOrder(Order order);
+
+    Cheque createCheque(Order order, Dish dish);
 }

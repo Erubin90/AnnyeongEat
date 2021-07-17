@@ -9,7 +9,6 @@ import java.util.List;
 @Table(name = "dishes")
 @Setter
 @Getter
-@ToString
 @NoArgsConstructor
 public class Dish {
     @Id

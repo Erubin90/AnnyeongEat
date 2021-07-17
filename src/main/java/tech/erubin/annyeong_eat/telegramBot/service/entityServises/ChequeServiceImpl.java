@@ -27,7 +27,11 @@ public class ChequeServiceImpl implements ChequeService {
 
     @Override
     public Cheque getChequeByOrderAndDish(Order order, Dish dish) {
-        return repository.findChequeByOrderIdAndDishId(order, dish);
+        Cheque cheque = repository.findChequeByOrderIdAndDishId(order, dish);
+        if (cheque == null) {
+            cheque = createCheque(order, dish);
+        }
+        return cheque;
     }
 
     @Override
@@ -41,7 +45,19 @@ public class ChequeServiceImpl implements ChequeService {
     }
 
     @Override
-    public Cheque createCheque() {
-        return new Cheque();
+    public void deleteAllChequesByOrder(Order order) {
+        List<Cheque> chequeList = order.getChequeList();
+        int i = 0;
+        while (i < chequeList.size()) {
+            chequeList.get(i).setOrderId(null);
+            chequeList.get(i).setDishId(null);
+            repository.delete(chequeList.get(i));
+            i++;
+        }
+    }
+
+    @Override
+    public Cheque createCheque(Order order, Dish dish) {
+        return new Cheque(order, dish);
     }
 }

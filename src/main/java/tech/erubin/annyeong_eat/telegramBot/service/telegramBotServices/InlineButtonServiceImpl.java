@@ -5,11 +5,9 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import tech.erubin.annyeong_eat.telegramBot.entity.Cheque;
-import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.entity.DishOptionally;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ChequeServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.DishServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.serviceInterface.InlineButtonService;
 
 import java.util.ArrayList;
@@ -19,13 +17,9 @@ import java.util.List;
 @AllArgsConstructor
 public class InlineButtonServiceImpl implements InlineButtonService {
     ChequeServiceImpl chequeService;
-    DishServiceImpl dishService;
 
     @Override
-    public InlineKeyboardMarkup clientCheque(Order order, String tag) {
-        Dish dish = dishService.getDishByTag(tag);
-        List<DishOptionally> dishOptionallies = dish.getDishOptionallyList();
-        Cheque cheque = chequeService.getChequeByOrderAndDish(order, dish);
+    public InlineKeyboardMarkup clientCheque(Order order, String tag, Cheque cheque) {
         String count;
         if (cheque == null) {
             count = "0";
@@ -38,7 +32,6 @@ public class InlineButtonServiceImpl implements InlineButtonService {
 
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         rows.add(row1);
-
         return new InlineKeyboardMarkup(rows);
     }
 
@@ -51,7 +44,7 @@ public class InlineButtonServiceImpl implements InlineButtonService {
     private List<InlineKeyboardButton> getSubCountAddButton (String count, String tag) {
         InlineKeyboardButton subDish = getInlineButton(tag, "-");
         InlineKeyboardButton countDish = new InlineKeyboardButton(count);
-        countDish.setCallbackData(tag + "Count");
+        countDish.setCallbackData(tag + "=");
         InlineKeyboardButton addDish = getInlineButton(tag, "+");
         return List.of(subDish, countDish, addDish);
     }

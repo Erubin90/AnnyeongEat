@@ -56,19 +56,20 @@ public class OrderButtonNames {
 
     public List<String> getBackAndBasketAndNextButton(Order order) {
         List<Cheque> cheques = order.getChequeList();
-        String basket = "\uD83D\uDED2 %s";
+        String basket = "\uD83D\uDED2 %s₽";
         if (cheques == null) {
             basket = String.format(basket, 0);
         }
         else {
-            Double sum = cheques
+            Integer sum = cheques
                     .stream()
                     .map(x -> x.getDishId().getPrice() * x.getCountDishes() +
                             x.getDishOpt1() * x.getCountDishOpt1() +
                             x.getDishOpt1() * x.getCountDishOpt1() +
                             x.getDishOpt1() * x.getCountDishOpt1())
-                    .reduce(Double::sum)
-                    .orElse(0.0);
+                    .map(Double::intValue)
+                    .reduce(Integer::sum)
+                    .orElse(0);
             basket = String.format(basket, sum);
         }
         return List.of(back, basket, next);

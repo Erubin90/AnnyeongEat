@@ -8,7 +8,6 @@ import javax.persistence.*;
 @Table(name = "dish_optionally")
 @Setter
 @Getter
-@ToString
 @NoArgsConstructor
 public class DishOptionally {
     @Id

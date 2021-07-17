@@ -34,9 +34,6 @@ public class MessageHandler {
             }
             botApiMethod = clientActions(update, client);
         }
-        else if (update.hasCallbackQuery()) {
-
-        }
         return botApiMethod;
     }
 

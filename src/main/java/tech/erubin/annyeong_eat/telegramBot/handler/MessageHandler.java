@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.module;
+package tech.erubin.annyeong_eat.telegramBot.handler;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ import tech.erubin.annyeong_eat.telegramBot.service.entityServises.EmployeeServi
 
 @Component
 @AllArgsConstructor
-public class TelegramFacade {
+public class MessageHandler {
     private EmployeeServiceImpl employeeService;
     private ClientServiceImpl clientService;
     private RegistrationModule registrationModule;
@@ -33,6 +33,9 @@ public class TelegramFacade {
                 client = clientService.createClient(userId);
             }
             botApiMethod = clientActions(update, client);
+        }
+        else if (update.hasCallbackQuery()) {
+
         }
         return botApiMethod;
     }

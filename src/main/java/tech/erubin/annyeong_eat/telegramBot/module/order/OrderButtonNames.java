@@ -82,6 +82,14 @@ public class OrderButtonNames {
                 .collect(Collectors.toList());
     }
 
+    public List<String> getTagDishesInCafe(Order order) {
+        return order.getCafeId().getDishesMenu()
+                .stream()
+                .map(Dish::getTag)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
     public List<List<String>> getMenuRows(Order order) {
         List<List<String>> orderMenuRows = new ArrayList<>();
         List<String> typeDishes = getTypeDishesInCafe(order);

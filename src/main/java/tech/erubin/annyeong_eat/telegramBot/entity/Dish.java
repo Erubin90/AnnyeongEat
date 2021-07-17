@@ -38,6 +38,9 @@ public class Dish {
     @Column(name = "grams")
     private int grams;
 
+    @Column(name = "link_photo")
+    private String linkPhoto;
+
     @OneToMany(mappedBy = "dishId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Cheque> chequeList;

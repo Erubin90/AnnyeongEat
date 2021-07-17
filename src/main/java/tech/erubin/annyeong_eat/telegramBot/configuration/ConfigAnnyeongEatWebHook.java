@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
-import tech.erubin.annyeong_eat.telegramBot.module.TelegramFacade;
+import tech.erubin.annyeong_eat.telegramBot.handler.MessageHandler;
 
 @Getter
 @Setter
@@ -28,15 +28,15 @@ public class ConfigAnnyeongEatWebHook {
     @Value("${telegrambot.botPath}")
     private String botPath;
 
-    private TelegramFacade telegramFacade;
+    private MessageHandler messageHandler;
 
-    public ConfigAnnyeongEatWebHook(TelegramFacade telegramFacade) {
-        this.telegramFacade = telegramFacade;
+    public ConfigAnnyeongEatWebHook(MessageHandler messageHandler) {
+        this.messageHandler = messageHandler;
     }
 
     @Bean
     public AnnyeongEatWebHook getAnnyeongEatWebHook() {
-        return new AnnyeongEatWebHook(botUsername, botToken, botPath, telegramFacade);
+        return new AnnyeongEatWebHook(botUsername, botToken, botPath, messageHandler);
     }
 
     @Bean

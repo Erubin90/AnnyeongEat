@@ -13,7 +13,7 @@ public interface DishService {
 
     void deleteDish(Dish dish);
 
-    List<Dish> getDishByType(String type);
+    List<Dish> getDishListByType(String type);
 
     Dish getDishByTag(String tag);
 

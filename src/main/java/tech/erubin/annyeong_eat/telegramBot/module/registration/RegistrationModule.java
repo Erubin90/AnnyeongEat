@@ -2,6 +2,7 @@ package tech.erubin.annyeong_eat.telegramBot.module.registration;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
@@ -20,7 +21,7 @@ public class RegistrationModule {
     private RegistrationTextMessage textMessage;
 
 
-    public SendMessage startClient(Update update, Client client){
+    public BotApiMethod<?> startClient(Update update, Client client){
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(update.getMessage().getChatId().toString());
         String sourceText = update.getMessage().getText();

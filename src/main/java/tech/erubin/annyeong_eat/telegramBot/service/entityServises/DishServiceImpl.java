@@ -34,7 +34,7 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public List<Dish> getDishByType(String type) {
+    public List<Dish> getDishListByType(String type) {
         return repository.findDishByType(type);
     }
 

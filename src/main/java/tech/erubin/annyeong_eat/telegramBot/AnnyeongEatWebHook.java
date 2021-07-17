@@ -7,7 +7,9 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import tech.erubin.annyeong_eat.telegramBot.handler.CallbackQueryHandler;
 import tech.erubin.annyeong_eat.telegramBot.handler.MessageHandler;
 
 @NoArgsConstructor
@@ -18,19 +20,30 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
     private String botPath;
 
     private MessageHandler messageHandler;
+    private CallbackQueryHandler callbackQueryHandler;
 
     @Override
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
-        BotApiMethod<?> botApiMethod = messageHandler.handleUpdate(update);
+        BotApiMethod<?> botApiMethod;
+        if (update.hasMessage()) {
+            botApiMethod = messageHandler.handleUpdate(update);
+        }
+        else if (update.hasCallbackQuery()) {
+            botApiMethod = callbackQueryHandler.handleUpdate(update);
+        }
+        else {
+            botApiMethod = null;
+        }
         return botApiMethod;
     }
 
-    public boolean sendPhoto(String chatId, String url, String text){
+    public boolean sendPhoto(String chatId, String url, String text, InlineKeyboardMarkup inlineKeyboardMarkup){
         InputFile inputFile = new InputFile(url);
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         sendPhoto.setPhoto(inputFile);
         sendPhoto.setCaption(text);
+        sendPhoto.setReplyMarkup(inlineKeyboardMarkup);
         try {
             execute(sendPhoto);
             return true;

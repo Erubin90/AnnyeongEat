@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.entity.Cafe;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
@@ -95,8 +96,8 @@ public class OrderModule {
                     Dish dish = dishService.getDishByTag(sourceText);
                     text = textMessage.getTextDishesByTag(dish);
                     String url = dish.getLinkPhoto();
-
-                    if (webHook.sendPhoto(chatId, url, text)){
+                    InlineKeyboardMarkup inlineKeyboard = inlineButtonService.clientCheque(order, sourceText);
+                    if (webHook.sendPhoto(chatId, url, text, inlineKeyboard)){
                         text = "";
                     }
                     else {

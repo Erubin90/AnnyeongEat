@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
+import tech.erubin.annyeong_eat.telegramBot.handler.CallbackQueryHandler;
 import tech.erubin.annyeong_eat.telegramBot.handler.MessageHandler;
 
 @Getter
@@ -29,14 +30,16 @@ public class ConfigAnnyeongEatWebHook {
     private String botPath;
 
     private MessageHandler messageHandler;
+    private CallbackQueryHandler callbackQueryHandler;
 
-    public ConfigAnnyeongEatWebHook(MessageHandler messageHandler) {
+    public ConfigAnnyeongEatWebHook(MessageHandler messageHandler, CallbackQueryHandler callbackQueryHandler) {
         this.messageHandler = messageHandler;
+        this.callbackQueryHandler = callbackQueryHandler;
     }
 
     @Bean
     public AnnyeongEatWebHook getAnnyeongEatWebHook() {
-        return new AnnyeongEatWebHook(botUsername, botToken, botPath, messageHandler);
+        return new AnnyeongEatWebHook(botUsername, botToken, botPath, messageHandler, callbackQueryHandler);
     }
 
     @Bean

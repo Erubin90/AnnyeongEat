@@ -76,7 +76,7 @@ public class OrderModule {
                     sendMessage.setReplyMarkup(replyButtonService.clientMainMenu());
                 }
                 else {
-                    text = "Воспользуйтесь кнопками выборе кафе";
+                    text = textMessage.getNotButton();
                 }
                 return returnSendMessage(sendMessage, client, order, text);
             case "меню":
@@ -118,7 +118,7 @@ public class OrderModule {
                     text = textMessage.getFullOrder(order);
                 }
                 else {
-                    text = "Нажата не та кнопка в выборе кафе";
+                    text = textMessage.getNotButton();
                 }
                 return returnSendMessage(sendMessage, client, order, text);
             case "доставка улица":
@@ -172,7 +172,7 @@ public class OrderModule {
                     sendMessage.setReplyMarkup(replyButtonService.clientOrderPhoneNumber(client));
                 }
                 else {
-                    text = "Используйте кнопки в меню выбора способа оплаты";
+                    text = textMessage.getNotButton();
                     sendMessage.setReplyMarkup(replyButtonService.clientOrderPayment());
                 }
                 return returnSendMessage(sendMessage, client, order, text);
@@ -191,7 +191,7 @@ public class OrderModule {
                     sendMessage.setReplyMarkup(replyButtonService.clientOrderPayment());
                 }
                 else {
-                    text = "Используйте кнопку чтоб подтвердить заказ";
+                    text = textMessage.getNotButton();
                 }
                 return returnSendMessage(sendMessage, client, order, text);
         }
@@ -202,12 +202,6 @@ public class OrderModule {
         sendMessage.setText(text);
         clientService.saveClient(client);
         orderService.saveOrder(order);
-        return sendMessage;
-    }
-
-    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, String text) {
-        sendMessage.setText(text);
-        clientService.saveClient(client);
         return sendMessage;
     }
 

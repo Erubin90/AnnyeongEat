@@ -12,9 +12,10 @@ import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.ReplyBut
 @Component
 @AllArgsConstructor
 public class MainMenuModule {
-    private ClientServiceImpl clientService;
-    private MainMenuButtonNames buttonNames;
-    private ReplyButtonServiceImpl replyButton;
+    private final ClientServiceImpl clientService;
+    private final MainMenuButtonNames buttonNames;
+    private final ReplyButtonServiceImpl replyButton;
+    private final MainMenuTextMessage textMessage;
 
     public BotApiMethod<?> startClient(Update update, Client client) {
         SendMessage sendMessage = new SendMessage();
@@ -25,7 +26,6 @@ public class MainMenuModule {
 
         switch (sate) {
             case "главное меню":
-                sendMessage.enableMarkdown(true);
                 sendMessage.setReplyMarkup(replyButton.clientMainMenu());
                 if (sourceText.equals(buttonNames.getClientOrder())) {
                     text = "Выберите кафе";
@@ -39,42 +39,39 @@ public class MainMenuModule {
                     sendMessage.setReplyMarkup(replyButton.clientCheckOrder());
                 }
                 else if (sourceText.equals(buttonNames.getHelp())) {
-                    text = "помогаем";
+                    text = textMessage.getHelp();
                     client.setState("помощь");
                     sendMessage.setReplyMarkup(replyButton.clientHelp());
                 }
                 else if (sourceText.equals(buttonNames.getClientInfo())) {
-                    text = "просмотр профиля";
+                    text = textMessage.getClientProfile(client);
                     client.setState("посмотреть профиль");
                     sendMessage.setReplyMarkup(replyButton.clientProfileInfo(client));
                 }
                 else {
-                    text = "Воспользуйтесь кнопками";
+                    text = textMessage.getNotButton();
                 }
                 return returnSendMessage(sendMessage, client, text);
             case "статус заказа":
-                sendMessage.enableMarkdown(true);
                 sendMessage.setReplyMarkup(replyButton.clientCheckOrder());
                 if (sourceText.equals(buttonNames.getBack())){
-                    text = "главное меню";
+                    text = textMessage.getReturnMainMenu();
                     client.setState("главное меню");
                     sendMessage.setReplyMarkup(replyButton.clientMainMenu());
                 }
                 return returnSendMessage(sendMessage, client, text);
             case "помощь":
-                sendMessage.enableMarkdown(true);
                 sendMessage.setReplyMarkup(replyButton.clientHelp());
                 if (sourceText.equals(buttonNames.getBack())) {
-                    text = "главное меню";
+                    text = textMessage.getReturnMainMenu();
                     client.setState("главное меню");
                     sendMessage.setReplyMarkup(replyButton.clientMainMenu());
                 }
                 return returnSendMessage(sendMessage, client, text);
             case "посмотреть профиль":
-                sendMessage.enableMarkdown(true);
                 sendMessage.setReplyMarkup(replyButton.clientProfileInfo(client));
                 if (sourceText.equals(buttonNames.getBack())) {
-                    text = "главное меню";
+                    text = textMessage.getReturnMainMenu();
                     client.setStatus("главное меню");
                     client.setState("главное меню");
                     sendMessage.setReplyMarkup(replyButton.clientMainMenu());

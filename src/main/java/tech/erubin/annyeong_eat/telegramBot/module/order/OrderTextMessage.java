@@ -31,6 +31,9 @@ public class OrderTextMessage {
     @Value("${order.message.client.emptyReceipt}")
     private String emptyReceipt;
 
+    @Value("${message.notButton}")
+    private String notButton;
+
     public OrderTextMessage(DishOptionallyServiceImpl dishOptionallyService, DishServiceImpl dishService,
                             OrderServiceImpl orderService) {
         this.dishOptionallyService = dishOptionallyService;
@@ -74,7 +77,7 @@ public class OrderTextMessage {
     public String getFullOrder(Order order) {
         StringBuilder fullOrder = new StringBuilder(order.getOrderName() + ":\n\n");
         List<Cheque> chequeList = order.getChequeList();
-        if (chequeList != null) {
+        if (chequeList != null && chequeList.size() > 0) {
             for (Cheque cheque : chequeList) {
                 Dish dish = cheque.getDishId();
                 fullOrder.append(dish.getName())

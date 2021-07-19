@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
-import tech.erubin.annyeong_eat.telegramBot.entity.Employee;
 import tech.erubin.annyeong_eat.telegramBot.module.CheckMessage;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.EmployeeServiceImpl;
@@ -104,6 +103,12 @@ public class RegistrationModule {
 //
 //        return  returnSendMessage(sendMessage, client, employee, text);
 //    }
+    //    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, Employee employee, String text) {
+//        sendMessage.setText(text);
+//        employeeService.saveEmployee(employee);
+//        clientService.saveClient(client);
+//        return sendMessage;
+//    }
 
     private SendMessage returnSendMessage (SendMessage sendMessage, Client client, String text) {
         sendMessage.setText(text);
@@ -113,13 +118,6 @@ public class RegistrationModule {
 
     private SendMessage returnSendMessage (SendMessage sendMessage, String text) {
         sendMessage.setText(text);
-        return sendMessage;
-    }
-
-    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, Employee employee, String text) {
-        sendMessage.setText(text);
-        employeeService.saveEmployee(employee);
-        clientService.saveClient(client);
         return sendMessage;
     }
 

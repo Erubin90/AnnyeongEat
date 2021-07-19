@@ -68,7 +68,7 @@ public class Order {
     private Timestamp timeEndDelivery;
 
     @OneToMany(mappedBy = "orderId",
-            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+            cascade = CascadeType.ALL)
     private List<Cheque> chequeList;
 
     public Order(Client clientId, String orderName) {

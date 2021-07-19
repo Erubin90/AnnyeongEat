@@ -102,7 +102,11 @@ public class OrderModule {
                 else if (sourceText.equals(buttonName.getBack())) {
                     text = textMessage.getBackToChoosingCafe();
                     client.setState("выбор кафе");
+                    client.setOrderList(null);
+                    clientService.saveClient(client);
+                    orderService.deleteOrder(order);
                     sendMessage.setReplyMarkup(replyButtonService.clientOrderCafe(client));
+                    return returnSendMessage(sendMessage, text);
                 }
                 else if (sourceText.equals(buttonName.getNext())) {
                     if (order.getChequeList().size() == 0) {

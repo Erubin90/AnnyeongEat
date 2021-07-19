@@ -37,7 +37,7 @@ public class OrderTextMessage {
     @Value("${order.message.client.hello}")
     private String hello;
 
-    @Value("${order.message.client.goToMainMenu}")
+    @Value("${order.message.client.backToMainMenu}")
     private String backToMainMenu;
 
     @Value("${order.message.client.backToChoosingCafe}")

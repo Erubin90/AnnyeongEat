@@ -96,7 +96,8 @@ class CheckMessageTest {
                 "-72342342342",
                 "-23423423243423422",
                 "-3232323",
-                "➡️"};
+                "➡️",
+                "8988647558"};
         String[] actual = {
                 "ok",
                 "ok",
@@ -106,7 +107,8 @@ class CheckMessageTest {
                 "error NoCorrectChar error FormatPhoneNumber ",
                 "error BigLength 12 error NoCorrectChar error FormatPhoneNumber ",
                 "error LittleLength 11 error NoCorrectChar error FormatPhoneNumber ",
-                "error LittleLength 11 error NoCorrectChar error FormatPhoneNumber "};
+                "error LittleLength 11 error NoCorrectChar error FormatPhoneNumber ",
+                "error LittleLength 11 error FormatPhoneNumber "};
         for (int i = 0; i < actual.length; i++) {
             String expected = checkMessage.checkPhoneNumber(sourceText[i]);
             System.out.println(sourceText[i]);

@@ -17,14 +17,21 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class ReplyButtonServiceImpl implements ReplyButtonService {
-    private CafeServiceImpl cafeService;
-    private RegistrationButtonName registrationButtonName;
-    private MainMenuButtonNames mainMenuButtonNames;
-    private OrderButtonNames orderButtonNames;
+    private final CafeServiceImpl cafeService;
+
+    private final RegistrationButtonName registrationButtonName;
+    private final MainMenuButtonNames mainMenuButtonNames;
+    private final OrderButtonNames orderButtonNames;
 
     public ReplyKeyboardMarkup clientRegistrationCity() {
         List<List<String>> buttonNames = registrationButtonName.getCityList();
         return getReplyKeyboardMarkup(buttonNames, true);
+    }
+
+    @Override
+    public ReplyKeyboardMarkup clientOrEmployeeRegistration() {
+        List<String> buttonNames = registrationButtonName.getClientOrEmployeeRegistration();
+        return getReplyKeyboardMarkup(buttonNames);
     }
 
     @Override
@@ -51,6 +58,27 @@ public class ReplyButtonServiceImpl implements ReplyButtonService {
         List<String> buttonNames = mainMenuButtonNames.getProfileInfoButton();
         return getReplyKeyboardMarkup(buttonNames);
     }
+
+//    @Override
+//    public ReplyKeyboardMarkup employeeMainMenu(Employee employee) {
+//        String employeeRole = employee.getRole();
+//        List<String> buttonNames = List.of(mainMenuButtonNames.getBack());
+//        switch (employeeRole) {
+//            case "администратор":
+//                buttonNames = mainMenuButtonNames.getAdminMainMenu();
+//                break;
+//            case "повар":
+//                buttonNames = mainMenuButtonNames.getCookMainMenu();
+//                break;
+//            case "офицант":
+//                buttonNames = mainMenuButtonNames.getWaiterMainMenu();
+//                break;
+//            case "доставщик":
+//                buttonNames = mainMenuButtonNames.getDeliveryMainMenu();
+//                break;
+//        }
+//        return getReplyKeyboardMarkup(buttonNames);
+//    }
 
     @Override
     public ReplyKeyboardMarkup clientOrderCafe(Client client) {

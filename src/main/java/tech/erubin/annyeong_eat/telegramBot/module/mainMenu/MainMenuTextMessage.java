@@ -20,8 +20,8 @@ public class MainMenuTextMessage {
     @Value("${mainMenu.message.client.returnMainMenu}")
     private String returnMainMenu;
 
-    @Value("${mainMenu.message.client.emptyOrderInfo}")
-    private String emptyOrderInfo;
+    @Value("${mainMenu.message.client.choosingCafe}")
+    private String choosingCafe;
 
     public String getClientProfile(Client client) {
         long countOrder = client.getOrderList().stream()

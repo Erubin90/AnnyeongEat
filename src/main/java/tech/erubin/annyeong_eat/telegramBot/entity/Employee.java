@@ -33,11 +33,15 @@ public class Employee {
     @Column(name = "status")
     private String status;
 
-    @Column(name = "condition")
-    private String condition;
+    @Column(name = "state")
+    private String state;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name = "cafe_id")
+    private Cafe cafeId;
 
     public Employee(String telegramUserId) {
         this.telegramUserId = telegramUserId;
-        this.status = "работает";
+        this.status = "";
     }
 }

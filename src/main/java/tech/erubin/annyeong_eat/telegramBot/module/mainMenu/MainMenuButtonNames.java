@@ -27,6 +27,12 @@ public class MainMenuButtonNames {
     @Value("${button.back}")
     private String back;
 
+//    @Value("${mainMenu.button.admin.orderStatus}")
+//    private String adminOrderStatus;
+//
+//    @Value("${mainMenu.button.admin.employeeStatus}")
+//    private String adminEmployeeStatus;
+
     public List<String> getMainMenuClientButton(){
         return List.of(clientOrder, checkOrder, clientInfo, help);
     }
@@ -42,4 +48,20 @@ public class MainMenuButtonNames {
     public List<String> getProfileInfoButton(){
         return List.of(back);
     }
+
+//    public List<String> getAdminMainMenu() {
+//        return List.of(adminOrderStatus, adminEmployeeStatus, back);
+//    }
+//
+//    public List<String> getCookMainMenu() {
+//        return List.of();
+//    }
+//
+//    public List<String> getWaiterMainMenu() {
+//        return List.of();
+//    }
+//
+//    public List<String> getDeliveryMainMenu() {
+//        return List.of();
+//    }
 }

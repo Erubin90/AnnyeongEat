@@ -7,12 +7,14 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 public interface ReplyButtonService {
     //Registration Module
     ReplyKeyboardMarkup clientRegistrationCity();
+    ReplyKeyboardMarkup clientOrEmployeeRegistration();
 
     //Main Menu Module
     ReplyKeyboardMarkup clientMainMenu();
     ReplyKeyboardMarkup clientCheckOrder();
     ReplyKeyboardMarkup clientHelp();
     ReplyKeyboardMarkup clientProfileInfo(Client client);
+//    ReplyKeyboardMarkup employeeMainMenu(Employee employee);
 
     //Order Module
     ReplyKeyboardMarkup clientOrderCafe(Client client);

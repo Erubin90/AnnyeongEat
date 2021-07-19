@@ -28,7 +28,7 @@ public class MainMenuModule {
             case "главное меню":
                 sendMessage.setReplyMarkup(replyButton.clientMainMenu());
                 if (sourceText.equals(buttonNames.getClientOrder())) {
-                    text = "Выберите кафе";
+                    text = textMessage.getChoosingCafe();
                     client.setStatus("оформление заказа");
                     client.setState("выбор кафе");
                     sendMessage.setReplyMarkup(replyButton.clientOrderCafe(client));

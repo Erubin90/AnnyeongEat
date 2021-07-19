@@ -34,6 +34,47 @@ public class OrderTextMessage {
     @Value("${message.notButton}")
     private String notButton;
 
+    @Value("${order.message.client.hello}")
+    private String hello;
+
+    @Value("${order.message.client.goToMainMenu}")
+    private String backToMainMenu;
+
+    @Value("${order.message.client.backToChoosingCafe}")
+    private String backToChoosingCafe;
+
+    @Value("${order.message.client.backToOrderMenu}")
+    private String backToOrderMenu;
+
+    @Value("${order.message.client.backToAddress}")
+    private String backToAddress;
+
+    @Value("${order.message.client.backToPhoneNumber}")
+    private String backToPhoneNumber;
+
+    @Value("${order.message.client.backToPaymentMethod}")
+    private String backToPaymentMethod;
+
+    @Value("${order.message.client.nextToAddress}")
+    private String nextToAddress;
+
+    @Value("${order.message.client.nextToPhoneNumber}")
+    private String nextToPhoneNumber;
+
+    @Value("${order.message.client.nextToPaymentMethod}")
+    private String nextToPaymentMethod;
+
+    @Value("${mainMenu.message.client.returnMainMenu}")
+    private String returnMainMenu;
+
+    @Value("${order.message.client.server.ok}")
+    private String serverOk;
+
+    @Value("${order.message.client.server.error}")
+    private String serverError;
+
+
+
     public OrderTextMessage(DishOptionallyServiceImpl dishOptionallyService, DishServiceImpl dishService,
                             OrderServiceImpl orderService) {
         this.dishOptionallyService = dishOptionallyService;
@@ -56,9 +97,7 @@ public class OrderTextMessage {
         StringBuilder text = new StringBuilder(type + ":\n");
         for (int i = 0; i < dishName.size(); i++) {
             text.append(dishName.get(i));
-            for (int j = 0; j < (32 - dishName.get(i).length() - dishPrice.get(i).toString().length() - 1); j++){
-                text.append(" ");
-            }
+            text.append(" ");
             text.append(dishPrice.get(i))
                     .append("₽\n")
                     .append(dishTag.get(i))

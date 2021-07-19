@@ -3,7 +3,6 @@ package tech.erubin.annyeong_eat.telegramBot.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
@@ -35,4 +34,8 @@ public class Cafe {
     @OneToMany(mappedBy = "cafeId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Order> orderList;
+
+    @OneToMany(mappedBy = "cafeId",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<Employee> employees;
 }

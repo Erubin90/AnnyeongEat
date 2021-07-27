@@ -23,6 +23,9 @@ public class MainMenuTextMessage {
     @Value("${mainMenu.message.client.choosingCafe}")
     private String choosingCafe;
 
+    @Value("${mainMenu.message.client.error}")
+    private String error;
+
     public String getClientProfile(Client client) {
         long countOrder = client.getOrderList().stream()
                 .filter(x -> x.getOrderStatus().equals("оформлен"))

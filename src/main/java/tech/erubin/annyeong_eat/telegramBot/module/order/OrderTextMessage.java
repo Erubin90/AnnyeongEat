@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
 public class OrderTextMessage {
-    private DishOptionallyServiceImpl dishOptionallyService;
-    private DishServiceImpl dishService;
-    private OrderServiceImpl orderService;
+    private final DishOptionallyServiceImpl dishOptionallyService;
+    private final DishServiceImpl dishService;
+    private final OrderServiceImpl orderService;
 
     @Value("${regular.errorTrigger}")
     private String errorTrigger = "error";
@@ -73,7 +73,8 @@ public class OrderTextMessage {
     @Value("${order.message.client.server.error}")
     private String serverError;
 
-
+    @Value("${order.message.client.error}")
+    private String error;
 
     public OrderTextMessage(DishOptionallyServiceImpl dishOptionallyService, DishServiceImpl dishService,
                             OrderServiceImpl orderService) {

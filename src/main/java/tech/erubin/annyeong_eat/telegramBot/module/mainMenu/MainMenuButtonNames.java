@@ -13,7 +13,7 @@ import java.util.List;
 public class MainMenuButtonNames {
 
     @Value("${mainMenu.button.client.order}")
-    private String clientOrder;
+    private String createOrder;
 
     @Value("${mainMenu.button.client.checkOrder}")
     private String checkOrder;
@@ -34,7 +34,7 @@ public class MainMenuButtonNames {
 //    private String adminEmployeeStatus;
 
     public List<String> getMainMenuClientButton(){
-        return List.of(clientOrder, checkOrder, clientInfo, help);
+        return List.of(createOrder, checkOrder, clientInfo, help);
     }
 
     public List<String> getHelpClientButton(){

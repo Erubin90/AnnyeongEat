@@ -18,7 +18,7 @@ import tech.erubin.annyeong_eat.telegramBot.handler.MessageHandler;
 @Configuration
 @ComponentScan("tech.erubin.annyeong_eat.telegramBot")
 @PropertySource("classpath:application.properties")
-public class ConfigAnnyeongEatWebHook {
+public class AnnyeongEatWebHookConfig {
 
     @Value("${telegrambot.botUsername}")
     private String botUsername;
@@ -32,7 +32,7 @@ public class ConfigAnnyeongEatWebHook {
     private MessageHandler messageHandler;
     private CallbackQueryHandler callbackQueryHandler;
 
-    public ConfigAnnyeongEatWebHook(MessageHandler messageHandler, CallbackQueryHandler callbackQueryHandler) {
+    public AnnyeongEatWebHookConfig(MessageHandler messageHandler, CallbackQueryHandler callbackQueryHandler) {
         this.messageHandler = messageHandler;
         this.callbackQueryHandler = callbackQueryHandler;
     }

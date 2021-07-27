@@ -25,6 +25,9 @@ public class Order {
     @JoinColumn(name = "cafe_id")
     private Cafe cafeId;
 
+    @Column(name = "order_using")
+    private int using;
+
     @Column(name = "order_name")
     private String orderName;
 
@@ -73,6 +76,14 @@ public class Order {
 
     public Order(Client clientId, String orderName) {
         this.clientId = clientId;
+        this.orderName = orderName;
+        this.orderStatus = "оформление";
+        this.paymentStatus = 0;
+    }
+
+    public Order(Client clientId, Cafe cafeId, String orderName) {
+        this.clientId = clientId;
+        this.cafeId = cafeId;
         this.orderName = orderName;
         this.orderStatus = "оформление";
     }

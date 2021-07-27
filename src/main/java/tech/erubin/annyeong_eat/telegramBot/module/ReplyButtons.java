@@ -1,7 +1,7 @@
-package tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices;
+package tech.erubin.annyeong_eat.telegramBot.module;
 
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
@@ -10,13 +10,12 @@ import tech.erubin.annyeong_eat.telegramBot.module.mainMenu.MainMenuButtonNames;
 import tech.erubin.annyeong_eat.telegramBot.module.order.OrderButtonNames;
 import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationButtonName;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.CafeServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.serviceInterface.ReplyButtonService;
 
 import java.util.*;
 
-@Service
+@Component
 @AllArgsConstructor
-public class ReplyButtonServiceImpl implements ReplyButtonService {
+public class ReplyButtons {
     private final CafeServiceImpl cafeService;
 
     private final RegistrationButtonName registrationButtonName;
@@ -28,59 +27,26 @@ public class ReplyButtonServiceImpl implements ReplyButtonService {
         return getReplyKeyboardMarkup(buttonNames, true);
     }
 
-    @Override
-    public ReplyKeyboardMarkup clientOrEmployeeRegistration() {
-        List<String> buttonNames = registrationButtonName.getClientOrEmployeeRegistration();
-        return getReplyKeyboardMarkup(buttonNames);
-    }
-
-    @Override
     public ReplyKeyboardMarkup clientMainMenu() {
         List<String> buttonNames = mainMenuButtonNames.getMainMenuClientButton();
         return getReplyKeyboardMarkup(buttonNames);
     }
 
-    @Override
     public ReplyKeyboardMarkup clientCheckOrder() {
         List<String> buttonNames = mainMenuButtonNames.getCheckOrderButton();
         return getReplyKeyboardMarkup(buttonNames);
     }
 
-    @Override
     public ReplyKeyboardMarkup clientHelp() {
         List<String> buttonNames = mainMenuButtonNames.getHelpClientButton();
         return getReplyKeyboardMarkup(buttonNames);
     }
 
-
-    @Override
     public ReplyKeyboardMarkup clientProfileInfo(Client client) {
         List<String> buttonNames = mainMenuButtonNames.getProfileInfoButton();
         return getReplyKeyboardMarkup(buttonNames);
     }
 
-//    @Override
-//    public ReplyKeyboardMarkup employeeMainMenu(Employee employee) {
-//        String employeeRole = employee.getRole();
-//        List<String> buttonNames = List.of(mainMenuButtonNames.getBack());
-//        switch (employeeRole) {
-//            case "администратор":
-//                buttonNames = mainMenuButtonNames.getAdminMainMenu();
-//                break;
-//            case "повар":
-//                buttonNames = mainMenuButtonNames.getCookMainMenu();
-//                break;
-//            case "офицант":
-//                buttonNames = mainMenuButtonNames.getWaiterMainMenu();
-//                break;
-//            case "доставщик":
-//                buttonNames = mainMenuButtonNames.getDeliveryMainMenu();
-//                break;
-//        }
-//        return getReplyKeyboardMarkup(buttonNames);
-//    }
-
-    @Override
     public ReplyKeyboardMarkup clientOrderCafe(Client client) {
         List<List<String>> buttonName = new ArrayList<>();
         List<String> cafeNames = cafeService.getCafeNameByCity(client.getCity());
@@ -92,13 +58,11 @@ public class ReplyButtonServiceImpl implements ReplyButtonService {
         return getReplyKeyboardMarkup(buttonName, false);
     }
 
-    @Override
     public ReplyKeyboardMarkup clientOrderMenu(Order order) {
         List<List<String>> buttonNames = orderButtonNames.getMenuRows(order);
         return getReplyKeyboardMarkup(buttonNames, false);
     }
 
-    @Override
     public ReplyKeyboardMarkup clientOrderAddress(Client client) {
         Set<String> buttonNames = new HashSet<>();
         List<Order> orderList = client.getOrderList();
@@ -114,7 +78,6 @@ public class ReplyButtonServiceImpl implements ReplyButtonService {
         return new ReplyKeyboardMarkup(keyboardRows, true, false, false);
     }
 
-    @Override
     public ReplyKeyboardMarkup clientOrderPhoneNumber(Client client) {
         String clientPhoneNumber = client.getPhoneNumber();
         Set<String> buttonNames = new HashSet<>();
@@ -132,19 +95,16 @@ public class ReplyButtonServiceImpl implements ReplyButtonService {
         return new ReplyKeyboardMarkup(keyboardRows, true, false, false);
     }
 
-    @Override
     public ReplyKeyboardMarkup clientOrderPayment() {
         List<List<String>> buttonNames = orderButtonNames.getPaymentRows();
         return getReplyKeyboardMarkup(buttonNames, false);
     }
 
-    @Override
     public ReplyKeyboardMarkup clientOrderConfirmation() {
         List<List<String>> buttonNames = orderButtonNames.getConfirmRows();
         return getReplyKeyboardMarkup(buttonNames, false);
     }
 
-    @Override
     public ReplyKeyboardMarkup clientFixOrder() {
         List<List<String>> buttonNames = orderButtonNames.getFixOrderRows();
         return getReplyKeyboardMarkup(buttonNames, false);

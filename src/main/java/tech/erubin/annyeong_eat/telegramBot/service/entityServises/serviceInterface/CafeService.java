@@ -15,6 +15,8 @@ public interface CafeService {
 
     Cafe getCafeByName(String name);
 
+    List<String> getAllCafeNames();
+
     List<String> getCafeNameByCity(String city);
 
     void saveCafe(Cafe cafe);

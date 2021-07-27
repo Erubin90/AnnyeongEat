@@ -7,10 +7,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
+import tech.erubin.annyeong_eat.telegramBot.entity.ClientStates;
 import tech.erubin.annyeong_eat.telegramBot.module.CheckMessage;
+import tech.erubin.annyeong_eat.telegramBot.module.ClientStateEnum;
+import tech.erubin.annyeong_eat.telegramBot.module.ReplyButtons;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.EmployeeServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.ReplyButtonServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientStatesServiceImpl;
 
 @Component
 @AllArgsConstructor
@@ -19,53 +21,51 @@ public class RegistrationModule {
     private final RegistrationTextMessage textMessage;
 
     private final CheckMessage checkMessage;
-    private final ReplyButtonServiceImpl replyButton;
+    private final ReplyButtons replyButtons;
 
     private final ClientServiceImpl clientService;
-    private final EmployeeServiceImpl employeeService;
+    private final ClientStatesServiceImpl stateService;
 
-    public BotApiMethod<?> startClient(Update update, Client client) {
+    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum, ClientStates clientStates) {
+        String chatId = update.getMessage().getChatId().toString();
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(update.getMessage().getChatId().toString());
+        sendMessage.setChatId(chatId);
         String sourceText = update.getMessage().getText();
-        String state = client.getState();
-        String text = "Ошибка";
-        switch (state) {
-            case "не зарегестрирован":
+        String text = textMessage.getError();
+        switch (clientStateEnum) {
+            case REGISTRATION_START:
                 text = textMessage.getStartClientRegistration();
-                client.setState("регистрация города");
-                sendMessage.enableMarkdown(true);
-                sendMessage.setReplyMarkup(replyButton.clientRegistrationCity());
-                return returnSendMessage(sendMessage, client, text);
-            case "регистрация города":
+                clientStates.setState(ClientStateEnum.REGISTRATION_CITY.getValue());
+                sendMessage.setReplyMarkup(replyButtons.clientRegistrationCity());
+                return returnSendMessage(sendMessage, client, clientStates, text);
+            case REGISTRATION_CITY:
                 text = textMessage.getErrorNameCity();
                 if (buttonName.getAllCitySetList().contains(sourceText)) {
                     text = textMessage.getCityNoError();
                     client.setCity(sourceText);
-                    client.setState("регистрация имени");
+                    clientStates.setState(ClientStateEnum.REGISTRATION_NAME.getValue());
                 }
                 else {
-                    sendMessage.enableMarkdown(true);
-                    sendMessage.setReplyMarkup(replyButton.clientRegistrationCity());
+                    sendMessage.setReplyMarkup(replyButtons.clientRegistrationCity());
                 }
-                return returnSendMessage(sendMessage, client, text);
-            case "регистрация имени":
+                return returnSendMessage(sendMessage, client, clientStates, text);
+            case REGISTRATION_NAME:
                 sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
                 text = checkMessage.checkName(sourceText);
                 if (!text.contains(textMessage.getErrorTrigger())) {
                     text = textMessage.getNameNoError();
                     client.setName(sourceText);
-                    client.setState("регистрация фамилии");
+                    clientStates.setState(ClientStateEnum.REGISTRATION_SURNAME.getValue());
                 }
-                return returnSendMessage(sendMessage, client, text);
-            case "регистрация фамилии":
+                return returnSendMessage(sendMessage, client, clientStates, text);
+            case REGISTRATION_SURNAME:
                 text = checkMessage.checkSurname(sourceText);
                 if (!text.contains(textMessage.getErrorTrigger())) {
                     client.setSurname(sourceText);
-                    client.setState("регистрация номера");
+                    clientStates.setState(ClientStateEnum.REGISTRATION_PHONE_NUMBERS.getValue());
                 }
-                return returnSendMessage(sendMessage, client, text);
-            case "регистрация номера":
+                return returnSendMessage(sendMessage, client, clientStates, text);
+            case REGISTRATION_PHONE_NUMBERS:
                 text = checkMessage.checkPhoneNumber(sourceText);
                 if (!text.contains(textMessage.getErrorTrigger())) {
                     if (sourceText.length() == 12) {
@@ -74,44 +74,18 @@ public class RegistrationModule {
                     text = textMessage.getPhoneNumberNoError() + "\n" +
                             textMessage.getEndClientRegistration();
                     client.setPhoneNumber(sourceText);
-                    client.setState("главное меню");
-                    client.setStatus("главное меню");
+                    clientStates.setState(ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.enableMarkdown(true);
-                    sendMessage.setReplyMarkup(replyButton.clientMainMenu());
+                    sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 }
-                return returnSendMessage(sendMessage, client, text);
+                return returnSendMessage(sendMessage, client, clientStates, text);
         }
         return returnSendMessage(sendMessage, text);
     }
 
-//    public BotApiMethod<?> startClientOrEmployee(Update update, Client client, Employee employee) {
-//        String chatId = update.getMessage().getChatId().toString();
-//        String sourceText = update.getMessage().getText();
-//        String text = "Войти как работник или клиент";
-//        SendMessage sendMessage = new SendMessage();
-//        sendMessage.setChatId(chatId);
-//        sendMessage.setReplyMarkup(replyButton.clientOrEmployeeRegistration());
-//        if (sourceText.equals(buttonName.getOrClient())) {
-//
-//        }
-//        else if (sourceText.equals(buttonName.getOrEmployee())) {
-//            text = "Добро пожаловать " + employee.getName() + "!";
-//            employee.setStatus("главное меню");
-//            employee.setState("главное меню");
-//            sendMessage.setReplyMarkup(replyButton.employeeMainMenu(employee));
-//        }
-//
-//        return  returnSendMessage(sendMessage, client, employee, text);
-//    }
-    //    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, Employee employee, String text) {
-//        sendMessage.setText(text);
-//        employeeService.saveEmployee(employee);
-//        clientService.saveClient(client);
-//        return sendMessage;
-//    }
-
-    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, String text) {
+    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, ClientStates clientStates, String text) {
         sendMessage.setText(text);
+        stateService.saveStates(clientStates);
         clientService.saveClient(client);
         return sendMessage;
     }

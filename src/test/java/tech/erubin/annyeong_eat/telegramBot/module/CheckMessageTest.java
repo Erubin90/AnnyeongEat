@@ -6,10 +6,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import tech.erubin.annyeong_eat.telegramBot.entity.Client;
-import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
-import tech.erubin.annyeong_eat.telegramBot.entity.DishOptionally;
-import tech.erubin.annyeong_eat.telegramBot.entity.Order;
+import tech.erubin.annyeong_eat.telegramBot.entity.*;
 import tech.erubin.annyeong_eat.telegramBot.module.order.OrderTextMessage;
 import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationTextMessage;
 import tech.erubin.annyeong_eat.telegramBot.repository.DishOptionallyRepository;
@@ -439,12 +436,13 @@ class CheckMessageTest {
             }
         }),
                         new OrderServiceImpl(new OrderRepository() {
+
             @Override
-            public List<Order> findOrderByOrderStatusAndClientId(String orderStatus, Client client) {
+            public List<Order> findOrderByClientIdAndCafeId(Client clientId, Cafe cafeId) {
                 return null;
             }
 
-                            @Override
+            @Override
             public List<Order> findAll() {
                 return null;
             }

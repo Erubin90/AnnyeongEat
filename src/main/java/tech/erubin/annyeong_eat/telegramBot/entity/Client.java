@@ -31,11 +31,9 @@ public class Client {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "state")
-    private String state;
+    @OneToMany(mappedBy = "clientId",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<ClientStates> clientStatesList;
 
     @OneToMany(mappedBy = "clientId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
@@ -43,7 +41,5 @@ public class Client {
 
     public Client(String telegramUserId) {
         this.telegramUserId = telegramUserId;
-        this.status = "регистрация";
-        this.state = "не зарегестрирован";
     }
 }

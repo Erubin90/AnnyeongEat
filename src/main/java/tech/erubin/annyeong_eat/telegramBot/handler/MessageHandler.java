@@ -6,84 +6,78 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
+import tech.erubin.annyeong_eat.telegramBot.entity.ClientStates;
+import tech.erubin.annyeong_eat.telegramBot.module.ClientStateEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.mainMenu.MainMenuModule;
 import tech.erubin.annyeong_eat.telegramBot.module.order.OrderModule;
 import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationModule;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServises.CafeServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.EmployeeServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientStatesServiceImpl;
+
+import java.util.List;
 
 @Component
 @AllArgsConstructor
 public class MessageHandler {
-    private final EmployeeServiceImpl employeeService;
     private final ClientServiceImpl clientService;
     private final RegistrationModule registrationModule;
     private final MainMenuModule mainMenuModule;
     private final OrderModule orderModule;
+    private final ClientStatesServiceImpl stateService;
+    private final CafeServiceImpl cafeService;
 
     public BotApiMethod<?> handleUpdate(Update update) {
         BotApiMethod<?> botApiMethod = null;
 
         if (update.getMessage() != null && update.getMessage().hasText()) {
             String userId = update.getMessage().getFrom().getId().toString();
-//            Employee employee = employeeService.getEmployeeByTelegramUserId(userId);
             Client client = clientService.getClientByTelegramUserId(userId);
-//            if (employee != null) {
-//                return employeeAction(update, client, employee);
-//            }
-//            else {
-                if (client == null) {
-                    client = clientService.createClient(userId);
-                }
-//            }
+            if (client == null) {
+                client = clientService.createClient(userId);
+            }
             botApiMethod = clientActions(update, client);
         }
         return botApiMethod;
     }
 
     private BotApiMethod<?> clientActions(Update update, Client client) {
-        String clientStatus = client.getStatus();
-        switch (clientStatus){
-            case "регистрация":
-                return registrationModule.startClient(update, client);
-            case "главное меню":
-                return mainMenuModule.startClient(update, client);
-            case "оформление заказа":
-                return orderModule.startClient(update, client);
-            default:
-                return new SendMessage(update.getMessage().getChatId().toString(), "Ошибка clientActions()");
+        ClientStates clientStates = stateService.getState(client);
+        ClientStateEnum clientStateEnum = getClientState(clientStates);
+
+        if (clientStateEnum == ClientStateEnum.REGISTRATION_START ||
+                clientStateEnum == ClientStateEnum.REGISTRATION_CITY ||
+                clientStateEnum == ClientStateEnum.REGISTRATION_NAME ||
+                clientStateEnum == ClientStateEnum.REGISTRATION_SURNAME ||
+                clientStateEnum == ClientStateEnum.REGISTRATION_PHONE_NUMBERS) {
+            return registrationModule.startClient(update, client, clientStateEnum, clientStates);
+        }
+        else if (clientStateEnum == ClientStateEnum.MAIN_MENU ||
+                clientStateEnum == ClientStateEnum.ORDER_CHECK ||
+                clientStateEnum == ClientStateEnum.HELP ||
+                clientStateEnum == ClientStateEnum.PROFILE) {
+            return mainMenuModule.startClient(update, client, clientStateEnum, clientStates);
+        }
+        else if (clientStateEnum == ClientStateEnum.ORDER_CAFE ||
+                clientStateEnum == ClientStateEnum.ORDER_CAFE_MENU ||
+                clientStateEnum == ClientStateEnum.DELIVERY_ADDRESS ||
+                clientStateEnum == ClientStateEnum.DELIVERY_PHONE_NUMBER ||
+                clientStateEnum == ClientStateEnum.DELIVERY_PAYMENT_METHOD ||
+                clientStateEnum == ClientStateEnum.DELIVERY_CONFIRMATION) {
+            return orderModule.startClient(update, client, clientStateEnum, clientStates);
+        }
+        else {
+            return new SendMessage(update.getMessage().getChatId().toString(), "Что-то пошло не так");
         }
     }
 
-//    private BotApiMethod<?> employeeAction(Update update, Client client, Employee employee) {
-//        String employeeRole = employee.getRole();
-//        switch (employeeRole) {
-//            case "администратор":
-//                return administratorStatus(update, client, employee);
-//            case "повар":
-//                break;
-//            case "доставщик":
-//                break;
-//            case "офицант":
-//                break;
-//        }
-//        return new SendMessage(update.getMessage().getChatId().toString(), "Ошибка employeeAction()");
-//    }
-
-//    private BotApiMethod<?> administratorStatus(Update update, Client client, Employee employee) {
-//        String employeeStatus = employee.getStatus();
-//        switch (employeeStatus) {
-//            case "выходной":
-//                return registrationModule.startClientOrEmployee(update, client, employee);
-//            case "главное меню":
-//                break;
-//            case "1":
-//                break;
-//            case "2":
-//                break;
-//            case "3":
-//                break;
-//        }
-//        return new SendMessage(update.getMessage().getChatId().toString(), "Ошибка administratorStatus()");
-//    }
+    private ClientStateEnum getClientState(ClientStates clientStates) {
+        List<String> cafeNameList = cafeService.getAllCafeNames();
+        if (cafeNameList.contains(clientStates.getState())) {
+            return ClientStateEnum.ORDER_CAFE_MENU;
+        }
+        else {
+            return ClientStateEnum.GET.clientState(clientStates.getState());
+        }
+    }
 }

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CafeServiceImpl implements CafeService {
-    private CafeRepository repository;
+    private final CafeRepository repository;
 
     @Override
     public List<Cafe> getAllCafe() {
@@ -34,6 +34,13 @@ public class CafeServiceImpl implements CafeService {
     @Override
     public Cafe getCafeByName(String name) {
         return repository.findCafeByName(name);
+    }
+
+    @Override
+    public List<String> getAllCafeNames() {
+        return repository.findAll().stream()
+                .map(Cafe::getName)
+                .collect(Collectors.toList());
     }
 
     @Override

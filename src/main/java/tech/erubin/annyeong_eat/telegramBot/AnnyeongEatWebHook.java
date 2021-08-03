@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -56,16 +55,12 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
                                  InlineKeyboardMarkup inlineMarkup, ReplyKeyboardMarkup replyMarkup) {
         EditMessageReplyMarkup editMessage =
                 new EditMessageReplyMarkup(chatId, messageId, null , inlineMarkup);
-        SendMessage sendMessage = new SendMessage(chatId, text);
-        sendMessage.setReplyMarkup(replyMarkup);
         try {
             execute(editMessage);
-            execute(sendMessage);
             return true;
         } catch (TelegramApiException e) {
             return false;
         }
-
     }
 
     @Override

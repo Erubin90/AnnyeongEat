@@ -1,24 +1,22 @@
-package tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices;
+package tech.erubin.annyeong_eat.telegramBot.module;
 
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import tech.erubin.annyeong_eat.telegramBot.entity.Cheque;
 import tech.erubin.annyeong_eat.telegramBot.entity.DishOptionally;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ChequeServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.telegramBotServices.serviceInterface.InlineButtonService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Component
 @AllArgsConstructor
-public class InlineButtonServiceImpl implements InlineButtonService {
+public class InlineButtons {
     ChequeServiceImpl chequeService;
 
-    @Override
     public InlineKeyboardMarkup clientCheque(Order order, String tag, Cheque cheque) {
         String count;
         if (cheque == null) {

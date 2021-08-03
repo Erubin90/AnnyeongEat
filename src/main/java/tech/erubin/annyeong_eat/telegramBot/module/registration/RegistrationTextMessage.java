@@ -57,6 +57,9 @@ public class RegistrationTextMessage {
     @Value("${registration.message.city.noError}")
     private String cityNoError = "ok";
 
+    @Value("${registration.message.client.error}")
+    private String error;
+
     //Introduction message
     @Value("${registration.message.client.start}")
     private String startClientRegistration;

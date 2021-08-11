@@ -1,16 +1,18 @@
 package tech.erubin.annyeong_eat.telegramBot.entity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
+import java.util.List;
 
 @Entity
-@Table(name = "cheque")
+@Table(name = "cheque_dishes")
 @Setter
 @Getter
 @NoArgsConstructor
-public class Cheque {
+public class ChequeDish {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -27,30 +29,13 @@ public class Cheque {
     @Column(name = "count_dishes")
     private int countDishes;
 
-    @Column(name = "dish_opt1")
-    private int dishOpt1;
+    @OneToMany(mappedBy = "chequeDishId",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<ChequeDishOptionally> chequeDishOptionallyList;
 
-    @Column(name = "count_dish_opt1")
-    private int countDishOpt1;
-
-    @Column(name = "dish_opt2")
-    private int dishOpt2;
-
-    @Column(name = "count_dish_opt2")
-    private int countDishOpt2;
-
-    @Column(name = "dish_opt3")
-    private int dishOpt3;
-
-    @Column(name = "count_dish_opt3")
-    private int countDishOpt3;
-
-    public Cheque(Order order, Dish dish) {
+    public ChequeDish(Order order, Dish dish) {
         orderId = order;
         dishId = dish;
         countDishes = 0;
-        countDishOpt1 = 0;
-        countDishOpt2 = 0;
-        countDishOpt3 = 0;
     }
 }

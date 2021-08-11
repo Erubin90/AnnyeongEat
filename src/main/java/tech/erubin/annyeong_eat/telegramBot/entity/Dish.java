@@ -42,7 +42,7 @@ public class Dish {
 
     @OneToMany(mappedBy = "dishId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    private List<Cheque> chequeList;
+    private List<ChequeDish> chequeDishList;
 
     @OneToMany(mappedBy = "dishesId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})

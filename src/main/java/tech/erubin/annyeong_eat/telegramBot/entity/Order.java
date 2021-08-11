@@ -72,7 +72,7 @@ public class Order {
 
     @OneToMany(mappedBy = "orderId",
             cascade = CascadeType.ALL)
-    private List<Cheque> chequeList;
+    private List<ChequeDish> chequeDishList;
 
     public Order(Client clientId, String orderName) {
         this.clientId = clientId;

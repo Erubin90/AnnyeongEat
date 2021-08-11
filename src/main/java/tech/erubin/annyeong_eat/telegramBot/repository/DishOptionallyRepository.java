@@ -6,5 +6,4 @@ import tech.erubin.annyeong_eat.telegramBot.entity.DishOptionally;
 
 @Repository
 public interface DishOptionallyRepository extends JpaRepository<DishOptionally, Integer> {
-
 }

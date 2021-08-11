@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import tech.erubin.annyeong_eat.telegramBot.entity.Cheque;
+import tech.erubin.annyeong_eat.telegramBot.entity.ChequeDish;
 import tech.erubin.annyeong_eat.telegramBot.entity.DishOptionally;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ChequeServiceImpl;
@@ -17,13 +17,13 @@ import java.util.List;
 public class InlineButtons {
     ChequeServiceImpl chequeService;
 
-    public InlineKeyboardMarkup clientCheque(Order order, String tag, Cheque cheque) {
+    public InlineKeyboardMarkup clientCheque(Order order, String tag, ChequeDish chequeDish) {
         String count;
-        if (cheque == null) {
+        if (chequeDish == null) {
             count = "0";
         }
         else {
-            count = String.valueOf(cheque.getCountDishes());
+            count = String.valueOf(chequeDish.getCountDishes());
         }
 
         List<InlineKeyboardButton> row1 = getSubCountAddButton(count, tag);

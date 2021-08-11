@@ -25,15 +25,15 @@ public class CallbackQueryHandler {
     private final ClientStatesServiceImpl stateService;
     private final CafeServiceImpl cafeService;
 
-    private final InlineButtons inlineButtonsService;
-    private final ReplyButtons replyButtonsService;
+    private final InlineButtons inlineButtons;
+    private final ReplyButtons replyButtons;
 
     private final AnnyeongEatWebHook webHook;
 
     public CallbackQueryHandler(ClientServiceImpl clientService, OrderServiceImpl orderService,
                                 DishServiceImpl dishService, ChequeServiceImpl chequeService,
                                 ClientStatesServiceImpl stateService, CafeServiceImpl cafeService,
-                                InlineButtons inlineButtonsService, ReplyButtons replyButtonsService,
+                                InlineButtons inlineButtons, ReplyButtons replyButtons,
                                 @Lazy AnnyeongEatWebHook webHook) {
         this.clientService = clientService;
         this.orderService = orderService;
@@ -41,8 +41,8 @@ public class CallbackQueryHandler {
         this.chequeService = chequeService;
         this.stateService = stateService;
         this.cafeService = cafeService;
-        this.inlineButtonsService = inlineButtonsService;
-        this.replyButtonsService = replyButtonsService;
+        this.inlineButtons = inlineButtons;
+        this.replyButtons = replyButtons;
         this.webHook = webHook;
     }
 
@@ -59,28 +59,33 @@ public class CallbackQueryHandler {
                 String tag = buttonDate.substring(0, buttonDate.length() - 1);
                 Order order = orderService.getOrder(client);
                 Dish dish = dishService.getDishByTag(tag);
-                Cheque cheque = chequeService.getChequeByOrderAndDish(order, dish);
+                ChequeDish chequeDish = chequeService.getChequeByOrderAndDish(order, dish);
                 int messageId = callback.getMessage().getMessageId();
-                int count = cheque.getCountDishes();
+                int count = chequeDish.getCountDishes();
                 String text = "Непонятно что происходит";
                 if (buttonDate.matches("/\\w*[+]")) {
                     count++;
                     text = dish.getName() + " добавлен";
                 } else if (buttonDate.matches("/\\w*[-]")) {
-                    if (count > 0) {
-                        count--;
-                        text = dish.getName() + " удален";
+                    if (count >= 0) {
+                        if (count > 0) {
+                            count--;
+                            text = dish.getName() + " удален";
+                        }
+                        else {
+                            text = dish.getName() + " нет в корзине";
+                        }
                     }
                 }
-                cheque.setCountDishes(count);
+                chequeDish.setCountDishes(count);
                 if (count > 0) {
-                    chequeService.saveCheque(cheque);
+                    chequeService.saveCheque(chequeDish);
                 }
                 else {
-                    chequeService.deleteCheque(cheque);
+                    chequeService.deleteCheque(chequeDish);
                 }
-                InlineKeyboardMarkup inlineMarkup = inlineButtonsService.clientCheque(order, tag, cheque);
-                ReplyKeyboardMarkup replyMarkup = replyButtonsService.clientOrderMenu(order);
+                InlineKeyboardMarkup inlineMarkup = inlineButtons.clientCheque(order, tag, chequeDish);
+                ReplyKeyboardMarkup replyMarkup = replyButtons.clientOrderMenu(order);
                 webHook.updateMarkups(chatId, messageId, text, inlineMarkup, replyMarkup);
                 SendMessage sendMessage = new SendMessage(chatId, text);
                 sendMessage.setReplyMarkup(replyMarkup);

@@ -95,8 +95,8 @@ public class OrderModule {
                     Dish dish = dishService.getDishByTag(sourceText);
                     text = textMessage.getTextDishesByTag(dish);
                     String url = dish.getLinkPhoto();
-                    Cheque cheque = chequeService.getChequeByOrderAndDish(order, dish);
-                    InlineKeyboardMarkup inlineKeyboard = inlineButtonsService.clientCheque(order, sourceText, cheque);
+                    ChequeDish chequeDish = chequeService.getChequeByOrderAndDish(order, dish);
+                    InlineKeyboardMarkup inlineKeyboard = inlineButtonsService.clientCheque(order, sourceText, chequeDish);
                     if (webHook.sendPhoto(chatId, url, text, inlineKeyboard)){
                         text = textMessage.getServerOk();
                     }
@@ -111,7 +111,7 @@ public class OrderModule {
                     sendMessage.setReplyMarkup(replyButtonsService.clientOrderCafe(client));
                 }
                 else if (sourceText.equals(buttonName.getNext())) {
-                    if (order.getChequeList().size() == 0) {
+                    if (order.getChequeDishList().size() == 0) {
                         text = textMessage.getEmptyReceipt();
                     }
                     else {

@@ -3,6 +3,7 @@ package tech.erubin.annyeong_eat.telegramBot.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "dish_optionally")
@@ -30,4 +31,8 @@ public class DishOptionally {
 
     @Column(name = "grams")
     private int grams;
+
+    @OneToMany(mappedBy = "dishOptionallyId",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<ChequeDishOptionally> chequeDishOptionallyList;
 }

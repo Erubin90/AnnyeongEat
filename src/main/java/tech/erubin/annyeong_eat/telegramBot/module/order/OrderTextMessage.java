@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-import tech.erubin.annyeong_eat.telegramBot.entity.Cheque;
+import tech.erubin.annyeong_eat.telegramBot.entity.ChequeDish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.service.entityServises.DishOptionallyServiceImpl;
@@ -116,17 +116,17 @@ public class OrderTextMessage {
 
     public String getFullOrder(Order order) {
         StringBuilder fullOrder = new StringBuilder(order.getOrderName() + ":\n\n");
-        List<Cheque> chequeList = order.getChequeList();
-        if (chequeList != null && chequeList.size() > 0) {
-            for (Cheque cheque : chequeList) {
-                Dish dish = cheque.getDishId();
+        List<ChequeDish> chequeDishList = order.getChequeDishList();
+        if (chequeDishList != null && chequeDishList.size() > 0) {
+            for (ChequeDish chequeDish : chequeDishList) {
+                Dish dish = chequeDish.getDishId();
                 fullOrder.append(dish.getName())
                         .append(" ")
-                        .append(cheque.getCountDishes())
+                        .append(chequeDish.getCountDishes())
                         .append(" x ")
                         .append(dish.getPrice())
                         .append(" = ")
-                        .append(cheque.getCountDishes() * dish.getPrice())
+                        .append(chequeDish.getCountDishes() * dish.getPrice())
                         .append("₽\n")
                         .append(dish.getTag())
                         .append("\n");

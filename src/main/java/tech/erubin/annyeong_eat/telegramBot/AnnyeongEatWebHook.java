@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import tech.erubin.annyeong_eat.telegramBot.handler.CallbackQueryHandler;
 import tech.erubin.annyeong_eat.telegramBot.handler.MessageHandler;
@@ -51,10 +50,7 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
         }
     }
 
-    public boolean updateMarkups(String chatId, int messageId, String text,
-                                 InlineKeyboardMarkup inlineMarkup, ReplyKeyboardMarkup replyMarkup) {
-        EditMessageReplyMarkup editMessage =
-                new EditMessageReplyMarkup(chatId, messageId, null , inlineMarkup);
+    public boolean updateMarkups(EditMessageReplyMarkup editMessage) {
         try {
             execute(editMessage);
             return true;

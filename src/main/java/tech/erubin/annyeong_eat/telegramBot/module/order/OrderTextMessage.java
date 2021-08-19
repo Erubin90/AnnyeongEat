@@ -4,9 +4,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-import tech.erubin.annyeong_eat.telegramBot.entity.ChequeDish;
-import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
-import tech.erubin.annyeong_eat.telegramBot.entity.Order;
+import tech.erubin.annyeong_eat.telegramBot.entity.*;
 import tech.erubin.annyeong_eat.telegramBot.service.DishOptionallyServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.DishServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.service.OrderServiceImpl;
@@ -118,7 +116,9 @@ public class OrderTextMessage {
         StringBuilder fullOrder = new StringBuilder(order.getOrderName() + ":\n\n");
         List<ChequeDish> chequeDishList = order.getChequeDishList();
         if (chequeDishList != null && chequeDishList.size() > 0) {
+            double sum = 0.0;
             for (ChequeDish chequeDish : chequeDishList) {
+                sum += chequeDish.getDishId().getPrice() * chequeDish.getCountDishes();
                 Dish dish = chequeDish.getDishId();
                 fullOrder.append(dish.getName())
                         .append(" ")
@@ -130,11 +130,30 @@ public class OrderTextMessage {
                         .append("₽\n")
                         .append(dish.getTag())
                         .append("\n");
+                if (chequeDish.getChequeDishOptionallyList() != null) {
+                    List<ChequeDishOptionally> dishOptionallyList = chequeDish.getChequeDishOptionallyList();
+                    for (ChequeDishOptionally chequeDishOptionally : dishOptionallyList) {
+                        sum += chequeDishOptionally.getDishOptionallyId().getPrice() * chequeDishOptionally.getCount();
+                        DishOptionally dishOpt = chequeDishOptionally.getDishOptionallyId();
+                        fullOrder.append(dishOpt.getName())
+                                .append(" ")
+                                .append(chequeDishOptionally.getCount())
+                                .append(" x ")
+                                .append(dishOpt.getPrice())
+                                .append(" = ")
+                                .append(chequeDishOptionally.getCount() * dishOpt.getPrice())
+                                .append("₽\n");
+                    }
+                }
             }
+            fullOrder.append("Сумма: ")
+                    .append(sum)
+                    .append("₽\n");
             return fullOrder.toString();
         }
         else {
             return emptyReceipt;
         }
     }
+
 }

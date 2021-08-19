@@ -6,6 +6,7 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.entity.ClientState;
 import tech.erubin.annyeong_eat.telegramBot.repository.ClientStatesRepository;
 import tech.erubin.annyeong_eat.telegramBot.service.serviceInterface.ClientStateService;
+import tech.erubin.annyeong_eat.telegramBot.states.ClientStateEnum;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class ClientStatesServiceImpl implements ClientStateService {
             return clientStateList.get(size - 1);
         }
         else {
-            return create(client);
+            return create(client, ClientStateEnum.REGISTRATION_START.getValue());
         }
     }
 
@@ -39,14 +40,12 @@ public class ClientStatesServiceImpl implements ClientStateService {
     @Override
     public void save(ClientState clientState) {
         if (clientState != null) {
-            ClientState newClientState = create(clientState.getClientId());
-            newClientState.setState(clientState.getState());
-            repository.save(newClientState);
+            repository.save(clientState);
         }
     }
 
     @Override
-    public ClientState create(Client client) {
-        return new ClientState(client);
+    public ClientState create(Client client, String state) {
+        return new ClientState(client, state);
     }
 }

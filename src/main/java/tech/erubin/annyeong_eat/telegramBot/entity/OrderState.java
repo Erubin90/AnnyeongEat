@@ -3,7 +3,6 @@ package tech.erubin.annyeong_eat.telegramBot.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tech.erubin.annyeong_eat.telegramBot.states.OrderStateEnum;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -30,9 +29,9 @@ public class OrderState {
     @Column(name = "usage_time")
     private Timestamp usageTime;
 
-    public OrderState(Order orderId) {
+    public OrderState(Order orderId, String state) {
         this.orderId = orderId;
-        this.state = OrderStateEnum.ORDER_START_REGISTRATION.getValue();
+        this.state = state;
         this.usageTime = new Timestamp(System.currentTimeMillis());
     }
 }

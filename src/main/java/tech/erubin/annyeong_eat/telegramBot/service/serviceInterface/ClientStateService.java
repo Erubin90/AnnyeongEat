@@ -14,5 +14,5 @@ public interface ClientStateService {
 
     void save(ClientState clientState);
 
-    ClientState create(Client client);
+    ClientState create(Client client, String state);
 }

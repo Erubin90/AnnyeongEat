@@ -3,7 +3,6 @@ package tech.erubin.annyeong_eat.telegramBot.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tech.erubin.annyeong_eat.telegramBot.states.ClientStateEnum;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -30,9 +29,9 @@ public class ClientState {
     @Column(name = "usage_time")
     private Timestamp usageTime;
 
-    public ClientState(Client clientId) {
+    public ClientState(Client clientId, String state) {
         this.clientId = clientId;
-        this.state = ClientStateEnum.REGISTRATION_START.getValue();
+        this.state = state;
         this.usageTime = new Timestamp(System.currentTimeMillis());
     }
 }

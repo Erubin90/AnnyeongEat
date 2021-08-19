@@ -58,14 +58,15 @@ public class OrderModule {
         this.orderStatesService = orderStatesService;
     }
 
-    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum,
-                                       ClientState clientState){
+    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum){
         String chatId = update.getMessage().getChatId().toString();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         String sourceText = update.getMessage().getText();
         String text = textMessage.getError();
         Order order = orderService.getOrder(client);
+        ClientState clientState = null;
+        OrderState orderState = null;
         switch (clientStateEnum) {
             case ORDER_CAFE:
                 List<String> cafeName = cafeService.getCafeNameByCity(client.getCity());
@@ -75,21 +76,19 @@ public class OrderModule {
                     Cafe cafe = cafeService.getCafeByName(sourceText);
                     order = orderService.getOrder(client, cafe);
                     order.setUsing(1);
-                    OrderState orderState = orderStatesService.create(order);
-                    orderState.setState(OrderStateEnum.ORDER_START_REGISTRATION.getValue());
-                    clientState.setState(sourceText);
+                    orderState = orderStatesService.create(order, OrderStateEnum.ORDER_START_REGISTRATION.getValue());
+                    clientState = clientStatesService.create(client, sourceText);
                     sendMessage.setReplyMarkup(replyButtonsService.clientOrderMenu(order));
-                    return returnSendMessage(sendMessage, client, clientState, order, orderState, text);
                 }
                 else if (sourceText.equals(buttonName.getBack())) {
-                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.MAIN_MENU.getValue());
                     text = textMessage.getBackToMainMenu();
                     sendMessage.setReplyMarkup(replyButtonsService.clientMainMenu());
                 }
                 else {
                     text = textMessage.getNotButton();
                 }
-                return returnSendMessage(sendMessage, client, clientState, order, text);
+                return returnSendMessage(sendMessage, client, clientState, order, orderState, text);
             case ORDER_CAFE_MENU:
                 sendMessage.setReplyMarkup(replyButtonsService.clientOrderMenu(order));
                 List<String> typeDishes = buttonName.getTypeDishesInCafe(order);
@@ -102,7 +101,8 @@ public class OrderModule {
                     text = textMessage.getTextDishesByTag(dish);
                     String url = dish.getLinkPhoto();
                     ChequeDish chequeDish = chequeService.getChequeByOrderAndDish(order, dish);
-                    InlineKeyboardMarkup inlineKeyboard = inlineButtonsService.clientCheque(order, sourceText, chequeDish);
+                    InlineKeyboardMarkup inlineKeyboard =
+                            inlineButtonsService.clientCheque(order, sourceText, chequeDish);
                     if (webHook.sendPhoto(chatId, url, text, inlineKeyboard)){
                         text = textMessage.getServerOk();
                     }
@@ -113,7 +113,7 @@ public class OrderModule {
                 else if (sourceText.equals(buttonName.getBack())) {
                     text = textMessage.getBackToChoosingCafe();
                     order.setUsing(0);
-                    clientState.setState(ClientStateEnum.ORDER_CAFE.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.ORDER_CAFE.getValue());
                     sendMessage.setReplyMarkup(replyButtonsService.clientOrderCafe(client));
                 }
                 else if (sourceText.equals(buttonName.getNext())) {
@@ -122,7 +122,7 @@ public class OrderModule {
                     }
                     else {
                         text = textMessage.getNextToAddress();
-                        clientState.setState(ClientStateEnum.DELIVERY_ADDRESS.getValue());
+                        clientState = clientStatesService.create(client, ClientStateEnum.DELIVERY_ADDRESS.getValue());
                         sendMessage.setReplyMarkup(replyButtonsService.clientOrderAddress(client));
                     }
                 }
@@ -132,29 +132,30 @@ public class OrderModule {
                 else {
                     text = textMessage.getNotButton();
                 }
-                return returnSendMessage(sendMessage, client, clientState, order, text);
+                return returnSendMessage(sendMessage, client, clientState, order, orderState, text);
             case DELIVERY_ADDRESS:
                 sendMessage.setReplyMarkup(replyButtonsService.clientOrderAddress(client));
                 if (sourceText.equals(buttonName.getBack())) {
                     text = textMessage.getBackToOrderMenu();
-                    clientState.setState(ClientStateEnum.ORDER_CAFE_MENU.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.ORDER_CAFE_MENU.getValue());
                     sendMessage.setReplyMarkup(replyButtonsService.clientOrderMenu(order));
                 }
                 else {
                     text = checkMessage.checkAddress(sourceText);
                     if (!text.contains(textMessage.getErrorTrigger())) {
                         text = textMessage.getNextToPhoneNumber();
-                        clientState.setState(ClientStateEnum.DELIVERY_PHONE_NUMBER.getValue());
+                        clientState =
+                                clientStatesService.create(client, ClientStateEnum.DELIVERY_PHONE_NUMBER.getValue());
                         order.setAddress(sourceText);
                         sendMessage.setReplyMarkup(replyButtonsService.clientOrderPhoneNumber(client));
                     }
                 }
-                return returnSendMessage(sendMessage, client, clientState, order, text);
+                return returnSendMessage(sendMessage, client, clientState, order, orderState, text);
             case DELIVERY_PHONE_NUMBER:
                 sendMessage.setReplyMarkup(replyButtonsService.clientOrderPhoneNumber(client));
                 if (sourceText.equals(buttonName.getBack())) {
                     text = textMessage.getBackToAddress();
-                    clientState.setState(ClientStateEnum.DELIVERY_ADDRESS.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.DELIVERY_ADDRESS.getValue());
                     sendMessage.setReplyMarkup(replyButtonsService.clientOrderAddress(client));
                 }
                 else {
@@ -162,73 +163,64 @@ public class OrderModule {
                     String checkText = checkMessage.checkPhoneNumber(sourceText);
                     if (!checkText.contains(textMessage.getErrorTrigger())) {
                         text = textMessage.getNextToPaymentMethod();
-                        clientState.setState(ClientStateEnum.DELIVERY_PAYMENT_METHOD.getValue());
-                        if (sourceText.length() == 12)
-                            order.setPhoneNumber("8" + sourceText.substring(2,12));
+                        clientState =
+                                clientStatesService.create(client, ClientStateEnum.DELIVERY_PAYMENT_METHOD.getValue());
+                        if (sourceText.length() == 12) {
+                            order.setPhoneNumber("8" + sourceText.substring(2, 12));
+                        }
                         order.setPhoneNumber(sourceText);
                         sendMessage.setReplyMarkup(replyButtonsService.clientOrderPayment());
                     }
                 }
-                return returnSendMessage(sendMessage, client, clientState, order, text);
+                return returnSendMessage(sendMessage, client, clientState, order, orderState, text);
             case DELIVERY_PAYMENT_METHOD:
                 List<String> paymentMethod = buttonName.getPaymentMethod();
                 if (paymentMethod.contains(sourceText)) {
                     text = textMessage.getFullOrder(order);
                     order.setPaymentMethod(sourceText);
-                    clientState.setState(ClientStateEnum.DELIVERY_CONFIRMATION.getValue());
+                    clientState =
+                            clientStatesService.create(client, ClientStateEnum.DELIVERY_CONFIRMATION.getValue());
                     sendMessage.setReplyMarkup(replyButtonsService.clientOrderConfirmation());
                 }
                 else if (sourceText.equals(buttonName.getBack())) {
                     text = textMessage.getBackToPhoneNumber();
-                    clientState.setState(ClientStateEnum.DELIVERY_PHONE_NUMBER.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.DELIVERY_PHONE_NUMBER.getValue());
                     sendMessage.setReplyMarkup(replyButtonsService.clientOrderPhoneNumber(client));
                 }
                 else {
                     text = textMessage.getNotButton();
                     sendMessage.setReplyMarkup(replyButtonsService.clientOrderPayment());
                 }
-                return returnSendMessage(sendMessage, client, clientState, order, text);
+                return returnSendMessage(sendMessage, client, clientState, order, orderState, text);
             case DELIVERY_CONFIRMATION:
                 sendMessage.setReplyMarkup(replyButtonsService.clientOrderConfirmation());
                 if (sourceText.equals(buttonName.getConfirm())) {
                     text = textMessage.getReturnMainMenu();
                     order.setUsing(0);
-                    OrderState orderState = orderStatesService.create(order);
-                    orderState.setState(OrderStateEnum.ORDER_END_REGISTRATION.getValue());
-                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    orderState = orderStatesService.create(order, OrderStateEnum.ORDER_END_REGISTRATION.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.setReplyMarkup(replyButtonsService.clientMainMenu());
-                    return returnSendMessage(sendMessage, client, clientState, order, orderState, text);
                 }
                 else if (sourceText.equals(buttonName.getBack())) {
                     text = textMessage.getBackToPaymentMethod();
-                    clientState.setState(ClientStateEnum.DELIVERY_PHONE_NUMBER.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.DELIVERY_PHONE_NUMBER.getValue());
                     sendMessage.setReplyMarkup(replyButtonsService.clientOrderPayment());
                 }
                 else {
                     text = textMessage.getNotButton();
                 }
-                return returnSendMessage(sendMessage, client, clientState, order, text);
+                return returnSendMessage(sendMessage, client, clientState, order, orderState, text);
         }
         return returnSendMessage(sendMessage, text);
     }
 
     private SendMessage returnSendMessage (SendMessage sendMessage, Client client, ClientState clientState,
                                            Order order, OrderState orderState, String text) {
-        returnSendMessage(sendMessage, client, clientState, order, text);
-        orderStatesService.save(orderState);
-        return sendMessage;
-    }
-
-    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, ClientState clientState,
-                                           Order order, String text) {
         sendMessage.setText(text);
         clientService.saveClient(client);
-        String lastClientState = client.getClientStateList().get(client.getClientStateList().size() - 2).getState();
-        String newClientState = clientState.getState();
-        if (!lastClientState.equals(newClientState)) {
-            clientStatesService.save(clientState);
-        }
+        clientStatesService.save(clientState);
         orderService.save(order);
+        orderStatesService.save(orderState);
         return sendMessage;
     }
 

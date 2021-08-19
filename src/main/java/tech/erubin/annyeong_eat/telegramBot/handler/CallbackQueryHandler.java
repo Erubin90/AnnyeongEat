@@ -2,17 +2,16 @@ package tech.erubin.annyeong_eat.telegramBot.handler;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.entity.*;
+import tech.erubin.annyeong_eat.telegramBot.module.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.service.*;
 import tech.erubin.annyeong_eat.telegramBot.states.ClientStateEnum;
-import tech.erubin.annyeong_eat.telegramBot.module.InlineButtons;
-import tech.erubin.annyeong_eat.telegramBot.module.ReplyButtons;
 
 import java.util.List;
 
@@ -26,14 +25,13 @@ public class CallbackQueryHandler {
     private final CafeServiceImpl cafeService;
 
     private final InlineButtons inlineButtons;
-    private final ReplyButtons replyButtons;
 
     private final AnnyeongEatWebHook webHook;
 
     public CallbackQueryHandler(ClientServiceImpl clientService, OrderServiceImpl orderService,
                                 DishServiceImpl dishService, ChequeDishServiceImpl chequeService,
                                 ClientStatesServiceImpl stateService, CafeServiceImpl cafeService,
-                                InlineButtons inlineButtons, ReplyButtons replyButtons,
+                                InlineButtons inlineButtons,
                                 @Lazy AnnyeongEatWebHook webHook) {
         this.clientService = clientService;
         this.orderService = orderService;
@@ -42,7 +40,6 @@ public class CallbackQueryHandler {
         this.stateService = stateService;
         this.cafeService = cafeService;
         this.inlineButtons = inlineButtons;
-        this.replyButtons = replyButtons;
         this.webHook = webHook;
     }
 
@@ -85,11 +82,10 @@ public class CallbackQueryHandler {
                     chequeService.deleteCheque(chequeDish);
                 }
                 InlineKeyboardMarkup inlineMarkup = inlineButtons.clientCheque(order, tag, chequeDish);
-                ReplyKeyboardMarkup replyMarkup = replyButtons.clientOrderMenu(order);
-                webHook.updateMarkups(chatId, messageId, text, inlineMarkup, replyMarkup);
-                SendMessage sendMessage = new SendMessage(chatId, text);
-                sendMessage.setReplyMarkup(replyMarkup);
-                botApiMethod = sendMessage;
+                EditMessageReplyMarkup editMessageReplyMarkup = new EditMessageReplyMarkup(chatId, messageId,
+                        null , inlineMarkup);
+                botApiMethod = getAnswerCallbackQuery(callback, text, false);
+                webHook.updateMarkups(editMessageReplyMarkup);
             }
         return botApiMethod;
     }
@@ -102,5 +98,13 @@ public class CallbackQueryHandler {
         else {
             return ClientStateEnum.GET.clientState(clientState.getState());
         }
+    }
+
+    private AnswerCallbackQuery getAnswerCallbackQuery(CallbackQuery callback, String text, boolean alert) {
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery.setCallbackQueryId(callback.getId());
+        answerCallbackQuery.setText(text);
+        answerCallbackQuery.setShowAlert(alert);
+        return answerCallbackQuery;
     }
 }

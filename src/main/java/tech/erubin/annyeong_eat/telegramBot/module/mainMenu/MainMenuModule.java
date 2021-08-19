@@ -16,40 +16,41 @@ import tech.erubin.annyeong_eat.telegramBot.service.ClientStatesServiceImpl;
 @AllArgsConstructor
 public class MainMenuModule {
     private final ClientServiceImpl clientService;
-    private final ClientStatesServiceImpl stateService;
+    private final ClientStatesServiceImpl clientStatesService;
 
     private final ReplyButtons replyButtons;
 
     private final MainMenuButtonNames buttonNames;
     private final MainMenuTextMessage textMessage;
 
-    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum, ClientState clientState) {
+    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum) {
         String chatId = update.getMessage().getChatId().toString();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         String sourceText = update.getMessage().getText();
         String text = textMessage.getError();
+        ClientState clientState = null;
         switch (clientStateEnum) {
             case MAIN_MENU:
                 sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 if (sourceText.equals(buttonNames.getCreateOrder())) {
                     text = textMessage.getChoosingCafe();
-                    clientState.setState(ClientStateEnum.ORDER_CAFE.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.ORDER_CAFE.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientOrderCafe(client));
                 }
                 else if (sourceText.equals(buttonNames.getCheckOrder())) {
                     text = "Просмотр статуса заказа";
-                    clientState.setState(ClientStateEnum.ORDER_CHECK.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.ORDER_CHECK.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientCheckOrder());
                 }
                 else if (sourceText.equals(buttonNames.getHelp())) {
                     text = textMessage.getHelp();
-                    clientState.setState(ClientStateEnum.HELP.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.HELP.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientHelp());
                 }
                 else if (sourceText.equals(buttonNames.getClientInfo())) {
                     text = textMessage.getClientProfile(client);
-                    clientState.setState(ClientStateEnum.PROFILE.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.PROFILE.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientProfileInfo(client));
                 }
                 else {
@@ -60,7 +61,7 @@ public class MainMenuModule {
                 sendMessage.setReplyMarkup(replyButtons.clientCheckOrder());
                 if (sourceText.equals(buttonNames.getBack())){
                     text = textMessage.getReturnMainMenu();
-                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 }
                 return returnSendMessage(sendMessage, client, clientState, text);
@@ -68,7 +69,7 @@ public class MainMenuModule {
                 sendMessage.setReplyMarkup(replyButtons.clientHelp());
                 if (sourceText.equals(buttonNames.getBack())) {
                     text = textMessage.getReturnMainMenu();
-                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 }
                 return returnSendMessage(sendMessage, client, clientState, text);
@@ -76,7 +77,7 @@ public class MainMenuModule {
                 sendMessage.setReplyMarkup(replyButtons.clientProfileInfo(client));
                 if (sourceText.equals(buttonNames.getBack())) {
                     text = textMessage.getReturnMainMenu();
-                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    clientState = clientStatesService.create(client, ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 }
                 return returnSendMessage(sendMessage, client, clientState, text);
@@ -87,7 +88,7 @@ public class MainMenuModule {
     private SendMessage returnSendMessage (SendMessage sendMessage, Client client, ClientState clientState, String text) {
         sendMessage.setText(text);
         clientService.saveClient(client);
-        stateService.save(clientState);
+        clientStatesService.save(clientState);
         return sendMessage;
     }
 

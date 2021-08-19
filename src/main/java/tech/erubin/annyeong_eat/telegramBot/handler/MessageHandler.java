@@ -50,13 +50,13 @@ public class MessageHandler {
                 clientStateEnum == ClientStateEnum.REGISTRATION_NAME ||
                 clientStateEnum == ClientStateEnum.REGISTRATION_SURNAME ||
                 clientStateEnum == ClientStateEnum.REGISTRATION_PHONE_NUMBERS) {
-            return registrationModule.startClient(update, client, clientStateEnum, clientState);
+            return registrationModule.startClient(update, client, clientStateEnum);
         }
         else if (clientStateEnum == ClientStateEnum.MAIN_MENU ||
                 clientStateEnum == ClientStateEnum.ORDER_CHECK ||
                 clientStateEnum == ClientStateEnum.HELP ||
                 clientStateEnum == ClientStateEnum.PROFILE) {
-            return mainMenuModule.startClient(update, client, clientStateEnum, clientState);
+            return mainMenuModule.startClient(update, client, clientStateEnum);
         }
         else if (clientStateEnum == ClientStateEnum.ORDER_CAFE ||
                 clientStateEnum == ClientStateEnum.ORDER_CAFE_MENU ||
@@ -64,7 +64,7 @@ public class MessageHandler {
                 clientStateEnum == ClientStateEnum.DELIVERY_PHONE_NUMBER ||
                 clientStateEnum == ClientStateEnum.DELIVERY_PAYMENT_METHOD ||
                 clientStateEnum == ClientStateEnum.DELIVERY_CONFIRMATION) {
-            return orderModule.startClient(update, client, clientStateEnum, clientState);
+            return orderModule.startClient(update, client, clientStateEnum);
         }
         else {
             return new SendMessage(update.getMessage().getChatId().toString(), "Что-то пошло не так");

@@ -24,18 +24,19 @@ public class RegistrationModule {
     private final ReplyButtons replyButtons;
 
     private final ClientServiceImpl clientService;
-    private final ClientStatesServiceImpl stateService;
+    private final ClientStatesServiceImpl clientStateService;
 
-    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum, ClientState clientState) {
+    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum) {
         String chatId = update.getMessage().getChatId().toString();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         String sourceText = update.getMessage().getText();
         String text = textMessage.getError();
+        ClientState clientState = null;
         switch (clientStateEnum) {
             case REGISTRATION_START:
                 text = textMessage.getStartClientRegistration();
-                clientState.setState(ClientStateEnum.REGISTRATION_CITY.getValue());
+                clientState = clientStateService.create(client, ClientStateEnum.REGISTRATION_CITY.getValue());
                 sendMessage.setReplyMarkup(replyButtons.clientRegistrationCity());
                 return returnSendMessage(sendMessage, client, clientState, text);
             case REGISTRATION_CITY:
@@ -43,7 +44,7 @@ public class RegistrationModule {
                 if (buttonName.getAllCitySetList().contains(sourceText)) {
                     text = textMessage.getCityNoError();
                     client.setCity(sourceText);
-                    clientState.setState(ClientStateEnum.REGISTRATION_NAME.getValue());
+                    clientState = clientStateService.create(client, ClientStateEnum.REGISTRATION_NAME.getValue());
                 }
                 else {
                     sendMessage.setReplyMarkup(replyButtons.clientRegistrationCity());
@@ -55,14 +56,14 @@ public class RegistrationModule {
                 if (!text.contains(textMessage.getErrorTrigger())) {
                     text = textMessage.getNameNoError();
                     client.setName(sourceText);
-                    clientState.setState(ClientStateEnum.REGISTRATION_SURNAME.getValue());
+                    clientState = clientStateService.create(client, ClientStateEnum.REGISTRATION_SURNAME.getValue());
                 }
                 return returnSendMessage(sendMessage, client, clientState, text);
             case REGISTRATION_SURNAME:
                 text = checkMessage.checkSurname(sourceText);
                 if (!text.contains(textMessage.getErrorTrigger())) {
                     client.setSurname(sourceText);
-                    clientState.setState(ClientStateEnum.REGISTRATION_PHONE_NUMBERS.getValue());
+                    clientState = clientStateService.create(client, ClientStateEnum.REGISTRATION_PHONE_NUMBERS.getValue());
                 }
                 return returnSendMessage(sendMessage, client, clientState, text);
             case REGISTRATION_PHONE_NUMBERS:
@@ -74,7 +75,7 @@ public class RegistrationModule {
                     text = textMessage.getPhoneNumberNoError() + "\n" +
                             textMessage.getEndClientRegistration();
                     client.setPhoneNumber(sourceText);
-                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    clientState = clientStateService.create(client, ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.enableMarkdown(true);
                     sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 }
@@ -85,7 +86,7 @@ public class RegistrationModule {
 
     private SendMessage returnSendMessage (SendMessage sendMessage, Client client, ClientState clientState, String text) {
         sendMessage.setText(text);
-        stateService.save(clientState);
+        clientStateService.save(clientState);
         clientService.saveClient(client);
         return sendMessage;
     }

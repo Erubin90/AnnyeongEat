@@ -59,10 +59,10 @@ public class OrderButtonNames {
         List<ChequeDish> chequeDishes = order.getChequeDishList();
         String basket = "\uD83D\uDED2 %s₽";
         if (chequeDishes == null) {
-            basket = String.format(basket, 0);
+            basket = String.format(basket, 0.0);
         }
         else {
-            double sum = 0;
+            double sum = 0.0;
             for (ChequeDish chequeDish : chequeDishes) {
                 sum += chequeDish.getDishId().getPrice() * chequeDish.getCountDishes();
                 if (chequeDish.getChequeDishOptionallyList() != null) {

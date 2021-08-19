@@ -1,10 +1,10 @@
-package tech.erubin.annyeong_eat.telegramBot.service.entityServises;
+package tech.erubin.annyeong_eat.telegramBot.service.entityServiсes;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tech.erubin.annyeong_eat.telegramBot.entity.DishOptionally;
 import tech.erubin.annyeong_eat.telegramBot.repository.DishOptionallyRepository;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface.DishOptionallyService;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.serviceInterface.DishOptionallyService;
 
 import java.util.List;
 

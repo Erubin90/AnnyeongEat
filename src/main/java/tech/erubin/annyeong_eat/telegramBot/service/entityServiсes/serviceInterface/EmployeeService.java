@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface;
+package tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.serviceInterface;
 
 import tech.erubin.annyeong_eat.telegramBot.entity.Employee;
 

@@ -8,6 +8,6 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 
 @Repository
-public interface ChequeRepository extends JpaRepository<ChequeDish, Integer> {
+public interface ChequeDishRepository extends JpaRepository<ChequeDish, Integer> {
     ChequeDish findChequeByOrderIdAndDishId(Order orderId, Dish dishId);
 }

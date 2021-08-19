@@ -7,12 +7,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
-import tech.erubin.annyeong_eat.telegramBot.entity.ClientStates;
+import tech.erubin.annyeong_eat.telegramBot.entity.ClientState;
 import tech.erubin.annyeong_eat.telegramBot.module.CheckMessage;
-import tech.erubin.annyeong_eat.telegramBot.module.ClientStateEnum;
+import tech.erubin.annyeong_eat.telegramBot.states.ClientStateEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.ReplyButtons;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientStatesServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ClientServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ClientStatesServiceImpl;
 
 @Component
 @AllArgsConstructor
@@ -26,7 +26,7 @@ public class RegistrationModule {
     private final ClientServiceImpl clientService;
     private final ClientStatesServiceImpl stateService;
 
-    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum, ClientStates clientStates) {
+    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum, ClientState clientState) {
         String chatId = update.getMessage().getChatId().toString();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -35,36 +35,36 @@ public class RegistrationModule {
         switch (clientStateEnum) {
             case REGISTRATION_START:
                 text = textMessage.getStartClientRegistration();
-                clientStates.setState(ClientStateEnum.REGISTRATION_CITY.getValue());
+                clientState.setState(ClientStateEnum.REGISTRATION_CITY.getValue());
                 sendMessage.setReplyMarkup(replyButtons.clientRegistrationCity());
-                return returnSendMessage(sendMessage, client, clientStates, text);
+                return returnSendMessage(sendMessage, client, clientState, text);
             case REGISTRATION_CITY:
                 text = textMessage.getErrorNameCity();
                 if (buttonName.getAllCitySetList().contains(sourceText)) {
                     text = textMessage.getCityNoError();
                     client.setCity(sourceText);
-                    clientStates.setState(ClientStateEnum.REGISTRATION_NAME.getValue());
+                    clientState.setState(ClientStateEnum.REGISTRATION_NAME.getValue());
                 }
                 else {
                     sendMessage.setReplyMarkup(replyButtons.clientRegistrationCity());
                 }
-                return returnSendMessage(sendMessage, client, clientStates, text);
+                return returnSendMessage(sendMessage, client, clientState, text);
             case REGISTRATION_NAME:
                 sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
                 text = checkMessage.checkName(sourceText);
                 if (!text.contains(textMessage.getErrorTrigger())) {
                     text = textMessage.getNameNoError();
                     client.setName(sourceText);
-                    clientStates.setState(ClientStateEnum.REGISTRATION_SURNAME.getValue());
+                    clientState.setState(ClientStateEnum.REGISTRATION_SURNAME.getValue());
                 }
-                return returnSendMessage(sendMessage, client, clientStates, text);
+                return returnSendMessage(sendMessage, client, clientState, text);
             case REGISTRATION_SURNAME:
                 text = checkMessage.checkSurname(sourceText);
                 if (!text.contains(textMessage.getErrorTrigger())) {
                     client.setSurname(sourceText);
-                    clientStates.setState(ClientStateEnum.REGISTRATION_PHONE_NUMBERS.getValue());
+                    clientState.setState(ClientStateEnum.REGISTRATION_PHONE_NUMBERS.getValue());
                 }
-                return returnSendMessage(sendMessage, client, clientStates, text);
+                return returnSendMessage(sendMessage, client, clientState, text);
             case REGISTRATION_PHONE_NUMBERS:
                 text = checkMessage.checkPhoneNumber(sourceText);
                 if (!text.contains(textMessage.getErrorTrigger())) {
@@ -74,18 +74,18 @@ public class RegistrationModule {
                     text = textMessage.getPhoneNumberNoError() + "\n" +
                             textMessage.getEndClientRegistration();
                     client.setPhoneNumber(sourceText);
-                    clientStates.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.enableMarkdown(true);
                     sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 }
-                return returnSendMessage(sendMessage, client, clientStates, text);
+                return returnSendMessage(sendMessage, client, clientState, text);
         }
         return returnSendMessage(sendMessage, text);
     }
 
-    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, ClientStates clientStates, String text) {
+    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, ClientState clientState, String text) {
         sendMessage.setText(text);
-        stateService.saveStates(clientStates);
+        stateService.save(clientState);
         clientService.saveClient(client);
         return sendMessage;
     }

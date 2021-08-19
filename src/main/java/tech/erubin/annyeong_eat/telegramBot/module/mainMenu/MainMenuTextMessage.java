@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
+import tech.erubin.annyeong_eat.telegramBot.entity.Order;
+import tech.erubin.annyeong_eat.telegramBot.states.OrderStateEnum;
 
 @Getter
 @Component
@@ -27,9 +29,14 @@ public class MainMenuTextMessage {
     private String error;
 
     public String getClientProfile(Client client) {
-        long countOrder = client.getOrderList().stream()
-                .filter(x -> x.getOrderStatus().equals("оформлен"))
-                .count();
+        int countOrder = 0;
+        for (Order order : client.getOrderList()) {
+            var orderStates = order.getOrderStateList();
+            String state = orderStates.get(orderStates.size() - 1).getState();
+            if(state.equals(OrderStateEnum.ORDER_CONFIRMATION.getValue())) {
+                countOrder++;
+            }
+        }
         return "Имя - " + client.getName() + "\n" +
                 "Фамилия - " + client.getSurname() + "\n" +
                 "Номер - " + client.getPhoneNumber() + "\n" +

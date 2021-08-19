@@ -1,19 +1,19 @@
-package tech.erubin.annyeong_eat.telegramBot.service.entityServises;
+package tech.erubin.annyeong_eat.telegramBot.service.entityServiсes;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tech.erubin.annyeong_eat.telegramBot.entity.ChequeDish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
-import tech.erubin.annyeong_eat.telegramBot.repository.ChequeRepository;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface.ChequeService;
+import tech.erubin.annyeong_eat.telegramBot.repository.ChequeDishRepository;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.serviceInterface.ChequeDishService;
 
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ChequeServiceImpl implements ChequeService {
-    private final ChequeRepository repository;
+public class ChequeDishServiceImpl implements ChequeDishService {
+    private final ChequeDishRepository repository;
 
     @Override
     public List<ChequeDish> getAllCheque() {

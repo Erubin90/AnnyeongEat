@@ -1,9 +1,10 @@
 package tech.erubin.annyeong_eat.telegramBot.entity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -46,38 +47,23 @@ public class Order {
     @Column(name = "payment_status")
     private int paymentStatus;
 
-    @Column(name = "order_status")
-    private String orderStatus;
-
     @Column(name = "waiter_id")
     private int waiterId;
 
     @Column(name = "delivery_id")
     private int deliveryId;
 
-    @Column(name = "time_accept")
-    private Timestamp timeAccept;
-
-    @Column(name = "time_start_cook")
-    private Timestamp timeStartCook;
-
-    @Column(name = "time_end_cook")
-    private Timestamp timeEndCook;
-
-    @Column(name = "time_start_delivery")
-    private Timestamp timeStartDelivery;
-
-    @Column(name = "time_end_delivery")
-    private Timestamp timeEndDelivery;
-
     @OneToMany(mappedBy = "orderId",
             cascade = CascadeType.ALL)
     private List<ChequeDish> chequeDishList;
 
+    @OneToMany(mappedBy = "orderId",
+            cascade = {CascadeType.DETACH, CascadeType.MERGE})
+    private List<OrderState> orderStateList;
+
     public Order(Client clientId, String orderName) {
         this.clientId = clientId;
         this.orderName = orderName;
-        this.orderStatus = "оформление";
         this.paymentStatus = 0;
     }
 
@@ -85,6 +71,5 @@ public class Order {
         this.clientId = clientId;
         this.cafeId = cafeId;
         this.orderName = orderName;
-        this.orderStatus = "оформление";
     }
 }

@@ -33,7 +33,7 @@ public class Client {
 
     @OneToMany(mappedBy = "clientId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    private List<ClientStates> clientStatesList;
+    private List<ClientState> clientStateList;
 
     @OneToMany(mappedBy = "clientId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})

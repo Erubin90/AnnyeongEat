@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface;
+package tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.serviceInterface;
 
 import tech.erubin.annyeong_eat.telegramBot.entity.ChequeDish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
@@ -6,7 +6,7 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 
 import java.util.List;
 
-public interface ChequeService {
+public interface ChequeDishService {
 
     List<ChequeDish> getAllCheque();
 

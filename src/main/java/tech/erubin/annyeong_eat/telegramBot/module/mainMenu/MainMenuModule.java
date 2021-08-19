@@ -6,11 +6,11 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
-import tech.erubin.annyeong_eat.telegramBot.entity.ClientStates;
-import tech.erubin.annyeong_eat.telegramBot.module.ClientStateEnum;
+import tech.erubin.annyeong_eat.telegramBot.entity.ClientState;
+import tech.erubin.annyeong_eat.telegramBot.states.ClientStateEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.ReplyButtons;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ClientStatesServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ClientServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ClientStatesServiceImpl;
 
 @Component
 @AllArgsConstructor
@@ -23,7 +23,7 @@ public class MainMenuModule {
     private final MainMenuButtonNames buttonNames;
     private final MainMenuTextMessage textMessage;
 
-    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum, ClientStates clientStates) {
+    public BotApiMethod<?> startClient(Update update, Client client, ClientStateEnum clientStateEnum, ClientState clientState) {
         String chatId = update.getMessage().getChatId().toString();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -34,60 +34,60 @@ public class MainMenuModule {
                 sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 if (sourceText.equals(buttonNames.getCreateOrder())) {
                     text = textMessage.getChoosingCafe();
-                    clientStates.setState(ClientStateEnum.ORDER_CAFE.getValue());
+                    clientState.setState(ClientStateEnum.ORDER_CAFE.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientOrderCafe(client));
                 }
                 else if (sourceText.equals(buttonNames.getCheckOrder())) {
                     text = "Просмотр статуса заказа";
-                    clientStates.setState(ClientStateEnum.ORDER_CHECK.getValue());
+                    clientState.setState(ClientStateEnum.ORDER_CHECK.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientCheckOrder());
                 }
                 else if (sourceText.equals(buttonNames.getHelp())) {
                     text = textMessage.getHelp();
-                    clientStates.setState(ClientStateEnum.HELP.getValue());
+                    clientState.setState(ClientStateEnum.HELP.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientHelp());
                 }
                 else if (sourceText.equals(buttonNames.getClientInfo())) {
                     text = textMessage.getClientProfile(client);
-                    clientStates.setState(ClientStateEnum.PROFILE.getValue());
+                    clientState.setState(ClientStateEnum.PROFILE.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientProfileInfo(client));
                 }
                 else {
                     text = textMessage.getNotButton();
                 }
-                return returnSendMessage(sendMessage, client, clientStates, text);
+                return returnSendMessage(sendMessage, client, clientState, text);
             case ORDER_CHECK:
                 sendMessage.setReplyMarkup(replyButtons.clientCheckOrder());
                 if (sourceText.equals(buttonNames.getBack())){
                     text = textMessage.getReturnMainMenu();
-                    clientStates.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 }
-                return returnSendMessage(sendMessage, client, clientStates, text);
+                return returnSendMessage(sendMessage, client, clientState, text);
             case HELP:
                 sendMessage.setReplyMarkup(replyButtons.clientHelp());
                 if (sourceText.equals(buttonNames.getBack())) {
                     text = textMessage.getReturnMainMenu();
-                    clientStates.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 }
-                return returnSendMessage(sendMessage, client, clientStates, text);
+                return returnSendMessage(sendMessage, client, clientState, text);
             case PROFILE:
                 sendMessage.setReplyMarkup(replyButtons.clientProfileInfo(client));
                 if (sourceText.equals(buttonNames.getBack())) {
                     text = textMessage.getReturnMainMenu();
-                    clientStates.setState(ClientStateEnum.MAIN_MENU.getValue());
+                    clientState.setState(ClientStateEnum.MAIN_MENU.getValue());
                     sendMessage.setReplyMarkup(replyButtons.clientMainMenu());
                 }
-                return returnSendMessage(sendMessage, client, clientStates, text);
+                return returnSendMessage(sendMessage, client, clientState, text);
         }
         return returnSendMessage(sendMessage, text);
     }
 
-    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, ClientStates clientStates, String text) {
+    private SendMessage returnSendMessage (SendMessage sendMessage, Client client, ClientState clientState, String text) {
         sendMessage.setText(text);
         clientService.saveClient(client);
-        stateService.saveStates(clientStates);
+        stateService.save(clientState);
         return sendMessage;
     }
 

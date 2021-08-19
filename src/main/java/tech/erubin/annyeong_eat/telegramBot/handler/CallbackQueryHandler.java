@@ -9,10 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.entity.*;
-import tech.erubin.annyeong_eat.telegramBot.module.ClientStateEnum;
+import tech.erubin.annyeong_eat.telegramBot.states.ClientStateEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.module.ReplyButtons;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.*;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.*;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class CallbackQueryHandler {
     private final ClientServiceImpl clientService;
     private final OrderServiceImpl orderService;
     private final DishServiceImpl dishService;
-    private final ChequeServiceImpl chequeService;
+    private final ChequeDishServiceImpl chequeService;
     private final ClientStatesServiceImpl stateService;
     private final CafeServiceImpl cafeService;
 
@@ -31,7 +31,7 @@ public class CallbackQueryHandler {
     private final AnnyeongEatWebHook webHook;
 
     public CallbackQueryHandler(ClientServiceImpl clientService, OrderServiceImpl orderService,
-                                DishServiceImpl dishService, ChequeServiceImpl chequeService,
+                                DishServiceImpl dishService, ChequeDishServiceImpl chequeService,
                                 ClientStatesServiceImpl stateService, CafeServiceImpl cafeService,
                                 InlineButtons inlineButtons, ReplyButtons replyButtons,
                                 @Lazy AnnyeongEatWebHook webHook) {
@@ -50,8 +50,8 @@ public class CallbackQueryHandler {
         BotApiMethod<?> botApiMethod = null;
         String userId = callback.getFrom().getId().toString();
         Client client = clientService.getClientByTelegramUserId(userId);
-        ClientStates clientStates = stateService.getState(client);
-        ClientStateEnum clientStateEnum = getClientState(clientStates);
+        ClientState clientState = stateService.getState(client);
+        ClientStateEnum clientStateEnum = getClientState(clientState);
         String buttonDate = callback.getData();
         String chatId = callback.getMessage().getChatId().toString();
         switch (clientStateEnum) {
@@ -94,13 +94,13 @@ public class CallbackQueryHandler {
         return botApiMethod;
     }
 
-    private ClientStateEnum getClientState(ClientStates clientStates) {
+    private ClientStateEnum getClientState(ClientState clientState) {
         List<String> cafeNameList = cafeService.getAllCafeNames();
-        if (cafeNameList.contains(clientStates.getState())) {
+        if (cafeNameList.contains(clientState.getState())) {
             return ClientStateEnum.ORDER_CAFE_MENU;
         }
         else {
-            return ClientStateEnum.GET.clientState(clientStates.getState());
+            return ClientStateEnum.GET.clientState(clientState.getState());
         }
     }
 }

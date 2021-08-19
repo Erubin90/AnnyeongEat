@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.service.entityServises;
+package tech.erubin.annyeong_eat.telegramBot.service.entityServiсes;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -6,7 +6,8 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Cafe;
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.repository.OrderRepository;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface.OrderService;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.serviceInterface.OrderService;
+import tech.erubin.annyeong_eat.telegramBot.states.OrderStateEnum;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,21 +41,21 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Order getOrder(Client client, Cafe cafe) {
-        List<Order> orderList = repository.findOrderByClientIdAndCafeId(client, cafe).stream()
-                .filter(x -> x.getOrderStatus().equals("оформление"))
-                .collect(Collectors.toList());
-        System.err.println(orderList);
-        if (orderList.isEmpty()) {
-            return createOrder(client, cafe);
+        List<Integer> orderList = repository.getOrderByClientIdAndCafeIdAndOrderState(
+                OrderStateEnum.ORDER_START_REGISTRATION.getValue(), cafe, client);
+        if (orderList != null && !orderList.isEmpty()) {
+            return repository.getById(orderList.get(0));
         }
         else {
-            return orderList.get(0);
+            return createOrder(client, cafe);
         }
     }
 
     @Override
-    public void saveOrder(Order order) {
-        repository.save(order);
+    public void save(Order order) {
+        if (order != null) {
+            repository.save(order);
+        }
     }
 
     @Override

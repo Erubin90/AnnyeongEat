@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import tech.erubin.annyeong_eat.telegramBot.entity.ChequeDish;
 import tech.erubin.annyeong_eat.telegramBot.entity.DishOptionally;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServises.ChequeServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ChequeDishServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 public class InlineButtons {
-    ChequeServiceImpl chequeService;
+    ChequeDishServiceImpl chequeService;
 
     public InlineKeyboardMarkup clientCheque(Order order, String tag, ChequeDish chequeDish) {
         String count;

@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.service.entityServises.serviceInterface;
+package tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.serviceInterface;
 
 import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
@@ -12,7 +12,7 @@ public interface OrderService {
 
     Order getOrder(Client client);
 
-    void saveOrder(Order order);
+    void save(Order order);
 
     void deleteOrder(Order order);
 

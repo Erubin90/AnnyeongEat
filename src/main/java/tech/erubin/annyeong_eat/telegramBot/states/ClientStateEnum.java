@@ -1,8 +1,5 @@
-package tech.erubin.annyeong_eat.telegramBot.module;
+package tech.erubin.annyeong_eat.telegramBot.states;
 
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
 public enum ClientStateEnum {
 
     REGISTRATION_START("начало регистрации"),
@@ -22,10 +19,13 @@ public enum ClientStateEnum {
     DELIVERY_PHONE_NUMBER("указание номера"),
     DELIVERY_PAYMENT_METHOD("указание способа оплаты"),
     DELIVERY_CONFIRMATION("подтверждение заказа"),
-    ERROR,
+    ERROR("ошибка"),
     GET;
 
     private String clientState;
+
+    ClientStateEnum() {
+    }
 
     ClientStateEnum(String clientState) {
         this.clientState = clientState;

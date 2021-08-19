@@ -11,7 +11,7 @@ import tech.erubin.annyeong_eat.telegramBot.entity.*;
 import tech.erubin.annyeong_eat.telegramBot.module.CheckMessage;
 import tech.erubin.annyeong_eat.telegramBot.module.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.module.ReplyButtons;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.*;
+import tech.erubin.annyeong_eat.telegramBot.service.*;
 import tech.erubin.annyeong_eat.telegramBot.states.ClientStateEnum;
 import tech.erubin.annyeong_eat.telegramBot.states.OrderStateEnum;
 

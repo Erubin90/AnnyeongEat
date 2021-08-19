@@ -9,8 +9,8 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Client;
 import tech.erubin.annyeong_eat.telegramBot.entity.ClientState;
 import tech.erubin.annyeong_eat.telegramBot.states.ClientStateEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.ReplyButtons;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ClientServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ClientStatesServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.ClientServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.ClientStatesServiceImpl;
 
 @Component
 @AllArgsConstructor

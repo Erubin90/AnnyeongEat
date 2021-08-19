@@ -9,7 +9,7 @@ import tech.erubin.annyeong_eat.telegramBot.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.module.mainMenu.MainMenuButtonNames;
 import tech.erubin.annyeong_eat.telegramBot.module.order.OrderButtonNames;
 import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationButtonName;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.CafeServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.CafeServiceImpl;
 
 import java.util.*;
 

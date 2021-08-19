@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.CafeServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.CafeServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;

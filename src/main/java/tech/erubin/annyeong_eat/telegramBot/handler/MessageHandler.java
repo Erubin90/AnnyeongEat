@@ -11,9 +11,9 @@ import tech.erubin.annyeong_eat.telegramBot.states.ClientStateEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.mainMenu.MainMenuModule;
 import tech.erubin.annyeong_eat.telegramBot.module.order.OrderModule;
 import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationModule;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.CafeServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ClientServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ClientStatesServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.CafeServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.ClientServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.ClientStatesServiceImpl;
 
 import java.util.List;
 

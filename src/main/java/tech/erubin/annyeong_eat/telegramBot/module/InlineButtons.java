@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import tech.erubin.annyeong_eat.telegramBot.entity.ChequeDish;
 import tech.erubin.annyeong_eat.telegramBot.entity.DishOptionally;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.ChequeDishServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.ChequeDishServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;

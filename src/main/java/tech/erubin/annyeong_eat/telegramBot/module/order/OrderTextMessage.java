@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import tech.erubin.annyeong_eat.telegramBot.entity.ChequeDish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Dish;
 import tech.erubin.annyeong_eat.telegramBot.entity.Order;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.DishOptionallyServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.DishServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.service.entityServiсes.OrderServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.DishOptionallyServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.DishServiceImpl;
+import tech.erubin.annyeong_eat.telegramBot.service.OrderServiceImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;

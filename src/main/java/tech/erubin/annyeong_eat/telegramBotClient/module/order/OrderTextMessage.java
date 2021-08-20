@@ -64,12 +64,6 @@ public class OrderTextMessage {
     @Value("${mainMenu.message.client.returnMainMenu}")
     private String returnMainMenu;
 
-    @Value("${order.message.client.server.ok}")
-    private String serverOk;
-
-    @Value("${order.message.client.server.error}")
-    private String serverError;
-
     @Value("${order.message.client.error}")
     private String error;
 

@@ -13,10 +13,8 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
-    @Query("SELECT o.id " +
-            "FROM Order o JOIN OrderState os ON o = os.orderId " +
-            "WHERE os.state LIKE :orderState AND o.cafeId = :cafe and o.clientId = :client")
-    List<Integer> getOrderByClientIdAndCafeIdAndOrderState(@Param("orderState")String orderState,
-                                                              @Param("cafe")Cafe cafe,
-                                                              @Param("client")Client client);
+    @Query("SELECT id " +
+            "FROM Order " +
+            "WHERE using = 1 AND cafeId = :cafe and clientId = :client")
+    List<Integer> getOrderByClientIdAndCafeId(@Param("cafe")Cafe cafe, @Param("client")Client client);
 }

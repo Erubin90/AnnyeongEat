@@ -56,7 +56,7 @@ public class CallbackQueryHandler {
         String chatId = callback.getMessage().getChatId().toString();
         if (clientStateEnum == ClientStateEnum.ORDER_CAFE_MENU) {
             String id = getTag(buttonDate);
-            Dish dish = dishService.getDishById(Integer.getInteger(id));
+            Dish dish = dishService.getDishById(Integer.parseInt(id));
             ChequeDish chequeDish = getChequeDish(client, dish);
             InlineKeyboardMarkup inlineMarkup;
             String text = textMessage.getError();
@@ -99,6 +99,7 @@ public class CallbackQueryHandler {
                 text = getTextDish(dish);
                 String url = dish.getLinkPhoto();
                 inlineMarkup = inlineButtons.clientCheque(id, chequeDish);
+                botApiMethod = getAnswerCallbackQuery(callback, text);
                 if (!webHook.sendPhoto(chatId, text, url, inlineMarkup)) {
                     botApiMethod = getAnswerCallbackQuery(callback, textMessage.getError());
                 }

@@ -7,7 +7,6 @@ import tech.erubin.annyeong_eat.telegramBotClient.entity.Client;
 import tech.erubin.annyeong_eat.telegramBotClient.entity.Order;
 import tech.erubin.annyeong_eat.telegramBotClient.repository.OrderRepository;
 import tech.erubin.annyeong_eat.telegramBotClient.service.serviceInterface.OrderService;
-import tech.erubin.annyeong_eat.telegramBotClient.states.OrderStateEnum;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,9 +29,9 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    @Override
     public Order getOrder(Client client, Cafe cafe) {
-        List<Integer> orderList = repository.getOrderByClientIdAndCafeIdAndOrderState(
-                OrderStateEnum.ORDER_START_REGISTRATION.getValue(), cafe, client);
+        List<Integer> orderList = repository.getOrderByClientIdAndCafeId(cafe, client);
         if (orderList != null && !orderList.isEmpty()) {
             return repository.getById(orderList.get(0));
         }
@@ -59,6 +58,7 @@ public class OrderServiceImpl implements OrderService {
         return new Order(client, orderName);
     }
 
+    @Override
     public Order createOrder(Client client, Cafe cafe) {
         String orderName = String.format("заказ %s_%s", client.getId(), client.getOrderList().size() + 1);
         return new Order(client, cafe, orderName);

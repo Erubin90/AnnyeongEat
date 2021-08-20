@@ -58,7 +58,7 @@ public class Order {
     private List<ChequeDish> chequeDishList;
 
     @OneToMany(mappedBy = "orderId",
-            cascade = {CascadeType.DETACH, CascadeType.MERGE})
+            cascade = CascadeType.ALL)
     private List<OrderState> orderStateList;
 
     public Order(Client clientId, String orderName) {

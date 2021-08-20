@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
 public class HandlersTextMessage {
 
-    @Value("handler.message.client.error")
+    @Value("${handler.message.client.error}")
     private String error;
 
-    @Value("handler.message.client.addDish")
+    @Value("${handler.message.client.addDish}")
     private String addDish;
 
-    @Value("handler.message.client.subDish")
+    @Value("${handler.message.client.subDish}")
     private String subDish;
 
-    @Value("handler.message.client.emptyDish")
+    @Value("${handler.message.client.emptyDish}")
     private String emptyDish;
 }

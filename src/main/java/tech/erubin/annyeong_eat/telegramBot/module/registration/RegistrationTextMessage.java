@@ -1,17 +1,13 @@
 package tech.erubin.annyeong_eat.telegramBot.module.registration;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Getter
-@ToString
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
-@NoArgsConstructor
 public class RegistrationTextMessage {
     @Value("${regular.errorTrigger}")
     private String errorTrigger;
@@ -45,25 +41,25 @@ public class RegistrationTextMessage {
     private String errorNameCity;
 
     //noError Message's
-    @Value("${registration.message.client.name.noError}")
+    @Value("${registration.message.name}")
     private String nameNoError;
 
-    @Value("${registration.message.client.surname.noError}")
+    @Value("${registration.message.surname}")
     private String surnameNoError;
 
-    @Value("${registration.message.phoneNumber.noError}")
+    @Value("${registration.message.phoneNumber}")
     private String phoneNumberNoError;
 
-    @Value("${registration.message.city.noError}")
+    @Value("${registration.message.city}")
     private String cityNoError;
 
-    @Value("${registration.message.client.error}")
+    @Value("${registration.message.error}")
     private String error;
 
     //Introduction message
-    @Value("${registration.message.client.start}")
+    @Value("${registration.message.start}")
     private String startClientRegistration;
 
-    @Value("${registration.message.client.end}")
+    @Value("${registration.message.end}")
     private String endClientRegistration;
 }

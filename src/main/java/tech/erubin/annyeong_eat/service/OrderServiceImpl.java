@@ -31,7 +31,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order getOrder(User user, Cafe cafe) {
-        List<Integer> orderList = repository.getOrderByClientIdAndCafeId(cafe, user);
+        List<Integer> orderList = repository.getOrderByUserIdAndCafeId(cafe, user);
         if (orderList != null && !orderList.isEmpty()) {
             return repository.getById(orderList.get(0));
         }

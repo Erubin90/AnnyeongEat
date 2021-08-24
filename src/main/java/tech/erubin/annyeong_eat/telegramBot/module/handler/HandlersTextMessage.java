@@ -11,19 +11,19 @@ import tech.erubin.annyeong_eat.entity.Dish;
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
 public class HandlersTextMessage {
 
-    @Value("${handler.message.client.error}")
+    @Value("${handler.message.error}")
     private String error;
 
-    @Value("${handler.message.client.addDish}")
+    @Value("${handler.message.addDish}")
     private String addDish;
 
-    @Value("${handler.message.client.subDish}")
+    @Value("${handler.message.subDish}")
     private String subDish;
 
-    @Value("${handler.message.client.emptyDish}")
+    @Value("${handler.message.emptyDish}")
     private String emptyDish;
 
-    @Value("${handler.message.client.notWork}")
+    @Value("${handler.message.notWork}")
     private String notWork;
 
     public String getTextDish(Dish dish) {

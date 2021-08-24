@@ -5,9 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import tech.erubin.annyeong_eat.entity.*;
-import tech.erubin.annyeong_eat.service.DishOptionallyServiceImpl;
-import tech.erubin.annyeong_eat.service.DishServiceImpl;
-import tech.erubin.annyeong_eat.service.OrderServiceImpl;
 
 import java.util.List;
 
@@ -15,9 +12,9 @@ import java.util.List;
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
 public class OrderTextMessage {
-    private final DishOptionallyServiceImpl dishOptionallyService;
-    private final DishServiceImpl dishService;
-    private final OrderServiceImpl orderService;
+
+    @Value("${order.message.error}")
+    private String error;
 
     @Value("${regular.errorTrigger}")
     private String errorTrigger;
@@ -25,54 +22,44 @@ public class OrderTextMessage {
     @Value("${address.noError}")
     private String AddressNoError;
 
-    @Value("${order.message.client.emptyReceipt}")
+    @Value("${order.message.emptyReceipt}")
     private String emptyReceipt;
 
     @Value("${message.error.notButton}")
     private String notButton;
 
-    @Value("${order.message.client.hello}")
+    @Value("${order.message.hello}")
     private String hello;
 
-    @Value("${order.message.client.backToMainMenu}")
+    @Value("${order.message.backToMainMenu}")
     private String backToMainMenu;
 
-    @Value("${order.message.client.backToChoosingCafe}")
+    @Value("${order.message.backToChoosingCafe}")
     private String backToChoosingCafe;
 
-    @Value("${order.message.client.backToOrderMenu}")
+    @Value("${order.message.backToOrderMenu}")
     private String backToOrderMenu;
 
-    @Value("${order.message.client.backToAddress}")
+    @Value("${order.message.backToAddress}")
     private String backToAddress;
 
-    @Value("${order.message.client.backToPhoneNumber}")
+    @Value("${order.message.backToPhoneNumber}")
     private String backToPhoneNumber;
 
-    @Value("${order.message.client.backToPaymentMethod}")
+    @Value("${order.message.backToPaymentMethod}")
     private String backToPaymentMethod;
 
-    @Value("${order.message.client.nextToAddress}")
+    @Value("${order.message.nextToAddress}")
     private String nextToAddress;
 
-    @Value("${order.message.client.nextToPhoneNumber}")
+    @Value("${order.message.nextToPhoneNumber}")
     private String nextToPhoneNumber;
 
-    @Value("${order.message.client.nextToPaymentMethod}")
+    @Value("${order.message.nextToPaymentMethod}")
     private String nextToPaymentMethod;
 
-    @Value("${mainMenu.message.client.returnMainMenu}")
+    @Value("${mainMenu.message.returnMainMenu}")
     private String returnMainMenu;
-
-    @Value("${order.message.client.error}")
-    private String error;
-
-    public OrderTextMessage(DishOptionallyServiceImpl dishOptionallyService, DishServiceImpl dishService,
-                            OrderServiceImpl orderService) {
-        this.dishOptionallyService = dishOptionallyService;
-        this.dishService = dishService;
-        this.orderService = orderService;
-    }
 
     public String getFullOrder(Order order) {
         StringBuilder fullOrder = new StringBuilder(order.getOrderName() + ":\n\n");

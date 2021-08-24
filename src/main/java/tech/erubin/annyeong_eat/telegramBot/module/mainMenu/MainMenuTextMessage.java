@@ -13,20 +13,20 @@ import tech.erubin.annyeong_eat.telegramBot.states.OrderStateEnum;
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
 public class MainMenuTextMessage {
 
-    @Value("${mainMenu.message.client.help}")
+    @Value("${mainMenu.message.error}")
+    private String error;
+
+    @Value("${mainMenu.message.help}")
     private String help;
 
     @Value("${message.error.notButton}")
     private String notButton;
 
-    @Value("${mainMenu.message.client.returnMainMenu}")
+    @Value("${mainMenu.message.returnMainMenu}")
     private String returnMainMenu;
 
-    @Value("${mainMenu.message.client.choosingCafe}")
+    @Value("${mainMenu.message.choosingCafe}")
     private String choosingCafe;
-
-    @Value("${mainMenu.message.client.error}")
-    private String error;
 
     public String getClientProfile(User user) {
         int countOrder = 0;

@@ -20,7 +20,7 @@ public class UserState {
     private int id;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "user_id")
     private User userId;
 
     @Column(name = "state")

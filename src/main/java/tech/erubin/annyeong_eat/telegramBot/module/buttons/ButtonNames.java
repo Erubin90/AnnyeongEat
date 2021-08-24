@@ -42,7 +42,7 @@ public class ButtonNames {
     @Value("${order.button.confirm}")
     private String confirm;
 
-    @Value("${order.button.client.editor.payment}")
+    @Value("${order.button.editor.payment}")
     private String editionPayment;
 
     @Value("${mainMenu.button.order}")

@@ -34,11 +34,15 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "clientId",
+    @OneToMany(mappedBy = "userId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<UserState> userStateList;
 
-    @OneToMany(mappedBy = "clientId",
+    @OneToMany(mappedBy = "userId",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<UserPosition> userPositionList;
+
+    @OneToMany(mappedBy = "userId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Order> orderList;
 

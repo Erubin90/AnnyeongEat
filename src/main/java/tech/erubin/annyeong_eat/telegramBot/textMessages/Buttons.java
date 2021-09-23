@@ -6,7 +6,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import tech.erubin.annyeong_eat.entity.Dish;
 import tech.erubin.annyeong_eat.entity.Order;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,17 +59,8 @@ public abstract class Buttons {
     @Value("${mainMenu.button.info}")
     protected String clientInfo;
 
-    @Value("${employee.button.client}")
-    protected String client;
-
-    @Value("${employee.button.employee}")
-    protected String employee;
-
     @Value("${message.error.putButton}")
     protected String putButton;
-
-    @Value("${employee.button.exit}")
-    protected String exit;
 
     @Value("${employee.button.accept}")
     protected String accept;
@@ -84,14 +74,11 @@ public abstract class Buttons {
     @Value("${message.tag.info}")
     protected String messageInfo;
 
+    @Value("${employee.button.restart}")
+    protected String restart;
 
     public List<String> paymentMethod(){
         return List.of(cash, cards);
-    }
-
-    public List<String> backAndBasketAndNextButton() {
-        String basket = "\uD83D\uDED2";
-        return List.of(back, basket, next);
     }
 
     public List<String> typeDishesInCafe(Order order) {
@@ -102,7 +89,11 @@ public abstract class Buttons {
                 .collect(Collectors.toList());
     }
 
-    public List<List<String>> dishesMenuButtons(Order order) {
+//    protected List<String> operatorMainMenuButtons() {
+//        return List.of(restart);
+//    }
+
+    protected List<List<String>> dishesMenuButtons(Order order) {
         List<List<String>> orderMenuRows = new ArrayList<>();
         List<String> typeDishes = typeDishesInCafe(order);
         List<String> littleButtonName = typeDishes.stream()
@@ -126,7 +117,7 @@ public abstract class Buttons {
         return orderMenuRows;
     }
 
-    public List<List<String>> paymentButtons() {
+    protected List<List<String>> paymentButtons() {
         List<List<String>> orderPayment = new ArrayList<>();
         orderPayment.add(List.of(cash));
         orderPayment.add(List.of(cards));
@@ -134,14 +125,14 @@ public abstract class Buttons {
         return orderPayment;
     }
 
-    public List<List<String>> confirmButtons() {
+    protected List<List<String>> confirmButtons() {
         List<List<String>> orderConfirm = new ArrayList<>();
         orderConfirm.add(List.of(confirm));
         orderConfirm.add(List.of(back));
         return orderConfirm;
     }
 
-    public List<List<String>> getCityListButtons(Set<String> cafeCits) {
+    protected List<List<String>> getCityListButtons(Set<String> cafeCits) {
         List<List<String>> buttonNames = new ArrayList<>();
         for (String cafeCity : cafeCits) {
             buttonNames.add(List.of(cafeCity));
@@ -149,7 +140,7 @@ public abstract class Buttons {
         return buttonNames;
     }
 
-    public List<String> clientMainMenuButtons(){
+    protected List<String> clientMainMenuButtons(){
         List<String> buttonsName = new ArrayList<>();
         buttonsName.add(createOrder);
         buttonsName.add(checkOrder);
@@ -158,42 +149,20 @@ public abstract class Buttons {
         return buttonsName;
     }
 
-    public List<String> employeeMainMenuButtons(EmployeeEnum employeeStateEnum) {
-        List<String> buttons = new ArrayList<>();
-        switch (employeeStateEnum) {
-            case ADMINISTRATOR:
-                buttons.add(exit);
-                break;
-            case OPERATOR:
-                buttons.add(exit);
-                break;
-            case DEVELOPER:
-                buttons.add(exit);
-                break;
-            case COURIER:
-                buttons.add(exit);
-                break;
-        }
-        return buttons;
-    }
-
-    public List<String> clientHelpButtons(){
+    protected List<String> clientHelpButtons(){
         return List.of(back);
     }
 
-    public List<String> checkOrderButtons(){
+    protected List<String> checkOrderButtons(){
         return List.of(back);
     }
 
-    public List<String> profileInfoButtons(){
+    protected List<String> profileInfoButtons(){
         return List.of(back);
     }
 
-    public List<String> choiceDepartmentButtons(List<String> departmentList) {
-        List<String> buttons = new ArrayList<>();
-        buttons.add(client);
-        buttons.addAll(departmentList);
-        return buttons;
+    private List<String> backAndBasketAndNextButton() {
+        String basket = "\uD83D\uDED2";
+        return List.of(back, basket, next);
     }
-
 }

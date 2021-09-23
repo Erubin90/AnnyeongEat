@@ -4,8 +4,6 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-import tech.erubin.annyeong_eat.entity.Dish;
-import tech.erubin.annyeong_eat.service.*;
 
 @Getter
 @Component
@@ -74,31 +72,6 @@ public abstract class Handlers {
     @Value("${message.tag.info}")
     protected String messageInfo;
 
-    protected final UserServiceImpl clientService;
-    protected final OrderServiceImpl orderService;
-    protected final OrderStatesServiceImpl orderStatesService;
-    protected final DishServiceImpl dishService;
-    protected final ChequeDishServiceImpl chequeService;
-    protected final UserStatesServiceImpl stateService;
-    protected final CafeServiceImpl cafeService;
-
-    public Handlers(UserServiceImpl clientService, OrderServiceImpl orderService,
-                    OrderStatesServiceImpl orderStatesService, DishServiceImpl dishService,
-                    ChequeDishServiceImpl chequeService, UserStatesServiceImpl stateService,
-                    CafeServiceImpl cafeService) {
-        this.clientService = clientService;
-        this.orderService = orderService;
-        this.orderStatesService = orderStatesService;
-        this.dishService = dishService;
-        this.chequeService = chequeService;
-        this.stateService = stateService;
-        this.cafeService = cafeService;
-    }
-
-    public String getTextDish(Dish dish) {
-        String dishName = dish.getName();
-        double dishPrice = dish.getPrice();
-        String dishComment = dish.getComment();
-        return String.format("%s %s₽\n%s", dishName, dishPrice, dishComment);
-    }
+    @Value("${message.buttonNotWork}")
+    protected String buttonNotWork;
 }

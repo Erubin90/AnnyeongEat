@@ -6,7 +6,7 @@ import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.entity.UserState;
 import tech.erubin.annyeong_eat.repository.UserStatesRepository;
 import tech.erubin.annyeong_eat.service.serviceInterface.UserStateService;
-import tech.erubin.annyeong_eat.telegramBot.enums.UserEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class UserStatesServiceImpl implements UserStateService {
             return userStateList.get(userStateList.size() - 1);
         }
         else {
-            return create(user, UserEnum.REGISTRATION_START.getValue());
+            return create(user, ClientEnum.REGISTRATION_START.getValue());
         }
     }
 

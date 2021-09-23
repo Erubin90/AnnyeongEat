@@ -12,8 +12,9 @@ import tech.erubin.annyeong_eat.entity.*;
 import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
+import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.UserEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.OrderModule;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Handlers;
 
@@ -23,42 +24,111 @@ import java.util.List;
 public class CallbackQueryHandler extends Handlers {
     private final AnnyeongEatWebHook webHook;
     private final OrderModule orderModule;
+    private final UserServiceImpl clientService;
+    private final OrderServiceImpl orderService;
+    private final OrderStatesServiceImpl orderStatesService;
+    private final DishServiceImpl dishService;
+    private final ChequeDishServiceImpl chequeService;
+    private final UserStatesServiceImpl stateService;
+    private final CafeServiceImpl cafeService;
     private final InlineButtons inlineButtons;
 
-    public CallbackQueryHandler(UserServiceImpl clientService, OrderServiceImpl orderService,
-                                OrderStatesServiceImpl orderStatesService, DishServiceImpl dishService,
-                                ChequeDishServiceImpl chequeService, UserStatesServiceImpl stateService,
-                                CafeServiceImpl cafeService,
-                                @Lazy AnnyeongEatWebHook webHook, OrderModule orderModule,
+    public CallbackQueryHandler(@Lazy AnnyeongEatWebHook webHook, OrderModule orderModule, UserServiceImpl clientService,
+                                OrderServiceImpl orderService, OrderStatesServiceImpl orderStatesService,
+                                DishServiceImpl dishService, ChequeDishServiceImpl chequeService,
+                                UserStatesServiceImpl stateService, CafeServiceImpl cafeService,
                                 InlineButtons inlineButtons) {
-        super(clientService, orderService, orderStatesService, dishService, chequeService,
-                stateService, cafeService);
         this.webHook = webHook;
         this.orderModule = orderModule;
+        this.clientService = clientService;
+        this.orderService = orderService;
+        this.orderStatesService = orderStatesService;
+        this.dishService = dishService;
+        this.chequeService = chequeService;
+        this.stateService = stateService;
+        this.cafeService = cafeService;
         this.inlineButtons = inlineButtons;
     }
 
     public BotApiMethod<?> handleUpdate(CallbackQuery callback) {
         String userId = callback.getFrom().getId().toString();
-        String buttonDate = callback.getData();
         String chatId = callback.getMessage().getChatId().toString();
-        String callbackText = error;
+        int messageId = callback.getMessage().getMessageId();
+        String buttonDate = callback.getData();
+        String elementId = getTag(buttonDate);
 
         User user = clientService.getUser(userId);
         UserState userState = stateService.getState(user);
-        UserEnum userEnum = getClientState(userState);
+        EmployeeEnum employeeEnum = EmployeeEnum.GET.department(userState.getState());
 
-        String id = getTag(buttonDate);
+        if (employeeEnum != null) {
+            return employeeCallback(callback, employeeEnum, buttonDate, chatId, messageId, elementId);
+        }
+        else {
+            ClientEnum clientEnum = getClientState(userState);
+            return clientCallback(callback, user, clientEnum, buttonDate, chatId, messageId, elementId);
+
+        }
+    }
+
+    private BotApiMethod<?> employeeCallback(CallbackQuery callback, EmployeeEnum employeeEnum, String buttonDate,
+                                             String chatId, int messageId, String elementId) {
+        BotApiMethod<?> botApiMethod;
+        InlineKeyboardMarkup inlineMarkup;
         Order order;
         OrderState orderState;
 
-        int messageId = callback.getMessage().getMessageId();
+        if (employeeEnum == EmployeeEnum.OPERATOR) {
+            if (buttonDate.matches("\\d+(in)")) {
+                botApiMethod = answerCallbackQuery(callback, messageInfo);
+            }
+            else {
+                order = orderService.getOrderById(elementId);
+                int size = order.getOrderStateList().size() - 1;
+                OrderEnum orderEnum = OrderEnum.GET.orderState(order.getOrderStateList().get(size).getState());
+                String editText = orderModule.getFullOrder(order);
+                if (orderEnum == OrderEnum.ORDER_END_REGISTRATION) {
+                    if (buttonDate.matches("\\d+[o][+]")) {
+                        orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
+                        orderStatesService.save(orderState);
+                        inlineMarkup = inlineButtons.getOperatorButtons(order);
+                        botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
+                    }
+                    else if (buttonDate.matches("\\d+[o][-]")) {
+                        orderState = orderStatesService.create(order, OrderEnum.ORDER_CANCEL.getValue());
+                        orderStatesService.save(orderState);
+                        inlineMarkup = inlineButtons.getOperatorButtons(order);
+                        botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
+                    }
+                    else {
+                        botApiMethod = answerCallbackQuery(callback, error);
+                    }
+                }
+                else if (orderEnum == OrderEnum.ORDER_ACCEPT || orderEnum == OrderEnum.ORDER_CANCEL) {
+                    inlineMarkup = inlineButtons.getOperatorButtons(order);
+                    botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
+                }
+                else {
+                    botApiMethod = answerCallbackQuery(callback, notWork);
+                }
+            }
+        }
+        else {
+            botApiMethod = answerCallbackQuery(callback, buttonNotWork);
+        }
+        return botApiMethod;
+    }
 
+    private BotApiMethod<?> clientCallback(CallbackQuery callback, User user, ClientEnum clientEnum, String buttonDate,
+                                           String chatId, int messageId, String elementId) {
+        String callbackText = error;
         BotApiMethod<?> botApiMethod;
         InlineKeyboardMarkup inlineMarkup;
-        if (userEnum == UserEnum.ORDER_CAFE_MENU) {
+        Order order;
+
+        if (clientEnum == ClientEnum.ORDER_CAFE_MENU) {
             order = orderService.getOrderById(user);
-            Dish dish = dishService.getDishById(Integer.parseInt(id));
+            Dish dish = dishService.getDishById(Integer.parseInt(elementId));
             ChequeDish chequeDish = chequeService.getChequeByOrderAndDish(order, dish);
             int count = chequeDish.getCountDishes();
             if (buttonDate.matches("\\d+[mb][+]")) {
@@ -82,18 +152,16 @@ public class CallbackQueryHandler extends Handlers {
             else if (buttonDate.matches("\\d+(in)")) {
                 callbackText = messageInfo;
             }
-
             if (buttonDate.matches("\\d+")) {
                 callbackText = getTextDish(dish);
-                inlineMarkup = inlineButtons.clientCheque(id, chequeDish);
+                inlineMarkup = inlineButtons.clientCheque(elementId, chequeDish);
                 if (!webHook.sendPhoto(chatId, callbackText, dish.getLinkPhoto(), inlineMarkup)) {
                     callbackText = error;
                 }
             }
             else if (buttonDate.matches("\\d+m[+0-]")) {
-                inlineMarkup = inlineButtons.clientCheque(id, chequeDish);
-                EditMessageReplyMarkup editMessageReplyMarkup =
-                        new EditMessageReplyMarkup(chatId, messageId, null, inlineMarkup);
+                inlineMarkup = inlineButtons.clientCheque(elementId, chequeDish);
+                EditMessageReplyMarkup editMessageReplyMarkup = editMessageReplyMarkup(chatId, messageId, inlineMarkup);
                 if (!webHook.updateMarkups(editMessageReplyMarkup)) {
                     if (buttonDate.matches("\\d+m0") && count == 0) {
                         callbackText = dish.getName() + " " + emptyDish;
@@ -106,75 +174,47 @@ public class CallbackQueryHandler extends Handlers {
             else if (buttonDate.matches("\\d+b[+0-]")) {
                 inlineMarkup = inlineButtons.getFullOrderButtons(order);
                 String editText = orderModule.getFullOrder(order);
-                EditMessageText editMessageText =
-                        new EditMessageText(chatId, messageId, null, editText, null,
-                                null, inlineMarkup, null);
+                EditMessageText editMessageText = editMessageText(chatId, messageId, editText, inlineMarkup);
                 if (!webHook.updateText(editMessageText)) {
                     callbackText = error;
                 }
             }
-
             saveOrDeleteChequeDish(chequeDish, count);
-            botApiMethod = getAnswerCallbackQuery(callback, callbackText);
-        }
-        else if (userEnum == UserEnum.OPERATOR) {
-            if (buttonDate.matches("\\d+(in)")) {
-                botApiMethod = getAnswerCallbackQuery(callback, messageInfo);
-            }
-            else {
-                order = orderService.getOrderById(id);
-                int size = order.getOrderStateList().size() - 1;
-                OrderEnum orderEnum = OrderEnum.GET.orderState(order.getOrderStateList().get(size).getState());
-                String editText = orderModule.getFullOrder(order);
-                if (orderEnum == OrderEnum.ORDER_END_REGISTRATION) {
-                    if (buttonDate.matches("\\d+[o][+]")) {
-                        orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
-                        orderStatesService.save(orderState);
-                        inlineMarkup = inlineButtons.getOperatorButtons(order);
-                        botApiMethod = new EditMessageText(chatId, messageId, null, editText,
-                                null, null, inlineMarkup, null);
-                    } else if (buttonDate.matches("\\d+[o][-]")) {
-                        orderState = orderStatesService.create(order, OrderEnum.ORDER_CANCEL.getValue());
-                        orderStatesService.save(orderState);
-                        inlineMarkup = inlineButtons.getOperatorButtons(order);
-                        botApiMethod = new EditMessageText(chatId, messageId, null, editText,
-                                null, null, inlineMarkup, null);
-                    } else {
-                        botApiMethod = getAnswerCallbackQuery(callback, error);
-                    }
-                }
-                else if (orderEnum == OrderEnum.ORDER_ACCEPT || orderEnum == OrderEnum.ORDER_CANCEL) {
-                    inlineMarkup = inlineButtons.getOperatorButtons(order);
-                    botApiMethod = new EditMessageText(chatId, messageId, null, editText,
-                            null, null, inlineMarkup, null);
-                }
-                else {
-                    botApiMethod = getAnswerCallbackQuery(callback, notWork);
-                }
-            }
+            botApiMethod = answerCallbackQuery(callback, callbackText);
         }
         else {
-            botApiMethod = getAnswerCallbackQuery(callback, error);
+            botApiMethod = answerCallbackQuery(callback, buttonNotWork);
         }
         return botApiMethod;
     }
 
-    private UserEnum getClientState(UserState userState) {
+    private ClientEnum getClientState(UserState userState) {
         List<String> cafeNameList = cafeService.getAllCafeNames();
         if (cafeNameList.contains(userState.getState())) {
-            return UserEnum.ORDER_CAFE_MENU;
+            return ClientEnum.ORDER_CAFE_MENU;
         }
         else {
-            return UserEnum.GET.userState(userState.getState());
+            return ClientEnum.GET.userState(userState.getState());
         }
     }
 
-    private AnswerCallbackQuery getAnswerCallbackQuery(CallbackQuery callback, String text) {
+    private AnswerCallbackQuery answerCallbackQuery(CallbackQuery callback, String text) {
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
         answerCallbackQuery.setCallbackQueryId(callback.getId());
         answerCallbackQuery.setText(text);
         answerCallbackQuery.setShowAlert(false);
         return answerCallbackQuery;
+    }
+
+    private EditMessageText editMessageText(String chatId, int messageId, String text,
+                                            InlineKeyboardMarkup inlineMarkup) {
+        return new EditMessageText(chatId, messageId, null, text,
+                null, null, inlineMarkup, null);
+    }
+
+    private EditMessageReplyMarkup editMessageReplyMarkup(String chatId, int messageId,
+                                                          InlineKeyboardMarkup inlineMarkup) {
+        return new EditMessageReplyMarkup(chatId, messageId, null, inlineMarkup);
     }
 
     private String getTag(String buttonDate) {
@@ -194,5 +234,12 @@ public class CallbackQueryHandler extends Handlers {
         else {
             chequeService.delete(chequeDish);
         }
+    }
+
+    public String getTextDish(Dish dish) {
+        String dishName = dish.getName();
+        double dishPrice = dish.getPrice();
+        String dishComment = dish.getComment();
+        return String.format("%s %s₽\n%s", dishName, dishPrice, dishComment);
     }
 }

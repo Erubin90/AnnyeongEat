@@ -1,19 +1,12 @@
 package tech.erubin.annyeong_eat.telegramBot.handler;
 
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Handlers;
 
 @Component
+@NoArgsConstructor
 public class CheckMessage extends Handlers {
-
-    public CheckMessage(UserServiceImpl clientService, OrderServiceImpl orderService,
-                        OrderStatesServiceImpl orderStatesService, DishServiceImpl dishService,
-                        ChequeDishServiceImpl chequeService, UserStatesServiceImpl stateService,
-                        CafeServiceImpl cafeService) {
-        super(clientService, orderService, orderStatesService, dishService, chequeService,
-                stateService, cafeService);
-    }
 
     //    message.error.obsceneWord = message.error.obsceneWord
     public String checkName(String sourceText) {

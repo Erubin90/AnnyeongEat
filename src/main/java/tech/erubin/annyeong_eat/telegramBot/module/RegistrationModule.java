@@ -1,15 +1,15 @@
 package tech.erubin.annyeong_eat.telegramBot.module;
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.entity.UserState;
 import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
-import tech.erubin.annyeong_eat.telegramBot.enums.UserEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Module;
 
@@ -30,63 +30,68 @@ public class RegistrationModule extends Module {
         this.checkMessage = checkMessage;
     }
 
-    public BotApiMethod<?> start(Update update, User user, UserEnum userEnum) {
-        String chatId = update.getMessage().getChatId().toString();
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        String sourceText = update.getMessage().getText();
-        String text = error;
-        UserState userState = null;
+    public SendMessage start(Update update, User user) {
         Set<String> allCityName = cafeService.getAllCity();
+        String text = startClientRegistration + "\n" + errorNameCity;
+        UserState userState = userStatesService.create(user, ClientEnum.REGISTRATION_CITY.getValue());
+        ReplyKeyboard replyKeyboard = replyButtons.userRegistrationCity(allCityName);
+        return sendMessage(update,  replyKeyboard, text, userState);
+    }
 
-        switch (userEnum) {
-            case REGISTRATION_START:
-                text = startClientRegistration + "\n" + errorNameCity;
-                userState = userStatesService.create(user, UserEnum.REGISTRATION_CITY.getValue());
-                sendMessage.setReplyMarkup(replyButtons.userRegistrationCity(allCityName));
-                break;
-            case REGISTRATION_CITY:
-                text = errorNameCity;
-                if (allCityName.contains(sourceText)) {
-                    text = cityNoError;
-                    user.setCity(sourceText);
-                    userState = userStatesService.create(user, UserEnum.REGISTRATION_NAME.getValue());
-                }
-                else {
-                    sendMessage.setReplyMarkup(replyButtons.userRegistrationCity(allCityName));
-                }
-                break;
-            case REGISTRATION_NAME:
-                sendMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
-                text = checkMessage.checkName(sourceText);
-                if (!text.contains(errorTrigger)) {
-                    text = nameNoError;
-                    user.setName(sourceText);
-                    userState = userStatesService.create(user, UserEnum.REGISTRATION_SURNAME.getValue());
-                }
-                break;
-            case REGISTRATION_SURNAME:
-                text = checkMessage.checkSurname(sourceText);
-                if (!text.contains(errorTrigger)) {
-                    user.setSurname(sourceText);
-                    userState = userStatesService.create(user, UserEnum.REGISTRATION_PHONE_NUMBERS.getValue());
-                }
-                break;
-            case REGISTRATION_PHONE_NUMBERS:
-                text = checkMessage.checkPhoneNumber(sourceText);
-                if (!text.contains(errorTrigger)) {
-                    if (sourceText.length() == 12) {
-                        sourceText = "8" + sourceText.substring(2, 12);
-                    }
-                    text = phoneNumberNoError + "\n" +
-                            endUserRegistration;
-                    user.setPhoneNumber(sourceText);
-                    userState = userStatesService.create(user, UserEnum.MAIN_MENU.getValue());
-                    sendMessage.enableMarkdown(true);
-                    sendMessage.setReplyMarkup(replyButtons.userMainMenu());
-                }
-                break;
+    public SendMessage city(Update update, User user, String sourceText) {
+        Set<String> allCityName = cafeService.getAllCity();
+        String text = errorNameCity;
+        UserState userState = null;
+        ReplyKeyboard replyKeyboard = new ReplyKeyboardRemove(true);
+        if (allCityName.contains(sourceText)) {
+            text = cityNoError;
+            user.setCity(sourceText);
+            userState = userStatesService.create(user, ClientEnum.REGISTRATION_NAME.getValue());
         }
-        return sendMessage(sendMessage, user, userState, text);
+        else {
+            replyKeyboard = replyButtons.userRegistrationCity(allCityName);
+        }
+        return sendMessage(update, replyKeyboard, text, userState, user);
+    }
+
+    public SendMessage name(Update update, User user, String sourceText) {
+        String text = checkMessage.checkName(sourceText);
+        ReplyKeyboard replyKeyboard = new ReplyKeyboardRemove(true);
+        UserState userState = null;
+        if (!text.contains(errorTrigger)) {
+            text = nameNoError;
+            user.setName(sourceText);
+            userState = userStatesService.create(user, ClientEnum.REGISTRATION_SURNAME.getValue());
+        }
+        return sendMessage(update, replyKeyboard, text, userState, user);
+    }
+
+    public SendMessage surname(Update update, User user, String sourceText) {
+        String text = checkMessage.checkSurname(sourceText);
+        ReplyKeyboard replyKeyboard = new ReplyKeyboardRemove(true);
+        UserState userState = null;
+        if (!text.contains(errorTrigger)) {
+            text = surnameNoError;
+            user.setSurname(sourceText);
+            userState = userStatesService.create(user, ClientEnum.REGISTRATION_PHONE_NUMBERS.getValue());
+        }
+        return sendMessage(update, replyKeyboard, text, userState, user);
+    }
+
+    public SendMessage phoneNumber(Update update, User user, String sourceText) {
+        String text = checkMessage.checkPhoneNumber(sourceText);
+        UserState userState = null;
+        ReplyKeyboard replyKeyboard = new ReplyKeyboardRemove(true);
+        if (!text.contains(errorTrigger)) {
+            if (sourceText.length() == 12) {
+                sourceText = "8" + sourceText.substring(2, 12);
+            }
+            text = phoneNumberNoError + "\n" +
+                    endUserRegistration;
+            user.setPhoneNumber(sourceText);
+            userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
+            replyKeyboard = replyButtons.userMainMenu();
+        }
+        return sendMessage(update, replyKeyboard, text, userState, user);
     }
 }

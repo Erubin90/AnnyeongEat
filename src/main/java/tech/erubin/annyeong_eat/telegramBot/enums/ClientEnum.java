@@ -1,7 +1,6 @@
 package tech.erubin.annyeong_eat.telegramBot.enums;
 
-public enum UserEnum {
-
+public enum ClientEnum {
     REGISTRATION_START("начало регистрации"),
     REGISTRATION_CITY("регистрация города"),
     REGISTRATION_NAME("регистрация имени"),
@@ -19,20 +18,14 @@ public enum UserEnum {
     DELIVERY_PHONE_NUMBER("указание номера"),
     DELIVERY_PAYMENT_METHOD("указание способа оплаты"),
     DELIVERY_CONFIRMATION("подтверждение заказа"),
-
-    CLIENT("Клиент"),
-    OPERATOR("Оператор"),
-    ADMINISTRATOR("Администратор"),
-    COURIER("Курьер"),
-    DEVELOPER("Разработчик"),
     GET;
 
     private String clientState;
 
-    UserEnum() {
+    ClientEnum() {
     }
 
-    UserEnum(String clientState) {
+    ClientEnum(String clientState) {
         this.clientState = clientState;
     }
 
@@ -40,7 +33,7 @@ public enum UserEnum {
         return clientState;
     }
 
-    public UserEnum userState(String state) {
+    public ClientEnum userState(String state) {
 
         if (state.equals(REGISTRATION_START.clientState)) {
             return REGISTRATION_START;
@@ -86,21 +79,6 @@ public enum UserEnum {
         }
         else if (state.equals(DELIVERY_ADDRESS.clientState)) {
             return DELIVERY_ADDRESS;
-        }
-        else if (state.equals(OPERATOR.clientState)) {
-            return OPERATOR;
-        }
-        else if (state.equals(ADMINISTRATOR.clientState)) {
-            return ADMINISTRATOR;
-        }
-        else if (state.equals(COURIER.clientState)) {
-            return COURIER;
-        }
-        else if (state.equals(DEVELOPER.clientState)) {
-            return DEVELOPER;
-        }
-        else if (state.equals(CLIENT.clientState)) {
-            return CLIENT;
         }
         else {
             return null;

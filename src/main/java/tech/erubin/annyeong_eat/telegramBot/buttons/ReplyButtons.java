@@ -1,19 +1,20 @@
 package tech.erubin.annyeong_eat.telegramBot.buttons;
 
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.User;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.service.CafeServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Buttons;
 
 import java.util.*;
 
 @Component
-@NoArgsConstructor
+@AllArgsConstructor
 public class ReplyButtons extends Buttons {
+    private final CafeServiceImpl cafeService;
 
     public ReplyKeyboardMarkup userRegistrationCity(Set<String> cafeCits) {
         List<List<String>> buttonNames = getCityListButtons(cafeCits);
@@ -22,10 +23,6 @@ public class ReplyButtons extends Buttons {
 
     public ReplyKeyboardMarkup userMainMenu() {
         return replyKeyboardMarkup(clientMainMenuButtons());
-    }
-
-    public ReplyKeyboardMarkup employeeMainMenu(EmployeeEnum employeeStateEnum) {
-        return replyKeyboardMarkup(employeeMainMenuButtons(employeeStateEnum));
     }
 
     public ReplyKeyboardMarkup userCheckOrder() {
@@ -40,7 +37,8 @@ public class ReplyButtons extends Buttons {
         return replyKeyboardMarkup(profileInfoButtons());
     }
 
-    public ReplyKeyboardMarkup userOrderCafe(List<String> cafeNames) {
+    public ReplyKeyboardMarkup userOrderCafe(User user) {
+        List<String> cafeNames = cafeService.getCafeNameByCity(user.getCity());
         List<List<String>> buttonName = new ArrayList<>();
         for (String cafeName : cafeNames) {
             buttonName.add(List.of(cafeName));
@@ -54,7 +52,7 @@ public class ReplyButtons extends Buttons {
     }
 
     public ReplyKeyboardMarkup userOrderAddress(User user) {
-        Set<String> buttonNames = new HashSet<>();
+        Set<String> buttonNames = new LinkedHashSet<>();
         List<Order> orderList = user.getOrderList();
 
         for (Order order : orderList){
@@ -62,11 +60,8 @@ public class ReplyButtons extends Buttons {
                 buttonNames.add(order.getAddress());
             }
         }
-
-        List<KeyboardRow> keyboardRows = keyboardManyButtonRows(buttonNames);
-        keyboardRows.add(keyboardOneButtonRow(this.getBack()));
-        return new ReplyKeyboardMarkup(keyboardRows, true, false,
-                false, putButton);
+        buttonNames.add(back);
+        return replyKeyboardMarkup(buttonNames);
     }
 
     public ReplyKeyboardMarkup userOrderPhoneNumber(User user) {
@@ -92,9 +87,9 @@ public class ReplyButtons extends Buttons {
         return replyKeyboardMarkup(confirmButtons(), false);
     }
 
-    public ReplyKeyboardMarkup choiceDepartment(List<String> department) {
-        return replyKeyboardMarkup(choiceDepartmentButtons(department));
-    }
+//    public ReplyKeyboardMarkup operatorMainMenu() {
+//        return replyKeyboardMarkup(operatorMainMenuButtons());
+//    }
 
     private ReplyKeyboardMarkup replyKeyboardMarkup(Collection<String> buttonNames) {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
@@ -114,21 +109,5 @@ public class ReplyButtons extends Buttons {
             keyboardRows.add(row);
         }
         return new ReplyKeyboardMarkup(keyboardRows, true, oneTimeKeyboard, false, putButton);
-    }
-
-    private List<KeyboardRow> keyboardManyButtonRows(Set<String> buttonNames) {
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        for (String buttonName : buttonNames) {
-            KeyboardRow row = new KeyboardRow();
-            row.add(buttonName);
-            keyboardRows.add(row);
-        }
-        return keyboardRows;
-    }
-
-    private KeyboardRow keyboardOneButtonRow(String buttonName) {
-        KeyboardRow row = new KeyboardRow();
-        row.add(buttonName);
-        return row;
     }
 }

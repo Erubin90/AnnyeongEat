@@ -1,7 +1,6 @@
 package tech.erubin.annyeong_eat.telegramBot.enums;
 
 public enum EmployeeEnum {
-    CLIENT("Клиент"),
     OPERATOR("Оператор"),
     ADMINISTRATOR("Администратор"),
     COURIER("Курьер"),
@@ -34,20 +33,12 @@ public enum EmployeeEnum {
             else if (department.equals(DEVELOPER.getValue())) {
                 return DEVELOPER;
             }
-            else if (department.equals(CLIENT.getValue())) {
-                return CLIENT;
-            }
             else {
-                throw new NullPointerException("Данного депатамента не существует");
+                return null;
             }
     }
 
-    public boolean isEmployee(EmployeeEnum department) {
-        return department != CLIENT;
+    public boolean isEmployee(String state) {
+        return department(state) != null;
     }
-
-    public boolean isEmployee(String department) {
-        return department(department) != CLIENT;
-    }
-
 }

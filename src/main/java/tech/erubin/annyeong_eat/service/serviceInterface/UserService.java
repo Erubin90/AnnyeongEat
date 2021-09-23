@@ -4,11 +4,11 @@ import tech.erubin.annyeong_eat.entity.User;
 
 public interface UserService {
 
-    User getClient(String userid, String userName);
+    User getUser(String userid);
 
     void save(User user);
 
     void delete(User user);
 
-    User create(String telegramUserId, String telegramUserName);
+    User create(String telegramUserId);
 }

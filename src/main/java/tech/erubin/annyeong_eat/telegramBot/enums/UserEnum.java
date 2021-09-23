@@ -1,6 +1,6 @@
-package tech.erubin.annyeong_eat.telegramBot.states;
+package tech.erubin.annyeong_eat.telegramBot.enums;
 
-public enum UserStateEnum {
+public enum UserEnum {
 
     REGISTRATION_START("начало регистрации"),
     REGISTRATION_CITY("регистрация города"),
@@ -19,15 +19,21 @@ public enum UserStateEnum {
     DELIVERY_PHONE_NUMBER("указание номера"),
     DELIVERY_PAYMENT_METHOD("указание способа оплаты"),
     DELIVERY_CONFIRMATION("подтверждение заказа"),
-    ERROR("ошибка"),
+
+    CHOICE_DEPARTMENT("Выбор депортамента"),
+    CLIENT("Клиент"),
+    OPERATOR("Оператор"),
+    ADMINISTRATOR("Администратор"),
+    COURIER("Курьер"),
+    DEVELOPER("Разработчик"),
     GET;
 
     private String clientState;
 
-    UserStateEnum() {
+    UserEnum() {
     }
 
-    UserStateEnum(String clientState) {
+    UserEnum(String clientState) {
         this.clientState = clientState;
     }
 
@@ -35,7 +41,7 @@ public enum UserStateEnum {
         return clientState;
     }
 
-    public UserStateEnum clientState(String state) {
+    public UserEnum userState(String state) {
 
         if (state.equals(REGISTRATION_START.clientState)) {
             return REGISTRATION_START;
@@ -70,9 +76,6 @@ public enum UserStateEnum {
         else if (state.equals(ORDER_CAFE_MENU.clientState)) {
             return ORDER_CAFE_MENU;
         }
-        else if (state.equals(DELIVERY_ADDRESS.clientState)) {
-            return DELIVERY_ADDRESS;
-        }
         else if (state.equals(DELIVERY_PHONE_NUMBER.clientState)) {
             return DELIVERY_PHONE_NUMBER;
         }
@@ -82,8 +85,36 @@ public enum UserStateEnum {
         else if (state.equals(DELIVERY_CONFIRMATION.clientState)) {
             return DELIVERY_CONFIRMATION;
         }
-        else {
-            return ERROR;
+        else if (state.equals(DELIVERY_ADDRESS.clientState)) {
+            return DELIVERY_ADDRESS;
         }
+        else if (state.equals(OPERATOR.clientState)) {
+            return OPERATOR;
+        }
+        else if (state.equals(ADMINISTRATOR.clientState)) {
+            return ADMINISTRATOR;
+        }
+        else if (state.equals(COURIER.clientState)) {
+            return COURIER;
+        }
+        else if (state.equals(DEVELOPER.clientState)) {
+            return DEVELOPER;
+        }
+        else if (state.equals(CHOICE_DEPARTMENT.clientState)) {
+            return CHOICE_DEPARTMENT;
+        }
+        else if (state.equals(CLIENT.clientState)) {
+            return CLIENT;
+        }
+        else {
+            return null;
+        }
+    }
+
+    public boolean isEmployeeState(UserEnum userEnum) {
+        return userEnum == UserEnum.OPERATOR ||
+                userEnum == UserEnum.ADMINISTRATOR ||
+                userEnum == UserEnum.COURIER ||
+                userEnum == UserEnum.DEVELOPER;
     }
 }

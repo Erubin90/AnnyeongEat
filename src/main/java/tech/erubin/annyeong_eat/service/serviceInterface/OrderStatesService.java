@@ -9,4 +9,6 @@ public interface OrderStatesService {
     void delete(OrderState orderState);
 
     OrderState create(Order order, String state);
+
+    OrderState getLastOrderState(Order order);
 }

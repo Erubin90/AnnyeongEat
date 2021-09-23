@@ -9,9 +9,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import tech.erubin.annyeong_eat.service.DepartmentServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
-import tech.erubin.annyeong_eat.telegramBot.module.handler.CallbackQueryHandler;
-import tech.erubin.annyeong_eat.telegramBot.module.handler.MessageHandler;
+import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
+import tech.erubin.annyeong_eat.telegramBot.handler.CallbackQueryHandler;
+import tech.erubin.annyeong_eat.telegramBot.handler.MessageHandler;
 
 @Getter
 @Setter
@@ -31,15 +33,21 @@ public class AnnyeongEatWebHookConfig {
 
     private MessageHandler messageHandler;
     private CallbackQueryHandler callbackQueryHandler;
+    private DepartmentServiceImpl departmentService;
+    private InlineButtons inlineButtons;
 
-    public AnnyeongEatWebHookConfig(MessageHandler messageHandler, CallbackQueryHandler callbackQueryHandler) {
+    public AnnyeongEatWebHookConfig(MessageHandler messageHandler, CallbackQueryHandler callbackQueryHandler,
+                                    DepartmentServiceImpl departmentService, InlineButtons inlineButtons) {
         this.messageHandler = messageHandler;
         this.callbackQueryHandler = callbackQueryHandler;
+        this.departmentService = departmentService;
+        this.inlineButtons = inlineButtons;
     }
 
     @Bean
     public AnnyeongEatWebHook getAnnyeongEatWebHook() {
-        return new AnnyeongEatWebHook(botUsername, botToken, botPath, messageHandler, callbackQueryHandler);
+        return new AnnyeongEatWebHook(botUsername, botToken, botPath, messageHandler, callbackQueryHandler,
+                departmentService, inlineButtons);
     }
 
     @Bean

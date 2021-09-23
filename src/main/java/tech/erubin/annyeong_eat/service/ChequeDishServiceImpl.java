@@ -24,7 +24,9 @@ public class ChequeDishServiceImpl implements ChequeDishService {
 
     @Override
     public void save(ChequeDish chequeDish) {
-        repository.save(chequeDish);
+        if (chequeDish != null) {
+            repository.save(chequeDish);
+        }
     }
 
     @Override

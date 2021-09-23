@@ -7,6 +7,8 @@ import tech.erubin.annyeong_eat.entity.OrderState;
 import tech.erubin.annyeong_eat.repository.OrderStatesRepository;
 import tech.erubin.annyeong_eat.service.serviceInterface.OrderStatesService;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class OrderStatesServiceImpl implements OrderStatesService {
@@ -27,5 +29,12 @@ public class OrderStatesServiceImpl implements OrderStatesService {
     @Override
     public OrderState create(Order order, String state) {
         return new OrderState(order, state);
+    }
+
+    @Override
+    public OrderState getLastOrderState(Order order) {
+        List<OrderState> orderStateList = repository.getOrderStateByOrderId(order);
+        int lastIndex = orderStateList.size();
+        return orderStateList.get(lastIndex - 1);
     }
 }

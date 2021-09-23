@@ -12,9 +12,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
     @Override
-    public User getClient(String userId, String userName) {
+    public User getUser(String userId) {
         User user = repository.findByTelegramUserId(userId);
-        return user != null ? user : create(userId, userName);
+        return user != null ? user : create(userId);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(String userId, String userName) {
-        return new User(userId, userName);
+    public User create(String userId) {
+        return new User(userId);
     }
 }

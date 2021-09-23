@@ -1,15 +1,19 @@
-package tech.erubin.annyeong_eat.telegramBot.module.handler;
+package tech.erubin.annyeong_eat.telegramBot.handler;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import tech.erubin.annyeong_eat.telegramBot.module.order.OrderTextMessage;
-import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationTextMessage;
+import tech.erubin.annyeong_eat.service.*;
+import tech.erubin.annyeong_eat.telegramBot.textMessages.Handlers;
 
 @Component
-@AllArgsConstructor
-public class CheckMessage{
-    private final RegistrationTextMessage registrationMessage;
-    private final OrderTextMessage orderMessage;
+public class CheckMessage extends Handlers {
+
+    public CheckMessage(UserServiceImpl clientService, OrderServiceImpl orderService,
+                        OrderStatesServiceImpl orderStatesService, DishServiceImpl dishService,
+                        ChequeDishServiceImpl chequeService, UserStatesServiceImpl stateService,
+                        CafeServiceImpl cafeService) {
+        super(clientService, orderService, orderStatesService, dishService, chequeService,
+                stateService, cafeService);
+    }
 
     //    message.error.obsceneWord = message.error.obsceneWord
     public String checkName(String sourceText) {
@@ -50,7 +54,7 @@ public class CheckMessage{
 
     private String checkIsNumber(String sourceText) {
         if (sourceText.matches(".*\\d+.*")){
-             return registrationMessage.getErrorNumber();
+             return errorNumber;
         }
         return "";
     }
@@ -59,19 +63,19 @@ public class CheckMessage{
         if (sourceText.matches("([А-Яа-яёЁ]+)[- ]?([А-Яа-яёЁ]+)[- ]?([А-Яа-яёЁ]+)")) {
             return "";
         }
-        return registrationMessage.getErrorFalseTextForm();
+        return errorFalseTextForm;
     }
 
     private String checkFormAddress(String sourceText) {
         if (sourceText.matches("[А-Яа-я0-9 ,./-]+")) {
             return "";
         }
-        return registrationMessage.getErrorFalseTextForm();
+        return errorFalseTextForm;
     }
 
     private String checkNoCorrectCharNameAndSurname(String sourceText) {
         if (sourceText.matches(".*[@#$%^&*+!(){};:<>?~`_|/,\"\\[\\]\\n\\t\\f\\r].*")) {
-            return registrationMessage.getErrorNoCorrectChar();
+            return errorNoCorrectChar;
         }
         return "";
     }
@@ -80,12 +84,12 @@ public class CheckMessage{
         if (sourceText.matches("[0-9+]+")) {
             return "";
         }
-        return registrationMessage.getErrorNoCorrectChar();
+        return errorNoCorrectChar;
     }
 
     private String checkNoCorrectCharAddress(String sourceText) {
         if (sourceText.matches(".*[@#$%^&*+!(){};:<>?~`_|\"\\[\\]\\n\\t\\f\\r].*")) {
-            return registrationMessage.getErrorNoCorrectChar();
+            return errorNoCorrectChar;
         }
         return "";
     }
@@ -93,10 +97,10 @@ public class CheckMessage{
     private String checkLength(String text, int minLength, int maxLength) {
         int lengthText = text.length();
         if (lengthText < minLength) {
-            return String.format(registrationMessage.getErrorLittleLength(), minLength);
+            return String.format(errorLittleLength, minLength);
         }
         if (lengthText > maxLength){
-            return String.format(registrationMessage.getErrorBigLength(), maxLength);
+            return String.format(errorBigLength, maxLength);
         }
         return "";
     }
@@ -106,7 +110,7 @@ public class CheckMessage{
             sourcePhoneNumber.matches("89\\d{9}")){
             return "";
         }
-        return registrationMessage.getErrorFormatPhoneNumber();
+        return errorFormatPhoneNumber;
     }
 
     private String checkObsceneWord() {
@@ -114,8 +118,8 @@ public class CheckMessage{
     }
 
     private String checkCorrectlyName(StringBuilder resultText){
-        if (!resultText.toString().contains(registrationMessage.getErrorTrigger())){
-            return registrationMessage.getNameNoError();
+        if (!resultText.toString().contains(errorTrigger)){
+            return nameNoError;
         }
         else {
             return resultText.toString();
@@ -123,8 +127,8 @@ public class CheckMessage{
     }
 
     private String checkCorrectlySurname(StringBuilder resultText){
-        if (!resultText.toString().contains(registrationMessage.getErrorTrigger())){
-            return registrationMessage.getSurnameNoError();
+        if (!resultText.toString().contains(errorTrigger)){
+            return surnameNoError;
         }
         else {
             return resultText.toString();
@@ -132,8 +136,8 @@ public class CheckMessage{
     }
 
     private String checkCorrectlyPhoneNumber(StringBuilder resultText){
-        if (!resultText.toString().contains(registrationMessage.getErrorTrigger())){
-            return registrationMessage.getPhoneNumberNoError();
+        if (!resultText.toString().contains(errorTrigger)){
+            return phoneNumberNoError;
         }
         else {
             return resultText.toString();
@@ -141,8 +145,8 @@ public class CheckMessage{
     }
 
     private String checkCorrectlyAddress(StringBuilder resultText){
-        if (!resultText.toString().contains(orderMessage.getErrorTrigger())){
-            return orderMessage.getAddressNoError();
+        if (!resultText.toString().contains(errorTrigger)){
+            return addressNoError;
         }
         else {
             return resultText.toString();

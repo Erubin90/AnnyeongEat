@@ -16,5 +16,5 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     @Query("SELECT id " +
             "FROM Order " +
             "WHERE using = 1 AND cafeId = :cafe and userId = :user")
-    List<Integer> getOrderByUserIdAndCafeId(@Param("cafe")Cafe cafe, @Param("user") User user);
+    Integer getOrderByUserIdAndCafeId(@Param("cafe")Cafe cafe, @Param("user") User user);
 }

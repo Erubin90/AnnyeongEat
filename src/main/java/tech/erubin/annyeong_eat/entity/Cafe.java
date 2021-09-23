@@ -34,4 +34,8 @@ public class Cafe {
     @OneToMany(mappedBy = "cafeId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Order> orderList;
+
+    @OneToMany(mappedBy = "cafeId",
+            cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    private List<Department> departmentsList;
 }

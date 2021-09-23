@@ -28,9 +28,6 @@ public class User {
     @Column(name = "telegram_user_id")
     private String telegramUserId;
 
-    @Column(name = "telegram_username")
-    private String telegramUserName;
-
     @Column(name = "phone_number")
     private String phoneNumber;
 
@@ -40,14 +37,13 @@ public class User {
 
     @OneToMany(mappedBy = "userId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    private List<UserPosition> userPositionList;
+    private List<Order> orderList;
 
     @OneToMany(mappedBy = "userId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    private List<Order> orderList;
+    private List<Department> departmentsList;
 
-    public User(String telegramUserId, String telegramUserName) {
+    public User(String telegramUserId) {
         this.telegramUserId = telegramUserId;
-        this.telegramUserName = telegramUserName;
     }
 }

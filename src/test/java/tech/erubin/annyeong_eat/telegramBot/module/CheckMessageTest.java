@@ -7,8 +7,8 @@
 //import org.springframework.data.domain.Pageable;
 //import org.springframework.data.domain.Sort;
 //import tech.erubin.annyeong_eat.entity.*;
-//import tech.erubin.annyeong_eat.telegramBot.module.order.OrderTextMessage;
-//import tech.erubin.annyeong_eat.telegramBot.module.registration.RegistrationTextMessage;
+//import tech.erubin.annyeong_eat.telegramBot.textMessages.OrderTextMessage;
+//import tech.erubin.annyeong_eat.telegramBot.textMessages.RegistrationTextMessage;
 //import tech.erubin.annyeong_eat.repository.DishOptionallyRepository;
 //import tech.erubin.annyeong_eat.repository.DishRepository;
 //import tech.erubin.annyeong_eat.repository.OrderRepository;

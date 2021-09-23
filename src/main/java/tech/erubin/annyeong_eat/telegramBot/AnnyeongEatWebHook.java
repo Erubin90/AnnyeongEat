@@ -116,7 +116,6 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
         InlineKeyboardMarkup inlineKeyboardMarkup = inlineButtons.getEmployee(employeeEnum, order);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText(text);
-        sendMessage.setReplyToMessageId(1);
         try {
             for (User u : userList) {
                 sendMessage.setChatId(u.getTelegramUserId());

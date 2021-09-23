@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import tech.erubin.annyeong_eat.entity.Department;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.entity.UserState;
 import tech.erubin.annyeong_eat.service.*;
@@ -13,7 +12,6 @@ import tech.erubin.annyeong_eat.telegramBot.enums.UserEnum;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Module;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class MainMenuModule extends Module {
@@ -37,11 +35,6 @@ public class MainMenuModule extends Module {
         UserState userState = null;
         switch (userEnum) {
             case MAIN_MENU:
-                List<String> departmentList = user.getDepartmentsList()
-                        .stream()
-                        .map(Department::getName)
-                        .collect(Collectors.toList());
-
                 if (sourceText.equals(replyButtons.getCreateOrder())) {
                     text = choosingCafe;
                     userState = userStatesService.create(user, UserEnum.ORDER_CAFE.getValue());
@@ -63,14 +56,9 @@ public class MainMenuModule extends Module {
                     userState = userStatesService.create(user, UserEnum.PROFILE.getValue());
                     sendMessage.setReplyMarkup(replyButtons.userProfileInfo());
                 }
-                else if (sourceText.equals(replyButtons.getBack()) && !user.getDepartmentsList().isEmpty()) {
-                    text = choiceDepartment;
-                    userState = userStatesService.create(user, UserEnum.CHOICE_DEPARTMENT.getValue());
-                    sendMessage.setReplyMarkup(replyButtons.choiceDepartment(departmentList));
-                }
                 else {
                     text = putButton;
-                    sendMessage.setReplyMarkup(replyButtons.userMainMenu(user));
+                    sendMessage.setReplyMarkup(replyButtons.userMainMenu());
                 }
                 break;
             case ORDER_CHECK:
@@ -78,7 +66,7 @@ public class MainMenuModule extends Module {
                 if (sourceText.equals(replyButtons.getBack())){
                     text = returnMainMenu;
                     userState = userStatesService.create(user, UserEnum.MAIN_MENU.getValue());
-                    sendMessage.setReplyMarkup(replyButtons.userMainMenu(user));
+                    sendMessage.setReplyMarkup(replyButtons.userMainMenu());
                 }
                 break;
             case HELP:
@@ -86,7 +74,7 @@ public class MainMenuModule extends Module {
                 if (sourceText.equals(replyButtons.getBack())) {
                     text = returnMainMenu;
                     userState = userStatesService.create(user, UserEnum.MAIN_MENU.getValue());
-                    sendMessage.setReplyMarkup(replyButtons.userMainMenu(user));
+                    sendMessage.setReplyMarkup(replyButtons.userMainMenu());
                 }
                 break;
             case PROFILE:
@@ -94,7 +82,7 @@ public class MainMenuModule extends Module {
                 if (sourceText.equals(replyButtons.getBack())) {
                     text = returnMainMenu;
                     userState = userStatesService.create(user, UserEnum.MAIN_MENU.getValue());
-                    sendMessage.setReplyMarkup(replyButtons.userMainMenu(user));
+                    sendMessage.setReplyMarkup(replyButtons.userMainMenu());
                 }
                 break;
         }

@@ -149,15 +149,12 @@ public abstract class Buttons {
         return buttonNames;
     }
 
-    public List<String> clientMainMenuButtons(boolean employeeMode){
+    public List<String> clientMainMenuButtons(){
         List<String> buttonsName = new ArrayList<>();
         buttonsName.add(createOrder);
         buttonsName.add(checkOrder);
         buttonsName.add(clientInfo);
         buttonsName.add(help);
-        if (!employeeMode) {
-            buttonsName.add(back);
-        }
         return buttonsName;
     }
 

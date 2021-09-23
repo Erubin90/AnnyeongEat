@@ -46,4 +46,8 @@ public enum EmployeeEnum {
         return department != CLIENT;
     }
 
+    public boolean isEmployee(String department) {
+        return department(department) != CLIENT;
+    }
+
 }

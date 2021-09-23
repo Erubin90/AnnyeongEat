@@ -20,7 +20,6 @@ public enum UserEnum {
     DELIVERY_PAYMENT_METHOD("указание способа оплаты"),
     DELIVERY_CONFIRMATION("подтверждение заказа"),
 
-    CHOICE_DEPARTMENT("Выбор депортамента"),
     CLIENT("Клиент"),
     OPERATOR("Оператор"),
     ADMINISTRATOR("Администратор"),
@@ -100,21 +99,11 @@ public enum UserEnum {
         else if (state.equals(DEVELOPER.clientState)) {
             return DEVELOPER;
         }
-        else if (state.equals(CHOICE_DEPARTMENT.clientState)) {
-            return CHOICE_DEPARTMENT;
-        }
         else if (state.equals(CLIENT.clientState)) {
             return CLIENT;
         }
         else {
             return null;
         }
-    }
-
-    public boolean isEmployeeState(UserEnum userEnum) {
-        return userEnum == UserEnum.OPERATOR ||
-                userEnum == UserEnum.ADMINISTRATOR ||
-                userEnum == UserEnum.COURIER ||
-                userEnum == UserEnum.DEVELOPER;
     }
 }

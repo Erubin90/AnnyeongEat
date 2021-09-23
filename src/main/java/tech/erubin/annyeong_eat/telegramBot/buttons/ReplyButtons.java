@@ -20,9 +20,8 @@ public class ReplyButtons extends Buttons {
         return replyKeyboardMarkup(buttonNames, true);
     }
 
-    public ReplyKeyboardMarkup userMainMenu(User user) {
-        boolean employeeMode = user.getDepartmentsList().isEmpty();
-        return replyKeyboardMarkup(clientMainMenuButtons(employeeMode));
+    public ReplyKeyboardMarkup userMainMenu() {
+        return replyKeyboardMarkup(clientMainMenuButtons());
     }
 
     public ReplyKeyboardMarkup employeeMainMenu(EmployeeEnum employeeStateEnum) {

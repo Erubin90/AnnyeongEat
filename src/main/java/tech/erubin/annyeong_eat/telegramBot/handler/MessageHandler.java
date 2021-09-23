@@ -5,6 +5,7 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.service.*;
+import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.UserEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.EmployeeModule;
 import tech.erubin.annyeong_eat.telegramBot.module.MainMenuModule;
@@ -39,7 +40,7 @@ public class MessageHandler extends Handlers {
         BotApiMethod<?> botApiMethod;
         User user = getUser(update);
         UserEnum userEnum = getUserState(user);
-        boolean isEmployee = user.getDepartmentsList() != null;
+        boolean isEmployee = EmployeeEnum.GET.isEmployee(userEnum.getValue());
         if  (isEmployee) {
             botApiMethod = employeeActions(update, user, userEnum);
         }

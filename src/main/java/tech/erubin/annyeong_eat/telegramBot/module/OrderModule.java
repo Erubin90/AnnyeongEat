@@ -71,7 +71,7 @@ public class OrderModule extends Module {
                 else if (sourceText.equals(replyButtons.getBack())) {
                     text = backToMainMenu;
                     userState = userStatesService.create(user, UserEnum.MAIN_MENU.getValue());
-                    sendMessage.setReplyMarkup(replyButtons.userMainMenu(user));
+                    sendMessage.setReplyMarkup(replyButtons.userMainMenu());
                 }
                 else {
                     text = putButton;
@@ -175,9 +175,9 @@ public class OrderModule extends Module {
                     order.setUsing(0);
                     orderState = orderStatesService.create(order, OrderEnum.ORDER_END_REGISTRATION.getValue());
                     userState = userStatesService.create(user, UserEnum.MAIN_MENU.getValue());
-                    sendMessage.setReplyMarkup(replyButtons.userMainMenu(user));
+                    sendMessage.setReplyMarkup(replyButtons.userMainMenu());
                     if (user.getDepartmentsList() != null) {
-                        sendMessageOperatorAndAdministrator(order);
+                        sendMessageOperator(order);
                     }
                 }
                 else if (sourceText.equals(replyButtons.getBack())) {
@@ -194,18 +194,11 @@ public class OrderModule extends Module {
         return sendMessage(sendMessage,userState, order, orderState, text);
     }
 
-    private void sendMessageOperatorAndAdministrator(Order order) {
-        List<Department> listOperatorsInCafe =
-                departmentService
+    private void sendMessageOperator(Order order) {
+        List<Department> listOperatorsInCafe = departmentService
                         .getEmployeeByCafeIdAndDepartmenName(order.getCafeId(), EmployeeEnum.OPERATOR.getValue());
-        List<Department> listAdministratorInCafe =
-                departmentService
-                        .getEmployeeByCafeIdAndDepartmenName(order.getCafeId(), EmployeeEnum.ADMINISTRATOR.getValue());
         if (listOperatorsInCafe != null) {
             webHook.sendMessageDepartment(listOperatorsInCafe, EmployeeEnum.OPERATOR, getFullOrder(order), order);
-        }
-        if (listAdministratorInCafe != null) {
-            webHook.sendMessageDepartment(listAdministratorInCafe, EmployeeEnum.ADMINISTRATOR, getFullOrder(order), null);
         }
     }
 }

@@ -83,7 +83,7 @@ public class RegistrationModule extends Module {
                     user.setPhoneNumber(sourceText);
                     userState = userStatesService.create(user, UserEnum.MAIN_MENU.getValue());
                     sendMessage.enableMarkdown(true);
-                    sendMessage.setReplyMarkup(replyButtons.userMainMenu(user));
+                    sendMessage.setReplyMarkup(replyButtons.userMainMenu());
                 }
                 break;
         }

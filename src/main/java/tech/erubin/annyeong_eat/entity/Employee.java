@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Department {
+public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

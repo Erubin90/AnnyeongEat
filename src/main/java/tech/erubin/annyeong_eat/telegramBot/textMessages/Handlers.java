@@ -74,4 +74,13 @@ public abstract class Handlers {
 
     @Value("${message.buttonNotWork}")
     protected String buttonNotWork;
+
+    @Value("${order.message.emptyReceipt}")
+    protected String emptyReceipt;
+
+    @Value("${operator.message.priceNotSpecified}")
+    protected String priceNotSpecified;
+
+    @Value("${operator.message.priceNotCalculated}")
+    protected String priceNotCalculated;
 }

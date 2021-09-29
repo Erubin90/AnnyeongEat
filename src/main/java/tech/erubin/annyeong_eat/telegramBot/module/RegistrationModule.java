@@ -23,8 +23,9 @@ public class RegistrationModule extends Module {
 
     public RegistrationModule(OrderServiceImpl orderService, UserServiceImpl userService,
                               UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
-                              CafeServiceImpl cafeService, ReplyButtons replyButtons, CheckMessage checkMessage) {
-        super(orderService, userService, userStatesService, orderStatesService);
+                              DepartmentServiceImpl departmentService, CafeServiceImpl cafeService,
+                              ReplyButtons replyButtons, CheckMessage checkMessage) {
+        super(orderService, userService, userStatesService, orderStatesService, departmentService);
         this.cafeService = cafeService;
         this.replyButtons = replyButtons;
         this.checkMessage = checkMessage;

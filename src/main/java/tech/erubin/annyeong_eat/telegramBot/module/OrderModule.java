@@ -10,9 +10,8 @@ import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
 import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Module;
 
@@ -25,7 +24,6 @@ public class OrderModule extends Module {
 
     private final CafeServiceImpl cafeService;
     private final DishServiceImpl dishService;
-    private final DepartmentServiceImpl departmentService;
 
     private final ReplyButtons replyButtons;
     private final InlineButtons inlineButtons;
@@ -34,14 +32,13 @@ public class OrderModule extends Module {
 
     public OrderModule(OrderServiceImpl orderService, UserServiceImpl userService,
                        UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
-                       @Lazy AnnyeongEatWebHook webHook, CafeServiceImpl cafeService, DishServiceImpl dishService,
-                       DepartmentServiceImpl departmentService, ReplyButtons replyButtons, InlineButtons inlineButtons,
-                       CheckMessage checkMessage) {
-        super(orderService, userService, userStatesService, orderStatesService);
+                       DepartmentServiceImpl departmentService, @Lazy AnnyeongEatWebHook webHook,
+                       CafeServiceImpl cafeService, DishServiceImpl dishService, ReplyButtons replyButtons,
+                       InlineButtons inlineButtons, CheckMessage checkMessage) {
+        super(orderService, userService, userStatesService, orderStatesService, departmentService);
         this.webHook = webHook;
         this.cafeService = cafeService;
         this.dishService = dishService;
-        this.departmentService = departmentService;
         this.replyButtons = replyButtons;
         this.inlineButtons = inlineButtons;
         this.checkMessage = checkMessage;
@@ -49,7 +46,7 @@ public class OrderModule extends Module {
 
     public SendMessage choosingCafe(Update update, User user, String sourceText){
         List<String> cafeNames = cafeService.getCafeNameByCity(user.getCity());
-        Order order = orderService.getOrderById(user);
+        Order order = orderService.getOrderByUser(user);
         UserState userState = null;
         OrderState orderState = null;
         String text;
@@ -57,7 +54,7 @@ public class OrderModule extends Module {
         if (cafeNames.contains(sourceText)){
             text = hello + " " + sourceText;
             Cafe cafe = cafeService.getCafeByName(sourceText);
-            order = orderService.getOrderById(user, cafe);
+            order = orderService.getOrderByUserIdAndCafeId(user, cafe);
             order.setUsing(1);
             orderState = orderStatesService.create(order, OrderEnum.ORDER_START_REGISTRATION.getValue());
             userState = userStatesService.create(user, sourceText);
@@ -76,7 +73,7 @@ public class OrderModule extends Module {
     }
 
     public SendMessage cafeMenu(Update update, User user, String sourceText){
-        Order order = orderService.getOrderById(user);
+        Order order = orderService.getOrderByUser(user);
         List<String> typeDishes = replyButtons.typeDishesInCafe(order);
         UserState userState = null;
         String text;
@@ -84,11 +81,11 @@ public class OrderModule extends Module {
         if (typeDishes.contains(sourceText)) {
             text = sourceText + ":";
             List<Dish> dishList = dishService.getDishListByType(sourceText);
-            replyKeyboard = inlineButtons.typeDishesMenu(dishList);
+            replyKeyboard = inlineButtons.typeDishesMenu(order, dishList);
         }
         else if (sourceText.equals(replyButtons.getBack())) {
-            text = backToChoosingCafe;
             order.setUsing(1);
+            text = backToChoosingCafe;
             userState = userStatesService.create(user, ClientEnum.ORDER_CAFE.getValue());
             replyKeyboard = replyButtons.userOrderCafe(user);
         }
@@ -104,8 +101,8 @@ public class OrderModule extends Module {
             }
         }
         else if (sourceText.equals("\uD83D\uDED2")) {
-            text = getFullOrder(order);
-            replyKeyboard = inlineButtons.getFullOrderButtons(order);
+            text = getFullOrderText(order, false);
+            replyKeyboard = inlineButtons.fullOrderButtons(order);
         }
         else {
             text = putButton;
@@ -115,7 +112,7 @@ public class OrderModule extends Module {
     }
 
     public SendMessage deliveryAddress(Update update, User user, String sourceText){
-        Order order = orderService.getOrderById(user);
+        Order order = orderService.getOrderByUser(user);
         UserState userState = null;
         String text;
         ReplyKeyboard replyKeyboard;
@@ -127,9 +124,9 @@ public class OrderModule extends Module {
         else {
             text = checkMessage.checkAddress(sourceText);
             if (!text.contains(errorTrigger)) {
+                order.setAddress(sourceText);
                 text = nextToPhoneNumber;
                 userState = userStatesService.create(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
-                order.setAddress(sourceText);
                 replyKeyboard = replyButtons.userOrderPhoneNumber(user);
             }
             else {
@@ -140,9 +137,8 @@ public class OrderModule extends Module {
     }
 
     public SendMessage deliveryPhoneNumber(Update update, User user, String sourceText){
-        Order order = orderService.getOrderById(user);
+        Order order = orderService.getOrderByUser(user);
         UserState userState = null;
-        OrderState orderState = null;
         String text;
         ReplyKeyboard replyKeyboard = replyButtons.userOrderPhoneNumber(user);
         if (sourceText.equals(replyButtons.getBack())) {
@@ -163,18 +159,18 @@ public class OrderModule extends Module {
                 replyKeyboard = replyButtons.userOrderPayment();
             }
         }
-        return sendMessage(update, replyKeyboard, text, userState, order, orderState);
+        return sendMessage(update, replyKeyboard, text, userState, order);
     }
 
     public SendMessage deliveryPaymentMethod(Update update, User user, String sourceText){
-        Order order = orderService.getOrderById(user);
+        Order order = orderService.getOrderByUser(user);
         List<String> paymentMethod = replyButtons.paymentMethod();
         UserState userState = null;
         String text;
         ReplyKeyboard replyKeyboard;
         if (paymentMethod.contains(sourceText)) {
-            text = getFullOrder(order);
             order.setPaymentMethod(sourceText);
+            text = getFullOrderText(order, false);
             userState = userStatesService.create(user, ClientEnum.DELIVERY_CONFIRMATION.getValue());
             replyKeyboard = replyButtons.userOrderConfirmation();
         }
@@ -192,19 +188,19 @@ public class OrderModule extends Module {
     }
 
     public SendMessage deliveryConfirmation(Update update, User user, String sourceText){
-        Order order = orderService.getOrderById(user);
+        Order order = orderService.getOrderByUser(user);
         UserState userState = null;
         OrderState orderState = null;
         String text;
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getConfirm())) {
-            text = returnMainMenu;
             order.setUsing(0);
+            text = returnMainMenu;
             orderState = orderStatesService.create(order, OrderEnum.ORDER_END_REGISTRATION.getValue());
             userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
-            if (user.getDepartmentsList() != null) {
-                sendMessageOperator(order);
+            if (user.getEmployeeList() != null) {
+                sendMessageOperator(order, webHook);
             }
         }
         else if (sourceText.equals(replyButtons.getBack())) {
@@ -218,80 +214,5 @@ public class OrderModule extends Module {
         }
 
         return sendMessage(update, replyKeyboard, text, userState, order, orderState);
-    }
-
-    public String getFullOrder(Order order) {
-        StringBuilder fullOrder = new StringBuilder(order.getOrderName() + ":\n\n");
-        List<ChequeDish> chequeDishList = order.getChequeDishList();
-        if (chequeDishList != null && !chequeDishList.isEmpty()) {
-            double sum = 0.0;
-            int count = 1;
-            for (ChequeDish chequeDish : chequeDishList) {
-                sum += chequeDish.getDishId().getPrice() * chequeDish.getCountDishes();
-                Dish dish = chequeDish.getDishId();
-                fullOrder.append(count++)
-                        .append(". ")
-                        .append(dish.getName())
-                        .append("\n")
-                        .append(chequeDish.getCountDishes())
-                        .append(" x ")
-                        .append(dish.getPrice())
-                        .append(" = ")
-                        .append(chequeDish.getCountDishes() * dish.getPrice())
-                        .append("₽\n")
-                        .append("\n");
-                if (chequeDish.getChequeDishOptionallyList() != null) {
-                    List<ChequeDishOptionally> dishOptionallyList = chequeDish.getChequeDishOptionallyList();
-                    for (ChequeDishOptionally chequeDishOptionally : dishOptionallyList) {
-                        sum += chequeDishOptionally.getDishOptionallyId().getPrice() * chequeDishOptionally.getCount();
-                        DishOptionally dishOpt = chequeDishOptionally.getDishOptionallyId();
-                        fullOrder.append(dishOpt.getName())
-                                .append("\n")
-                                .append(chequeDishOptionally.getCount())
-                                .append(" x ")
-                                .append(dishOpt.getPrice())
-                                .append(" = ")
-                                .append(chequeDishOptionally.getCount() * dishOpt.getPrice())
-                                .append("₽\n\n");
-                    }
-                }
-            }
-            fullOrder.append("Сумма: ")
-                    .append(sum)
-                    .append("₽\n");
-            if (order.getPhoneNumber() != null) {
-                fullOrder.append("Номер телефона: ")
-                        .append(order.getPhoneNumber())
-                        .append("\n");
-            }
-            if (order.getAddress() != null) {
-                fullOrder.append("Адрес доставки: ")
-                        .append(order.getAddress())
-                        .append("\n");
-            }
-            if (order.getPaymentMethod() != null) {
-                fullOrder.append("Способ оплаты: ")
-                        .append(order.getPaymentMethod())
-                        .append("\n");
-            }
-            List<OrderState> orderStateList = order.getOrderStateList();
-            if (orderStateList.size() > 2) {
-                fullOrder.append("Статус заказа: ")
-                        .append(orderStateList.get(orderStateList.size() - 1).getState())
-                        .append("\n");
-            }
-            return fullOrder.toString();
-        }
-        else {
-            return emptyReceipt;
-        }
-    }
-
-    private void sendMessageOperator(Order order) {
-        List<Department> listOperatorsInCafe = departmentService
-                .getEmployeeByCafeIdAndDepartmenName(order.getCafeId(), EmployeeEnum.OPERATOR.getValue());
-        if (listOperatorsInCafe != null) {
-            webHook.sendMessageDepartment(listOperatorsInCafe, EmployeeEnum.OPERATOR, getFullOrder(order), order);
-        }
     }
 }

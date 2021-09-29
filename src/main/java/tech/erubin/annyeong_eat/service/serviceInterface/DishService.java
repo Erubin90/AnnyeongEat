@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface DishService {
 
-    Dish getDishById(int id);
+    Dish getDishById(String dishId);
 
     void save(Dish dish);
 

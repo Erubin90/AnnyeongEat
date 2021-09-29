@@ -6,9 +6,11 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.entity.UserState;
-import tech.erubin.annyeong_eat.service.*;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.service.CafeServiceImpl;
+import tech.erubin.annyeong_eat.service.UserServiceImpl;
+import tech.erubin.annyeong_eat.service.UserStatesServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.EmployeeModule;
 import tech.erubin.annyeong_eat.telegramBot.module.MainMenuModule;
 import tech.erubin.annyeong_eat.telegramBot.module.OrderModule;
@@ -35,7 +37,7 @@ public class MessageHandler extends Handlers {
         EmployeeEnum employeeEnum = EmployeeEnum.GET.department(userState.getState());
         String sourceText = update.getMessage().getText();
         if  (employeeEnum != null) {
-            botApiMethod = employeeActions(update, user, employeeEnum, userState, sourceText);
+            botApiMethod = employeeActions(update, user, employeeEnum, sourceText);
         }
         else {
             ClientEnum clientEnum = getUserEnum(userState);
@@ -98,11 +100,11 @@ public class MessageHandler extends Handlers {
         return botApiMethod;
     }
 
-    private BotApiMethod<?> employeeActions(Update update, User user, EmployeeEnum employeeEnum, UserState userState, String sourceText) {
+    private BotApiMethod<?> employeeActions(Update update, User user, EmployeeEnum employeeEnum, String sourceText) {
         BotApiMethod<?> botApiMethod;
         switch (employeeEnum) {
             case OPERATOR:
-                botApiMethod = employeeModule.operator(update, user, sourceText);
+                botApiMethod = employeeModule.operator(update, sourceText);
                 break;
             case ADMINISTRATOR:
                 botApiMethod = employeeModule.administrator(update, user, sourceText);

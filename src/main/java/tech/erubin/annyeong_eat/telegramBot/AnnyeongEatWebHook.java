@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import tech.erubin.annyeong_eat.entity.Department;
+import tech.erubin.annyeong_eat.entity.Employee;
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.service.DepartmentServiceImpl;
@@ -65,9 +65,8 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
         catch (Exception e) {
             e.printStackTrace();
             String errorText = e.getMessage() != null? e.getMessage() : "Произошла ошибка но текс ошибки не выявлен. Посмотри логи";
-            List<Department> developerList = departmentService.getDeveloperList();
+            List<Employee> developerList = departmentService.getDeveloperList();
             sendMessageDepartment(developerList, EmployeeEnum.DEVELOPER, errorText, null);
-
         }
         return botApiMethod;
     }
@@ -88,13 +87,20 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
         }
     }
 
-    public boolean updateMarkups(EditMessageReplyMarkup editMessageReplyMarkup) {
+    public boolean updateMarkups(EditMessageReplyMarkup editMessageReplyMarkup, int count) {
         try {
             execute(editMessageReplyMarkup);
             return true;
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-            return false;
+        }
+        catch (TelegramApiException e) {
+            if (count == 0) {
+                return true;
+            }
+            else {
+                e.printStackTrace();
+                return false;
+            }
+
         }
     }
 
@@ -108,12 +114,12 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
         }
     }
 
-    public void sendMessageDepartment(List<Department> departmentList, EmployeeEnum employeeEnum,
+    public void sendMessageDepartment(List<Employee> employeeList, EmployeeEnum employeeEnum,
                                       String text, Order order) {
-        List<User> userList = departmentList.stream()
-                .map(Department::getUserId)
+        List<User> userList = employeeList.stream()
+                .map(Employee::getUserId)
                 .collect(Collectors.toList());
-        InlineKeyboardMarkup inlineKeyboardMarkup = inlineButtons.getEmployee(employeeEnum, order);
+        InlineKeyboardMarkup inlineKeyboardMarkup = inlineButtons.employeeButtons(employeeEnum, order);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText(text);
         try {

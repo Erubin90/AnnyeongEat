@@ -8,7 +8,6 @@ import tech.erubin.annyeong_eat.entity.ChequeDish;
 import tech.erubin.annyeong_eat.entity.Dish;
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Buttons;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class InlineButtons extends Buttons {
 
-    public InlineKeyboardMarkup clientCheque(String tag, ChequeDish chequeDish) {
+    public InlineKeyboardMarkup clientCheque(ChequeDish chequeDish) {
         String count;
         if (chequeDish == null) {
             count = "0";
@@ -28,56 +27,46 @@ public class InlineButtons extends Buttons {
             count = String.valueOf(chequeDish.getCountDishes());
         }
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        rows.add(getSubCountAddButtons(count, tag));
-        rows.add(List.of(getInlineButtons(delete, tag + "m0")));
+        int orderId = chequeDish.getOrderId().getId();
+        int dishId = chequeDish.getDishId().getId();
+        rows.add(getSubCountAddButtons(count, orderId, dishId, "m"));
+        rows.add(List.of(getInlineButtons(delete, orderId, dishId, "mx")));
         return new InlineKeyboardMarkup(rows);
     }
 
-    public InlineKeyboardMarkup typeDishesMenu(List<Dish> dishList) {
+    public InlineKeyboardMarkup typeDishesMenu(Order order, List<Dish> dishList) {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         if (dishList != null && !dishList.isEmpty()) {
             for (Dish dish : dishList) {
+                List<InlineKeyboardButton> buttons = new ArrayList<>();
                 String nameButton = dish.getName() + " " + dish.getPrice() + "₽";
-                rows.add(List.of(getInlineButtons(nameButton, String.valueOf(dish.getId()))));
+                buttons.add(getInlineButtons(nameButton, order.getId(), dish.getId(), String.valueOf(dish.getId())));
+                rows.add(buttons);
             }
         }
         return new InlineKeyboardMarkup(rows);
     }
 
-    public InlineKeyboardMarkup getFullOrderButtons(Order order) {
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        if (order.getChequeDishList() != null && !order.getChequeDishList().isEmpty()) {
-            List<Dish> dishList = order.getChequeDishList().stream()
-                    .map(ChequeDish::getDishId)
-                    .collect(Collectors.toList());
-            int count = 1;
-            for (Dish dish : dishList) {
-                List<InlineKeyboardButton> buttonList = new ArrayList<>();
-                buttonList.add(getInlineButtons(String.valueOf(count++), String.valueOf(dish.getId())));
-                buttonList.add(getInlineButtons(delete, dish.getId() + "b0"));
-                buttonList.add(getInlineButtons(sub, dish.getId() + "b-"));
-                buttonList.add(getInlineButtons(add, dish.getId() + "b+"));
-                rows.add(buttonList);
-            }
-        }
+    public InlineKeyboardMarkup fullOrderButtons(Order order) {
+        List<List<InlineKeyboardButton>> rows = getEditOrderButtons(order, "b");
         return new InlineKeyboardMarkup(rows);
     }
 
-    public InlineKeyboardMarkup getEmployee(EmployeeEnum department, Order order) {
+    public InlineKeyboardMarkup employeeButtons(EmployeeEnum department, Order order) {
         InlineKeyboardMarkup inlineMarkup;
         switch (department) {
             case OPERATOR:
-                inlineMarkup = getOperatorButtons(order);
+                inlineMarkup = orderAndRegistrationButtons(order);
                 break;
-            case ADMINISTRATOR:
-                inlineMarkup = getAdministratorButtons();
-                break;
-            case DEVELOPER:
-                inlineMarkup = getDeveloperButtons();
-                break;
-            case COURIER:
-                inlineMarkup = getCourierButtons();
-                break;
+//            case ADMINISTRATOR:
+//                inlineMarkup = getAdministratorButtons();
+//                break;
+//            case DEVELOPER:
+//                inlineMarkup = getDeveloperButtons();
+//                break;
+//            case COURIER:
+//                inlineMarkup = getCourierButtons();
+//                break;
             default:
                 inlineMarkup = new InlineKeyboardMarkup();
                 break;
@@ -85,53 +74,96 @@ public class InlineButtons extends Buttons {
         return inlineMarkup;
     }
 
-    public InlineKeyboardMarkup getOperatorButtons(Order order){
-        String orderState = order.getOrderStateList().get(order.getOrderStateList().size() - 1).getState();
-        System.out.println(orderState);
-        OrderEnum orderEnum = OrderEnum.GET.orderState(orderState);
+    public InlineKeyboardMarkup orderAndRegistrationButtons(Order order) {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-        if (orderEnum == OrderEnum.ORDER_START_REGISTRATION) {
-            rows.add(List.of(getInlineButtons(accept, order.getId() + "o+")));
-            rows.add(List.of(getInlineButtons(cancel, order.getId() + "o-")));
+        rows.add(List.of(getInlineButtons(editOrder, order.getId(), 0, "oe")));
+        rows.add(List.of(getInlineButtons(restart, order.getId(), 0, "or")));
+        rows.add(List.of(getInlineButtons(accept, order.getId(), 0, "o+")));
+        rows.add(List.of(getInlineButtons(cancel, order.getId(), 0, "o-")));
+        return new InlineKeyboardMarkup(rows);
+    }
+
+    public InlineKeyboardMarkup orderEditButtons(Order order) {
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        rows.add(List.of(getInlineButtons(addDishes, order.getId(), 0, "ead")));
+        rows.add(List.of(getInlineButtons(changeQuantity, order.getId(), 0, "ec")));
+        rows.add(List.of(getInlineButtons(restart, order.getId(), 0, "er")));
+        rows.add(List.of(getInlineButtons(accept, order.getId(), 0, "o+")));
+        rows.add(List.of(getInlineButtons(cancel, order.getId(), 0, "o-")));
+        return new InlineKeyboardMarkup(rows);
+    }
+
+    public InlineKeyboardMarkup orderAddDishButtons(Order order) {
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<String> typeDishList = typeDishesInCafe(order);
+        for (String c : typeDishList) {
+            rows.add(List.of(getInlineButtons(c, order.getId(), 0, c)));
         }
-        else if (orderEnum == OrderEnum.ORDER_ACCEPT) {
-            rows.add(List.of(getInlineButtons(good, order.getId() + tagInfo)));
+        rows.add(List.of(getInlineButtons(back, order.getId(), 0, "eb")));
+        return new InlineKeyboardMarkup(rows);
+    }
+
+    public InlineKeyboardMarkup orderEditCountDishButtons(Order order) {
+        List<List<InlineKeyboardButton>> rows = getEditOrderButtons(order, "r");
+        rows.add(List.of(getInlineButtons(back, order.getId(), 0, "eb")));
+        return new InlineKeyboardMarkup(rows);
+    }
+
+    public InlineKeyboardMarkup orderTypeDishesButtons(Order order, List<Dish> dishList) {
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<Dish> remove = order.getChequeDishList()
+                .stream()
+                .map(ChequeDish::getDishId)
+                .collect(Collectors.toList());
+        dishList.removeAll(remove);
+        for (Dish dish : dishList) {
+            List<InlineKeyboardButton> buttons = new ArrayList<>();
+            String nameButton = dish.getName();
+            buttons.add(getInlineButtons(nameButton, order.getId(), dish.getId(), String.valueOf(dish.getId())));
+            rows.add(buttons);
         }
-        else if (orderEnum == OrderEnum.ORDER_CANCEL) {
-            rows.add(List.of(getInlineButtons(delete, order.getId() + tagInfo)));
+        rows.add(List.of(getInlineButtons(back, order.getId(), 0, "ead")));
+        return new InlineKeyboardMarkup(rows);
+    }
+
+    public InlineKeyboardMarkup orderAcceptButtons() {
+        return new InlineKeyboardMarkup(List.of(List.of(getInlineButtons(acceptState, 0, 0, tagInfo))));
+    }
+
+    public InlineKeyboardMarkup orderCancelButtons() {
+        return new InlineKeyboardMarkup(List.of(List.of(getInlineButtons(cancelState, 0, 0, tagInfo))));
+    }
+
+    private List<List<InlineKeyboardButton>> getEditOrderButtons(Order order, String tag) {
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        if (order.getChequeDishList() != null && !order.getChequeDishList().isEmpty()) {
+            int count = 1;
+            for (ChequeDish chequeDish : order.getChequeDishList()) {
+                List<InlineKeyboardButton> buttonList = new ArrayList<>();
+                Dish dish = chequeDish.getDishId();
+                buttonList.add(getInlineButtons(String.valueOf(count++), order.getId(), dish.getId(), String.valueOf(dish.getId())));
+                buttonList.add(getInlineButtons(delete, order.getId(), dish.getId(), tag + "x"));
+                buttonList.addAll(getSubCountAddButtons(String.valueOf(chequeDish.getCountDishes()), order.getId(), dish.getId(), tag));
+                rows.add(buttonList);
+            }
         }
-        return new InlineKeyboardMarkup(rows);
+        return rows;
     }
 
-
-    public InlineKeyboardMarkup getAdministratorButtons(){
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        return new InlineKeyboardMarkup(rows);
-    }
-
-    public InlineKeyboardMarkup getDeveloperButtons(){
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        return new InlineKeyboardMarkup(rows);
-    }
-
-    public InlineKeyboardMarkup getCourierButtons(){
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        return new InlineKeyboardMarkup(rows);
-    }
-
-    private List<InlineKeyboardButton> getSubCountAddButtons(String count, String id) {
-        InlineKeyboardButton subDish = getInlineButtons(sub, id + "m-");
-        InlineKeyboardButton countDish = getInlineButtons(count, id + tagInfo);
-        InlineKeyboardButton addDish = getInlineButtons(add, id + "m+");
+    private List<InlineKeyboardButton> getSubCountAddButtons(String count, int orderId, int dishId, String tag) {
+        InlineKeyboardButton subDish = getInlineButtons(sub, orderId, dishId,tag + "-");
+        InlineKeyboardButton countDish = getInlineButtons(count, orderId, dishId, tagInfo);
+        InlineKeyboardButton addDish = getInlineButtons(add, orderId, dishId, tag + "+");
         return List.of(subDish, countDish, addDish);
     }
 
-    private InlineKeyboardButton getInlineButtons(String nameButton, String id){
+    private InlineKeyboardButton getInlineButtons(String nameButton, int orderId, int dishId, String tag){
         InlineKeyboardButton subDish = new InlineKeyboardButton(nameButton);
-        subDish.setCallbackData(id);
+        subDish.setCallbackData(genTag(orderId, dishId, tag));
         return subDish;
+    }
+
+    private String genTag(int orderId, int dishId, String tag) {
+        return orderId + "/" + dishId + "/" + tag;
     }
 }

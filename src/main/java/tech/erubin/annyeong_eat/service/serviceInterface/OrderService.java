@@ -6,11 +6,15 @@ import tech.erubin.annyeong_eat.entity.Order;
 
 public interface OrderService {
 
-    Order getOrderById(User user);
+    Order getOrderByUser(User user);
 
-    Order getOrderById(User user, Cafe cafe);
+    Order getOrderByUserIdAndCafeId(User user, Cafe cafe);
 
-    Order getOrderById(String orderId);
+    Order getOrderByStringId(String orderId);
+
+    Order getOrderById(int orderId);
+
+    Order getOrderByOrderName(String orderName);
 
     void save(Order order);
 
@@ -19,5 +23,4 @@ public interface OrderService {
     Order create(User user);
 
     Order createOrder(User user, Cafe cafe);
-
 }

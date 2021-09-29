@@ -47,6 +47,9 @@ public class Order {
     @Column(name = "payment_status")
     private int paymentStatus;
 
+    @Column(name = "price_delivery")
+    private int priceDelivery;
+
     @Column(name = "waiter_id")
     private int waiterId;
 
@@ -65,11 +68,15 @@ public class Order {
         this.userId = userId;
         this.orderName = orderName;
         this.paymentStatus = 0;
+        this.priceDelivery = -1;
+        this.comment = "";
     }
 
     public Order(User userId, Cafe cafeId, String orderName) {
         this.userId = userId;
         this.cafeId = cafeId;
         this.orderName = orderName;
+        this.priceDelivery = -1;
+        this.comment = "";
     }
 }

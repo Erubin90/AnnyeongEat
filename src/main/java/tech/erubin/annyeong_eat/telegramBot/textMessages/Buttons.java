@@ -32,9 +32,6 @@ public abstract class Buttons {
     @Value("${button.sub}")
     protected String sub;
 
-    @Value("${button.good}")
-    protected String good;
-
     @Value("${order.button.cash}")
     protected String cash;
 
@@ -62,11 +59,23 @@ public abstract class Buttons {
     @Value("${message.error.putButton}")
     protected String putButton;
 
+    @Value("${employee.button.editOrder}")
+    protected String editOrder;
+
     @Value("${employee.button.accept}")
     protected String accept;
 
     @Value("${employee.button.cancel}")
     protected String cancel;
+
+    @Value("${employee.button.acceptState}")
+    protected String acceptState;
+
+    @Value("${employee.button.cancelState}")
+    protected String cancelState;
+
+    @Value("${employee.button.restart}")
+    protected String restart;
 
     @Value("${button.tag.info}")
     protected String tagInfo;
@@ -74,8 +83,14 @@ public abstract class Buttons {
     @Value("${message.tag.info}")
     protected String messageInfo;
 
-    @Value("${employee.button.restart}")
-    protected String restart;
+    @Value("${employee.button.addDishes}")
+    protected String addDishes;
+
+    @Value("${employee.button.changeQuantity}")
+    protected String changeQuantity;
+
+    @Value("${employee.button.form}")
+    protected String form;
 
     public List<String> paymentMethod(){
         return List.of(cash, cards);
@@ -89,9 +104,9 @@ public abstract class Buttons {
                 .collect(Collectors.toList());
     }
 
-//    protected List<String> operatorMainMenuButtons() {
-//        return List.of(restart);
-//    }
+    protected List<String> operatorMainMenuButtons() {
+        return List.of(restart);
+    }
 
     protected List<List<String>> dishesMenuButtons(Order order) {
         List<List<String>> orderMenuRows = new ArrayList<>();

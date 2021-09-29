@@ -22,8 +22,8 @@ public class MainMenuModule extends Module {
 
     public MainMenuModule(OrderServiceImpl orderService, UserServiceImpl userService,
                           UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
-                          ReplyButtons replyButtons) {
-        super(orderService, userService, userStatesService, orderStatesService);
+                          DepartmentServiceImpl departmentService, ReplyButtons replyButtons) {
+        super(orderService, userService, userStatesService, orderStatesService, departmentService);
         this.replyButtons = replyButtons;
     }
 

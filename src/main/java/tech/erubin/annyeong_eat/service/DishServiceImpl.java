@@ -14,8 +14,8 @@ public class DishServiceImpl implements DishService {
     private final DishRepository repository;
 
     @Override
-    public Dish getDishById(int id) {
-        return repository.getById(id);
+    public Dish getDishById(String dishId) {
+        return dishId.matches("\\d+") ? repository.getById(Integer.parseInt(dishId)) : null;
     }
 
     @Override

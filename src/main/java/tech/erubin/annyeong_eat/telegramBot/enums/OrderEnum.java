@@ -4,6 +4,9 @@ package tech.erubin.annyeong_eat.telegramBot.enums;
 public enum OrderEnum {
     ORDER_START_REGISTRATION("начало оформление заказа"),
     ORDER_END_REGISTRATION("заказ оформлен"),
+
+    ORDER_EDITING("редактирование заказа"),
+
     ORDER_ACCEPT("заказ принят"),
     ORDER_CANCEL("заказ отменен"),
     ORDER_START_COOK("заказ начал готовиться"),
@@ -33,6 +36,9 @@ public enum OrderEnum {
         else if (state.equals(ORDER_END_REGISTRATION.getValue())){
             return ORDER_END_REGISTRATION;
         }
+        else if (state.equals(ORDER_EDITING.getValue())){
+            return ORDER_EDITING;
+        }
         else if (state.equals(ORDER_ACCEPT.getValue())){
             return ORDER_ACCEPT;
         }
@@ -52,12 +58,17 @@ public enum OrderEnum {
             return ORDER_END_DELIVERY;
         }
         else {
-            return null;
+            return GET;
         }
     }
 
     public boolean isOrderAccepted(String orderState) {
         OrderEnum orderEnum = orderState(orderState);
         return orderEnum != ORDER_START_REGISTRATION && orderEnum != ORDER_CANCEL;
+    }
+
+    public boolean isOrderEditing(String orderState) {
+        OrderEnum orderEnum = orderState(orderState);
+        return orderEnum == ORDER_EDITING;
     }
 }

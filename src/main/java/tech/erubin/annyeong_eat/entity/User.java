@@ -41,7 +41,7 @@ public class User {
 
     @OneToMany(mappedBy = "userId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    private List<Department> departmentsList;
+    private List<Employee> employeeList;
 
     public User(String telegramUserId) {
         this.telegramUserId = telegramUserId;

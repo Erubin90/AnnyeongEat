@@ -17,7 +17,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository repository;
 
     @Override
-    public Order getOrderById(User user) {
+    public Order getOrderByUser(User user) {
         List<Order> orderList = user.getOrderList().stream()
                 .filter(x -> x.getUsing() == 1)
                 .collect(Collectors.toList());
@@ -30,7 +30,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrderById(User user, Cafe cafe) {
+    public Order getOrderByUserIdAndCafeId(User user, Cafe cafe) {
         Integer orderId = repository.getOrderByUserIdAndCafeId(cafe, user);
         if (orderId != null) {
             return repository.getById(orderId);
@@ -41,8 +41,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrderById(String orderId) {
-        return orderId.matches("\\d") ? repository.getById(Integer.parseInt(orderId)) : null;
+    public Order getOrderByStringId(String orderId) {
+        return orderId.matches("\\d+") ? repository.getById(Integer.parseInt(orderId)) : null;
+    }
+
+    @Override
+    public Order getOrderById(int orderId) {
+        return repository.getById(orderId);
+    }
+
+    @Override
+    public Order getOrderByOrderName(String orderName) {
+        return repository.getOrderByOrderName(orderName);
     }
 
     @Override

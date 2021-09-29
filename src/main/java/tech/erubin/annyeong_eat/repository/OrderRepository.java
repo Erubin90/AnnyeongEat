@@ -5,10 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import tech.erubin.annyeong_eat.entity.Cafe;
-import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.entity.Order;
-
-import java.util.List;
+import tech.erubin.annyeong_eat.entity.User;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
@@ -17,4 +15,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             "FROM Order " +
             "WHERE using = 1 AND cafeId = :cafe and userId = :user")
     Integer getOrderByUserIdAndCafeId(@Param("cafe")Cafe cafe, @Param("user") User user);
+
+    Order getOrderByOrderName(String orderName);
 }

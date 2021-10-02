@@ -21,22 +21,19 @@ import java.util.Map;
 @Component
 public class EmployeeModule extends Module {
     private final ReplyButtons replyButtons;
-    private final AnnyeongEatWebHook webHook;
 
     public EmployeeModule(OrderServiceImpl orderService, UserServiceImpl userService,
                           UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
-                          DepartmentServiceImpl departmentService, ReplyButtons replyButtons,
+                          EmployeeServiceImpl departmentService, ReplyButtons replyButtons,
                           @Lazy AnnyeongEatWebHook webHook) {
-        super(orderService, userService, userStatesService, orderStatesService, departmentService);
+        super(orderService, userService, userStatesService, orderStatesService, departmentService, webHook);
         this.replyButtons = replyButtons;
-        this.webHook = webHook;
     }
 
     public SendMessage operator(Update update, String soursText) {
         String text;
         if (soursText.indexOf("Заказ:") == 0) {
             text = getTextEditingOrder(soursText);
-            Order order = getOrder(text);
         }
         else if (soursText.equals(replyButtons.getForm())) {
             text = getForm();
@@ -104,6 +101,7 @@ public class EmployeeModule extends Module {
                     builder.append("\n- комментарий");
                 }
                 orderService.save(order);
+                sendMessageOperator(order);
                 text = builder.toString();
             }
             else {
@@ -140,19 +138,5 @@ public class EmployeeModule extends Module {
                 "Сумма доставки:\n" +
                 "Способ оплаты:\n" +
                 "Комментарий:\n" ;
-    }
-
-    private Order getOrder(String text) {
-        Order order = null;
-        int indexFirst = text.indexOf("\"");
-        if (indexFirst > 0) {
-            String orderId = text.substring(indexFirst);
-            indexFirst = text.indexOf("\"");
-            if (indexFirst > 0) {
-                orderId = orderId.substring(indexFirst);
-                order = orderService.getOrderByStringId(orderId);
-            }
-        }
-        return order;
     }
 }

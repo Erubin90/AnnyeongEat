@@ -24,6 +24,7 @@ import java.util.List;
 public class CallbackQueryHandler extends Handlers {
     private final AnnyeongEatWebHook webHook;
     private final UserServiceImpl clientService;
+    private final EmployeeServiceImpl employeeService;
     private final OrderServiceImpl orderService;
     private final OrderStatesServiceImpl orderStatesService;
     private final DishServiceImpl dishService;
@@ -35,12 +36,13 @@ public class CallbackQueryHandler extends Handlers {
     private final OrderModule orderModule;
 
     public CallbackQueryHandler(@Lazy AnnyeongEatWebHook webHook, UserServiceImpl clientService,
-                                OrderServiceImpl orderService, OrderStatesServiceImpl orderStatesService,
+                                EmployeeServiceImpl employeeService, OrderServiceImpl orderService, OrderStatesServiceImpl orderStatesService,
                                 DishServiceImpl dishService, ChequeDishServiceImpl chequeService,
                                 UserStatesServiceImpl stateService, CafeServiceImpl cafeService,
                                 InlineButtons inlineButtons, OrderModule orderModule) {
         this.webHook = webHook;
         this.clientService = clientService;
+        this.employeeService = employeeService;
         this.orderService = orderService;
         this.orderStatesService = orderStatesService;
         this.dishService = dishService;
@@ -85,6 +87,10 @@ public class CallbackQueryHandler extends Handlers {
             case OPERATOR:
                 botApiMethod = operator(callback, order, dish, chatId, messageId, tag);
                 break;
+            case ADMINISTRATOR:
+                botApiMethod = administrator(callback, order, dish, chatId, messageId, tag);
+                break;
+            case COURIER:
             default:
                 botApiMethod = answerCallbackQuery(callback, buttonNotWork);
         }
@@ -93,35 +99,33 @@ public class CallbackQueryHandler extends Handlers {
 
     private BotApiMethod<?> operator(CallbackQuery callback, Order order, Dish dish,
                                      String chatId, int messageId, String tag) {
-        int size = order.getOrderStateList().size() - 1;
-        OrderEnum orderEnum = OrderEnum.GET.orderState(order.getOrderStateList().get(size).getState());
-
         BotApiMethod<?> botApiMethod;
         InlineKeyboardMarkup inlineMarkup;
         OrderState orderState;
-        String editText;
-        String text = error;
+        String text;
+        int size = order.getOrderStateList().size() - 1;
+        OrderEnum orderEnum = OrderEnum.GET.orderState(order.getOrderStateList().get(size).getState());
 
         switch (orderEnum) {
             case ORDER_END_REGISTRATION:
-                editText = orderModule.getFullOrderText(order, true);
+                text = orderModule.getChequeText(order, true);
                 if (tag.equals("o+")) {
                     orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
                     orderStatesService.save(orderState);
                     inlineMarkup = inlineButtons.orderAcceptButtons();
-                    botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
+                    botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
                 }
                 else if (tag.equals("o-")) {
                     orderState = orderStatesService.create(order, OrderEnum.ORDER_CANCEL.getValue());
                     orderStatesService.save(orderState);
                     inlineMarkup = inlineButtons.orderCancelButtons();
-                    botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
+                    botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
                 }
                 else if (tag.equals("oe")) {
                     orderState = orderStatesService.create(order, OrderEnum.ORDER_EDITING.getValue());
                     orderStatesService.save(orderState);
                     inlineMarkup = inlineButtons.orderEditButtons(order);
-                    botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
+                    botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
                 }
                 else {
                     botApiMethod = answerCallbackQuery(callback, error);
@@ -129,88 +133,85 @@ public class CallbackQueryHandler extends Handlers {
                 break;
             case ORDER_EDITING:
                 List<String> typeDishList = inlineButtons.typeDishesInCafe(order);
-                editText = orderModule.getFullOrderText(order, true);
                 if (tag.matches("o.")) {
-                    switch (tag) {
-                        case "o+":
-                            orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
-                            orderStatesService.save(orderState);
-                            inlineMarkup = inlineButtons.orderAcceptButtons();
-                            botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
-                            break;
-                        case "o-":
-                            orderState = orderStatesService.create(order, OrderEnum.ORDER_CANCEL.getValue());
-                            orderStatesService.save(orderState);
-                            inlineMarkup = inlineButtons.orderCancelButtons();
-                            botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
-                            break;
-                        case "oe":
-                            inlineMarkup = inlineButtons.orderEditButtons(order);
-                            botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
-                            break;
-                        case "or":
-                            inlineMarkup = inlineButtons.orderAndRegistrationButtons(order);
-                            botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
-                            break;
-                        default:
-                            botApiMethod = answerCallbackQuery(callback, text);
-                            break;
+                    text = orderModule.getChequeText(order, true);
+                    if ("o+".equals(tag)) {
+                        orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
+                        orderStatesService.save(orderState);
+                        inlineMarkup = inlineButtons.orderAcceptButtons();
+                        sendMessageEmployee(order, EmployeeEnum.COURIER);
+                        botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
+                    }
+                    else if ("o-".equals(tag)) {
+                        orderState = orderStatesService.create(order, OrderEnum.ORDER_CANCEL.getValue());
+                        orderStatesService.save(orderState);
+                        inlineMarkup = inlineButtons.orderCancelButtons();
+                        botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
+                    }
+                    else if ("oe".equals(tag)) {
+                        inlineMarkup = inlineButtons.orderEditButtons(order);
+                        botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
+                    }
+                    else if ("or".equals(tag)) {
+                        inlineMarkup = inlineButtons.orderAndRegistrationButtons(order);
+                        botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
+                    }
+                    else {
+                        botApiMethod = answerCallbackQuery(callback, error);
                     }
                 }
                 else if (tag.matches("r.")) {
                     ChequeDish chequeDish = chequeService.getChequeByOrderAndDish(order, dish);
-                    int count = 0;
+                    int count = chequeDish.getCountDishes();
                     switch (tag) {
                         case "rx":
+                            count = 0;
                             saveOrDeleteChequeDish(chequeDish, count);
-                            text = orderModule.getFullOrderText(order, true);
+                            text = orderModule.getChequeText(order, true);
                             inlineMarkup = inlineButtons.orderEditCountDishButtons(order);
                             botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
                             break;
                         case "r+":
-                            count = chequeDish.getCountDishes() + 1;
+                            count++;
                             saveOrDeleteChequeDish(chequeDish, count);
-                            text = orderModule.getFullOrderText(order, true);
+                            text = orderModule.getChequeText(order, true);
                             inlineMarkup = inlineButtons.orderEditCountDishButtons(order);
                             botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
                             break;
                         case "r-":
-                            count = chequeDish.getCountDishes();
                             if (count > 0) {
                                 count--;
                             saveOrDeleteChequeDish(chequeDish, count);
-                            text = orderModule.getFullOrderText(order, true);
+                            text = orderModule.getChequeText(order, true);
                             inlineMarkup = inlineButtons.orderEditCountDishButtons(order);
                             botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
                             break;
                         }
                         default:
-                            botApiMethod = answerCallbackQuery(callback, text);
+                            botApiMethod = answerCallbackQuery(callback, error);
                             break;
                     }
                 }
                 else if (tag.matches("e.+")) {
-                    switch (tag) {
-                        case "ead":
-                            inlineMarkup = inlineButtons.orderAddDishButtons(order);
-                            botApiMethod = editMessageReplyMarkup(chatId, messageId, inlineMarkup);
-                            break;
-                        case "ec":
-                            inlineMarkup = inlineButtons.orderEditCountDishButtons(order);
-                            botApiMethod = editMessageReplyMarkup(chatId, messageId, inlineMarkup);
-                            break;
-                        case "eb":
-                            inlineMarkup = inlineButtons.orderEditButtons(order);
-                            botApiMethod = editMessageReplyMarkup(chatId, messageId, inlineMarkup);
-                            break;
-                        case "er":
-                            editText = orderModule.getFullOrderText(order, true);
-                            inlineMarkup = inlineButtons.orderEditButtons(order);
-                            botApiMethod = editMessageText(chatId, messageId, editText, inlineMarkup);
-                            break;
-                        default:
-                            botApiMethod = answerCallbackQuery(callback, text);
-                            break;
+                    if ("ead".equals(tag)) {
+                        inlineMarkup = inlineButtons.orderAddDishButtons(order);
+                        botApiMethod = editMessageReplyMarkup(chatId, messageId, inlineMarkup);
+                    }
+                    else if ("ec".equals(tag)) {
+                        inlineMarkup = inlineButtons.orderEditCountDishButtons(order);
+                        botApiMethod = editMessageReplyMarkup(chatId, messageId, inlineMarkup);
+                    }
+                    else if ("eb".equals(tag)) {
+                        inlineMarkup = inlineButtons.orderEditButtons(order);
+                        botApiMethod = editMessageReplyMarkup(chatId, messageId, inlineMarkup);
+                    }
+                    else if ("er".equals(tag)) {
+                        text = orderModule.getChequeText(order, true);
+                        inlineMarkup = inlineButtons.orderEditButtons(order);
+                        botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
+                    }
+                    else {
+                        botApiMethod = answerCallbackQuery(callback, error);
                     }
                 }
                 else if (typeDishList.contains(tag)) {
@@ -222,13 +223,13 @@ public class CallbackQueryHandler extends Handlers {
                     ChequeDish chequeDish = chequeService.getChequeByOrderAndDish(order, dish);
                     chequeDish.setCountDishes(1);
                     chequeService.save(chequeDish);
-                    text = orderModule.getFullOrderText(order, true);
+                    text = orderModule.getChequeText(order, true);
                     List<Dish> dishList = dishService.getDishListByType(dish.getType());
                     inlineMarkup = inlineButtons.orderTypeDishesButtons(order, dishList);
                     botApiMethod = editMessageText(chatId, messageId, text, inlineMarkup);
                 }
                 else {
-                    botApiMethod = answerCallbackQuery(callback, text);
+                    botApiMethod = answerCallbackQuery(callback, error);
                 }
                 break;
             case ORDER_ACCEPT:
@@ -243,11 +244,17 @@ public class CallbackQueryHandler extends Handlers {
         return botApiMethod;
     }
 
+    private BotApiMethod<?> administrator(CallbackQuery callback, Order order, Dish dish,
+                                     String chatId, int messageId, String tag) {
+
+        return null;
+    }
+
     private BotApiMethod<?> clientCallback(CallbackQuery callback, Order order, Dish dish,
                                            ClientEnum clientEnum, String chatId, int messageId, String tag) {
-        String callbackText = error;
         BotApiMethod<?> botApiMethod;
         InlineKeyboardMarkup inlineMarkup;
+        String callbackText = error;
 
         if (clientEnum == ClientEnum.ORDER_CAFE_MENU) {
             ChequeDish chequeDish = chequeService.getChequeByOrderAndDish(order, dish);
@@ -288,7 +295,7 @@ public class CallbackQueryHandler extends Handlers {
             }
             else if (tag.equals("b+") || tag.equals("bx") || tag.equals("b-")) {
                 inlineMarkup = inlineButtons.fullOrderButtons(order);
-                String editText = orderModule.getFullOrderText(order, false);
+                String editText = orderModule.getChequeText(order, false);
                 EditMessageText editMessageText = editMessageText(chatId, messageId, editText, inlineMarkup);
                 if (!webHook.updateText(editMessageText)) {
                     callbackText = error;
@@ -344,5 +351,13 @@ public class CallbackQueryHandler extends Handlers {
         double dishPrice = dish.getPrice();
         String dishComment = dish.getComment();
         return String.format("%s %s₽\n%s", dishName, dishPrice, dishComment);
+    }
+
+    private void sendMessageEmployee(Order order, EmployeeEnum employeeEnum) {
+        Cafe cafe = order.getCafeId();
+        List<Employee> listOperatorsInCafe = employeeService.getEmployeeByCafeIdAndDepartmenName(cafe, employeeEnum.getValue());
+        if (listOperatorsInCafe != null) {
+            webHook.sendMessageDepartment(listOperatorsInCafe, employeeEnum, orderModule.getChequeText(order, true), order);
+        }
     }
 }

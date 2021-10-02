@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tech.erubin.annyeong_eat.entity.Cafe;
 import tech.erubin.annyeong_eat.entity.Employee;
-import tech.erubin.annyeong_eat.repository.DepartmentRepository;
+import tech.erubin.annyeong_eat.repository.EmployeeRepository;
 import tech.erubin.annyeong_eat.service.serviceInterface.DepartmentService;
 
 import java.util.ArrayList;
@@ -12,8 +12,8 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class DepartmentServiceImpl implements DepartmentService {
-    private final DepartmentRepository repository;
+public class EmployeeServiceImpl implements DepartmentService {
+    private final EmployeeRepository repository;
 
     @Override
     public List<Employee> getEmployeeByCafeIdAndDepartmenName(Cafe cafeId, String name) {

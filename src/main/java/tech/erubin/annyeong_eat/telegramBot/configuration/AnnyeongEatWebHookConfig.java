@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import tech.erubin.annyeong_eat.service.DepartmentServiceImpl;
+import tech.erubin.annyeong_eat.service.EmployeeServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.handler.CallbackQueryHandler;
@@ -33,11 +33,11 @@ public class AnnyeongEatWebHookConfig {
 
     private MessageHandler messageHandler;
     private CallbackQueryHandler callbackQueryHandler;
-    private DepartmentServiceImpl departmentService;
+    private EmployeeServiceImpl departmentService;
     private InlineButtons inlineButtons;
 
     public AnnyeongEatWebHookConfig(MessageHandler messageHandler, CallbackQueryHandler callbackQueryHandler,
-                                    DepartmentServiceImpl departmentService, InlineButtons inlineButtons) {
+                                    EmployeeServiceImpl departmentService, InlineButtons inlineButtons) {
         this.messageHandler = messageHandler;
         this.callbackQueryHandler = callbackQueryHandler;
         this.departmentService = departmentService;

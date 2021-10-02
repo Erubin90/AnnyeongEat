@@ -1,5 +1,6 @@
 package tech.erubin.annyeong_eat.telegramBot.module;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -8,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRem
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.entity.UserState;
 import tech.erubin.annyeong_eat.service.*;
+import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
@@ -23,9 +25,10 @@ public class RegistrationModule extends Module {
 
     public RegistrationModule(OrderServiceImpl orderService, UserServiceImpl userService,
                               UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
-                              DepartmentServiceImpl departmentService, CafeServiceImpl cafeService,
-                              ReplyButtons replyButtons, CheckMessage checkMessage) {
-        super(orderService, userService, userStatesService, orderStatesService, departmentService);
+                              EmployeeServiceImpl departmentService, CafeServiceImpl cafeService,
+                              ReplyButtons replyButtons, CheckMessage checkMessage,
+                              @Lazy AnnyeongEatWebHook webHook) {
+        super(orderService, userService, userStatesService, orderStatesService, departmentService, webHook);
         this.cafeService = cafeService;
         this.replyButtons = replyButtons;
         this.checkMessage = checkMessage;

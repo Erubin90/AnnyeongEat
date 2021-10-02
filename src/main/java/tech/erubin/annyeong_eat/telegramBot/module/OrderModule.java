@@ -20,8 +20,6 @@ import java.util.List;
 
 @Component
 public class OrderModule extends Module {
-    private final AnnyeongEatWebHook webHook;
-
     private final CafeServiceImpl cafeService;
     private final DishServiceImpl dishService;
 
@@ -32,11 +30,10 @@ public class OrderModule extends Module {
 
     public OrderModule(OrderServiceImpl orderService, UserServiceImpl userService,
                        UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
-                       DepartmentServiceImpl departmentService, @Lazy AnnyeongEatWebHook webHook,
-                       CafeServiceImpl cafeService, DishServiceImpl dishService, ReplyButtons replyButtons,
-                       InlineButtons inlineButtons, CheckMessage checkMessage) {
-        super(orderService, userService, userStatesService, orderStatesService, departmentService);
-        this.webHook = webHook;
+                       EmployeeServiceImpl departmentService, CafeServiceImpl cafeService,
+                       DishServiceImpl dishService, ReplyButtons replyButtons, InlineButtons inlineButtons,
+                       CheckMessage checkMessage, @Lazy AnnyeongEatWebHook webHook) {
+        super(orderService, userService, userStatesService, orderStatesService, departmentService, webHook);
         this.cafeService = cafeService;
         this.dishService = dishService;
         this.replyButtons = replyButtons;
@@ -101,7 +98,7 @@ public class OrderModule extends Module {
             }
         }
         else if (sourceText.equals("\uD83D\uDED2")) {
-            text = getFullOrderText(order, false);
+            text = getChequeText(order, false);
             replyKeyboard = inlineButtons.fullOrderButtons(order);
         }
         else {
@@ -170,7 +167,7 @@ public class OrderModule extends Module {
         ReplyKeyboard replyKeyboard;
         if (paymentMethod.contains(sourceText)) {
             order.setPaymentMethod(sourceText);
-            text = getFullOrderText(order, false);
+            text = getChequeText(order, false);
             userState = userStatesService.create(user, ClientEnum.DELIVERY_CONFIRMATION.getValue());
             replyKeyboard = replyButtons.userOrderConfirmation();
         }
@@ -200,7 +197,7 @@ public class OrderModule extends Module {
             userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
             if (user.getEmployeeList() != null) {
-                sendMessageOperator(order, webHook);
+                sendMessageOperator(order);
             }
         }
         else if (sourceText.equals(replyButtons.getBack())) {

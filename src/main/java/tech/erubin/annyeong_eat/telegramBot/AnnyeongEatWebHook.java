@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import tech.erubin.annyeong_eat.entity.Employee;
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.User;
-import tech.erubin.annyeong_eat.service.DepartmentServiceImpl;
+import tech.erubin.annyeong_eat.service.EmployeeServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
 import tech.erubin.annyeong_eat.telegramBot.handler.CallbackQueryHandler;
@@ -32,7 +32,7 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
     private final MessageHandler messageHandler;
     private final CallbackQueryHandler callbackQueryHandler;
 
-    private final DepartmentServiceImpl departmentService;
+    private final EmployeeServiceImpl departmentService;
     private final InlineButtons inlineButtons;
 
     @Override

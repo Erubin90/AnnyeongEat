@@ -1,6 +1,7 @@
 package tech.erubin.annyeong_eat.telegramBot.textMessages;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -116,16 +117,20 @@ public abstract class Module{
     protected UserServiceImpl userService;
     protected UserStatesServiceImpl userStatesService;
     protected OrderStatesServiceImpl orderStatesService;
-    protected DepartmentServiceImpl departmentService;
+    protected EmployeeServiceImpl departmentService;
+
+    protected AnnyeongEatWebHook webHook;
 
 
     public Module(OrderServiceImpl orderService, UserServiceImpl userService, UserStatesServiceImpl userStatesService,
-                  OrderStatesServiceImpl orderStatesService, DepartmentServiceImpl departmentService) {
+                  OrderStatesServiceImpl orderStatesService, EmployeeServiceImpl departmentService,
+                  @Lazy AnnyeongEatWebHook webHook) {
         this.orderService = orderService;
         this.userService = userService;
         this.userStatesService = userStatesService;
         this.orderStatesService = orderStatesService;
         this.departmentService = departmentService;
+        this.webHook = webHook;
     }
 
     protected SendMessage sendMessage(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState) {
@@ -159,7 +164,14 @@ public abstract class Module{
         return sendMessage;
     }
 
-    public String getFullOrderText(Order order, boolean isEmployee) {
+    protected void sendMessageOperator(Order order) {
+        List<Employee> listOperatorsInCafe = departmentService.getEmployeeByCafeIdAndDepartmenName(order.getCafeId(), EmployeeEnum.OPERATOR.getValue());
+        if (listOperatorsInCafe != null) {
+            webHook.sendMessageDepartment(listOperatorsInCafe, EmployeeEnum.OPERATOR, getChequeText(order, true), order);
+        }
+    }
+
+    public String getChequeText(Order order, boolean isEmployee) {
         List<ChequeDish> chequeDishList = order.getChequeDishList();
         if (chequeDishList != null && !chequeDishList.isEmpty()) {
             String receiptPositions = getReceiptPositions(order);
@@ -182,9 +194,9 @@ public abstract class Module{
                         .append("\n");
             }
             fullOrder.append("Сумма заказа: ")
-                        .append(sumCheque)
-                        .append("₽\n")
-                        .append("Сумма доставки: ");
+                    .append(sumCheque)
+                    .append("₽\n")
+                    .append("Сумма доставки: ");
             if (priceDelivery >= 0) {
                 double sumOrder = sumCheque + priceDelivery;
                 fullOrder.append(priceDelivery)
@@ -226,7 +238,7 @@ public abstract class Module{
         }
     }
 
-    private String getReceiptPositions(Order order) {
+    public String getReceiptPositions(Order order) {
         int count = 1;
         List<ChequeDish> chequeDishList = order.getChequeDishList();
         StringBuilder receiptPositions = new StringBuilder();
@@ -261,7 +273,7 @@ public abstract class Module{
         return receiptPositions.toString();
     }
 
-    private double getSumCheque(Order order) {
+    public double getSumCheque(Order order) {
         double sumCheque = 0.0;
         for (ChequeDish chequeDish : order.getChequeDishList()) {
             sumCheque += chequeDish.getDishId().getPrice() * chequeDish.getCountDishes();
@@ -272,13 +284,5 @@ public abstract class Module{
             }
         }
         return sumCheque;
-    }
-
-    protected void sendMessageOperator(Order order, AnnyeongEatWebHook webHook) {
-        List<Employee> listOperatorsInCafe = departmentService
-                .getEmployeeByCafeIdAndDepartmenName(order.getCafeId(), EmployeeEnum.OPERATOR.getValue());
-        if (listOperatorsInCafe != null) {
-            webHook.sendMessageDepartment(listOperatorsInCafe, EmployeeEnum.OPERATOR, getFullOrderText(order, true), order);
-        }
     }
 }

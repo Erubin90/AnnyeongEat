@@ -7,7 +7,7 @@ import tech.erubin.annyeong_eat.entity.Employee;
 
 import java.util.List;
 
-public interface DepartmentRepository extends JpaRepository<Employee, Integer> {
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     List<Employee> getDepartmentsByCafeIdAndName(Cafe cafeId, String name);
 

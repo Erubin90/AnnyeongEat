@@ -12,5 +12,7 @@ public interface ChequeDishService {
 
     void delete(ChequeDish chequeDish);
 
+    void saveOrDeleteChequeDish(ChequeDish chequeDish, int count);
+
     ChequeDish create(Order order, Dish dish);
 }

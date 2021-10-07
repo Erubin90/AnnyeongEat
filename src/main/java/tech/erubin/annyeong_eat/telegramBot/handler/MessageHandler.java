@@ -6,18 +6,16 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.entity.UserState;
-import tech.erubin.annyeong_eat.service.CafeServiceImpl;
 import tech.erubin.annyeong_eat.service.UserServiceImpl;
 import tech.erubin.annyeong_eat.service.UserStatesServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
-import tech.erubin.annyeong_eat.telegramBot.module.EmployeeModule;
 import tech.erubin.annyeong_eat.telegramBot.module.MainMenuModule;
+import tech.erubin.annyeong_eat.telegramBot.module.OperatorModule;
 import tech.erubin.annyeong_eat.telegramBot.module.OrderModule;
 import tech.erubin.annyeong_eat.telegramBot.module.RegistrationModule;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Handlers;
-
-import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -25,45 +23,58 @@ public class MessageHandler extends Handlers {
     private final RegistrationModule registrationModule;
     private final MainMenuModule mainMenuModule;
     private final OrderModule orderModule;
-    private final EmployeeModule employeeModule;
+    private final OperatorModule operatorModule;
     private final UserServiceImpl clientService;
     private final UserStatesServiceImpl stateService;
-    private final CafeServiceImpl cafeService;
 
     public BotApiMethod<?> handleUpdate(Update update) {
-        BotApiMethod<?> botApiMethod;
+        String sourceText = update.getMessage().getText();
         User user = getUser(update);
         UserState userState = stateService.getState(user);
-        EmployeeEnum employeeEnum = EmployeeEnum.GET.department(userState.getState());
-        String sourceText = update.getMessage().getText();
-        if  (employeeEnum != null) {
-            botApiMethod = employeeActions(update, user, employeeEnum, sourceText);
+        DepartmentEnum department = DepartmentEnum.GET.department(user);
+        if (department != DepartmentEnum.NO_CORRECT_DEPARTMENT) {
+            if (department != DepartmentEnum.CLIENT) {
+                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, userState.getState());
+                if (employeeEnum != EmployeeEnum.NO_CORRECT_STATE) {
+                    return employeeActions(update, user, employeeEnum, sourceText);
+                }
+                else {
+                    return null;
+                }
+            }
+            else {
+                ClientEnum clientEnum = ClientEnum.GET.userState(userState.getState());
+                if (clientEnum != ClientEnum.NO_CORRECT_STATE) {
+                    return clientActions(update, user, clientEnum, sourceText);
+                }
+                else {
+                    return null;
+                }
+            }
         }
         else {
-            ClientEnum clientEnum = getUserEnum(userState);
-            botApiMethod = clientActions(update, user, clientEnum, sourceText);
+            return null;
         }
-        return botApiMethod;
+    }
+
+    private BotApiMethod<?> employeeActions(Update update, User user, EmployeeEnum employeeEnum, String sourceText) {
+        switch (employeeEnum) {
+            case OPERATOR_MAIN_MENU:
+                return operatorModule.mainMenu(update, user, sourceText);
+            case OPERATOR_CAFE_MENU:
+                return null;
+            case OPERATOR_METHOD_OF_OBTAINING:
+                return null;
+            case OPERATOR_CHOOSE_TABLE:
+                return null;
+            default:
+                return null;
+        }
     }
 
     private BotApiMethod<?> clientActions(Update update, User user, ClientEnum clientEnum, String sourceText) {
         BotApiMethod<?> botApiMethod;
         switch (clientEnum) {
-            case REGISTRATION_START:
-                botApiMethod = registrationModule.start(update, user);
-                break;
-            case REGISTRATION_CITY:
-                botApiMethod = registrationModule.city(update, user, sourceText);
-                break;
-            case REGISTRATION_NAME:
-                botApiMethod = registrationModule.name(update, user, sourceText);
-                break;
-            case REGISTRATION_SURNAME:
-                botApiMethod = registrationModule.surname(update, user, sourceText);
-                break;
-            case REGISTRATION_PHONE_NUMBERS:
-                botApiMethod = registrationModule.phoneNumber(update, user, sourceText);
-                break;
             case MAIN_MENU:
                 botApiMethod = mainMenuModule.mainMenu(update, user, sourceText);
                 break;
@@ -94,29 +105,23 @@ public class MessageHandler extends Handlers {
             case DELIVERY_CONFIRMATION:
                 botApiMethod = orderModule.deliveryConfirmation(update, user, sourceText);
                 break;
-            default:
-                throw new NullPointerException("Такого состояния у клиента несуществует");
-        }
-        return botApiMethod;
-    }
-
-    private BotApiMethod<?> employeeActions(Update update, User user, EmployeeEnum employeeEnum, String sourceText) {
-        BotApiMethod<?> botApiMethod;
-        switch (employeeEnum) {
-            case OPERATOR:
-                botApiMethod = employeeModule.operator(update, sourceText);
+            case REGISTRATION_START:
+                botApiMethod = registrationModule.start(update, user);
                 break;
-            case ADMINISTRATOR:
-                botApiMethod = employeeModule.administrator(update, user, sourceText);
+            case REGISTRATION_CITY:
+                botApiMethod = registrationModule.city(update, user, sourceText);
                 break;
-            case COURIER:
-                botApiMethod = employeeModule.courier(update, user, sourceText);
+            case REGISTRATION_NAME:
+                botApiMethod = registrationModule.name(update, user, sourceText);
                 break;
-            case DEVELOPER:
-                botApiMethod = employeeModule.developer(update, user, sourceText);
+            case REGISTRATION_SURNAME:
+                botApiMethod = registrationModule.surname(update, user, sourceText);
+                break;
+            case REGISTRATION_PHONE_NUMBERS:
+                botApiMethod = registrationModule.phoneNumber(update, user, sourceText);
                 break;
             default:
-                throw new NullPointerException("Такого состояния у работника несуществует");
+                return null;
         }
         return botApiMethod;
     }
@@ -124,15 +129,5 @@ public class MessageHandler extends Handlers {
     private User getUser(Update update) {
         String userId = update.getMessage().getFrom().getId().toString();
         return  clientService.getUser(userId);
-    }
-
-    private ClientEnum getUserEnum(UserState userState) {
-        List<String> cafeNameList = cafeService.getAllCafeNames();
-        if (cafeNameList.contains(userState.getState())) {
-            return ClientEnum.ORDER_CAFE_MENU;
-        }
-        else {
-            return ClientEnum.GET.userState(userState.getState());
-        }
     }
 }

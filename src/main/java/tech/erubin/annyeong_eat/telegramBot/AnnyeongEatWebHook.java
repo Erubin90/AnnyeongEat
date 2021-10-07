@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -16,7 +17,7 @@ import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.service.EmployeeServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.handler.CallbackQueryHandler;
 import tech.erubin.annyeong_eat.telegramBot.handler.MessageHandler;
 
@@ -66,16 +67,16 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
             e.printStackTrace();
             String errorText = e.getMessage() != null? e.getMessage() : "Произошла ошибка но текс ошибки не выявлен. Посмотри логи";
             List<Employee> developerList = departmentService.getDeveloperList();
-            sendMessageDepartment(developerList, EmployeeEnum.DEVELOPER, errorText, null);
+            sendMessageDepartment(developerList, DepartmentEnum.DEVELOPER, errorText, null);
         }
         return botApiMethod;
     }
 
-    public boolean sendPhoto(String chatId, String text, String imgPath, InlineKeyboardMarkup inlineKeyboardMarkup){
+    public boolean sendPhoto(CallbackQuery callback, String text, String imgPath, InlineKeyboardMarkup inlineKeyboardMarkup){
         InputFile inputFile = new InputFile(imgPath);
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setPhoto(inputFile);
-        sendPhoto.setChatId(chatId);
+        sendPhoto.setChatId(String.valueOf(callback.getMessage().getChatId()));
         sendPhoto.setCaption(text);
         sendPhoto.setReplyMarkup(inlineKeyboardMarkup);
         try {
@@ -110,16 +111,17 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
             return true;
         }
         catch (TelegramApiException e) {
+            e.printStackTrace();
             return false;
         }
     }
 
-    public void sendMessageDepartment(List<Employee> employeeList, EmployeeEnum employeeEnum,
+    public void sendMessageDepartment(List<Employee> employeeList, DepartmentEnum departmentEnum,
                                       String text, Order order) {
         List<User> userList = employeeList.stream()
                 .map(Employee::getUserId)
                 .collect(Collectors.toList());
-        InlineKeyboardMarkup inlineKeyboardMarkup = inlineButtons.employeeButtons(employeeEnum, order);
+        InlineKeyboardMarkup inlineKeyboardMarkup = inlineButtons.employeeButtons(departmentEnum, order);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText(text);
         try {

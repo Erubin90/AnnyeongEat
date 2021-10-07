@@ -24,9 +24,9 @@ public class MainMenuModule extends Module {
 
     public MainMenuModule(OrderServiceImpl orderService, UserServiceImpl userService,
                           UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
-                          EmployeeServiceImpl departmentService, ReplyButtons replyButtons,
+                          EmployeeServiceImpl employeeService, ReplyButtons replyButtons,
                           @Lazy AnnyeongEatWebHook webHook) {
-        super(orderService, userService, userStatesService, orderStatesService, departmentService, webHook);
+        super(orderService, userService, userStatesService, orderStatesService, employeeService, webHook);
         this.replyButtons = replyButtons;
     }
 
@@ -58,7 +58,7 @@ public class MainMenuModule extends Module {
             text = putButton;
             replyKeyboard = replyButtons.userMainMenu();
         }
-        return sendMessage(update, replyKeyboard, text, userState);
+        return message(update, replyKeyboard, text, userState);
     }
 
     public SendMessage orderChek(Update update, User user, String sourceText) {
@@ -70,7 +70,7 @@ public class MainMenuModule extends Module {
             userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
         }
-        return sendMessage(update, replyKeyboard, text, userState);
+        return message(update, replyKeyboard, text, userState);
     }
 
     public SendMessage help(Update update, User user, String sourceText) {
@@ -82,7 +82,7 @@ public class MainMenuModule extends Module {
             userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
         }
-        return sendMessage(update, replyKeyboard, text, userState);
+        return message(update, replyKeyboard, text, userState);
     }
 
     public SendMessage profile(Update update, User user, String sourceText) {
@@ -94,7 +94,7 @@ public class MainMenuModule extends Module {
             userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
         }
-        return sendMessage(update, replyKeyboard, text, userState);
+        return message(update, replyKeyboard, text, userState);
     }
 
     private String clientProfile(User user) {
@@ -102,8 +102,8 @@ public class MainMenuModule extends Module {
         for (Order order : user.getOrderList()) {
             List<OrderState> orderStateList = order.getOrderStateList();
             if (orderStateList.size() > 1) {
-                String state = orderStateList.get(orderStateList.size() - 1).getState();
-                if (OrderEnum.GET.isOrderAccepted(state)) {
+                OrderState orderState = orderStateList.get(orderStateList.size() - 1);
+                if (OrderEnum.GET.isOrderAccepted(orderState)) {
                     countOrder++;
                 }
             }

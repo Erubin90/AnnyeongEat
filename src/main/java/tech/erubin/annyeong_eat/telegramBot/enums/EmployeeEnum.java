@@ -1,44 +1,50 @@
 package tech.erubin.annyeong_eat.telegramBot.enums;
 
 public enum EmployeeEnum {
-    OPERATOR("Оператор"),
-    ADMINISTRATOR("Администратор"),
-    COURIER("Курьер"),
-    DEVELOPER("Разработчик"),
+
+    OPERATOR_MAIN_MENU("главное меню"),
+    OPERATOR_CAFE_MENU("создание заказа"),
+    OPERATOR_METHOD_OF_OBTAINING("способ получения"),
+    OPERATOR_CHOOSE_TABLE("выбор стола"),
+    NO_CORRECT_STATE("не корректное состояние"),
     GET;
 
-    private String department;
+    private String state;
 
     EmployeeEnum() {
     }
 
-    EmployeeEnum(String department) {
-        this.department = department;
+    EmployeeEnum(String state) {
+        this.state = state;
     }
 
     public String getValue() {
-        return department;
+        return state;
     }
 
-    public EmployeeEnum department(String department) {
-            if (department.equals(OPERATOR.getValue())) {
-                return OPERATOR;
-            }
-            else if (department.equals(ADMINISTRATOR.getValue())) {
-                return ADMINISTRATOR;
-            }
-            else if (department.equals(COURIER.getValue())) {
-                return COURIER;
-            }
-            else if (department.equals(DEVELOPER.getValue())) {
-                return DEVELOPER;
-            }
-            else {
-                return null;
-            }
-    }
-
-    public boolean isEmployee(String state) {
-        return department(state) != null;
+    public EmployeeEnum employeeState(DepartmentEnum department, String state) {
+        switch (department) {
+            case OPERATOR:
+                if (state.equals(OPERATOR_CAFE_MENU.getValue())) {
+                    return OPERATOR_CAFE_MENU;
+                }
+                else if (state.equals(OPERATOR_METHOD_OF_OBTAINING.getValue())) {
+                    return OPERATOR_METHOD_OF_OBTAINING;
+                }
+                else if (state.equals(OPERATOR_CHOOSE_TABLE.getValue())) {
+                    return OPERATOR_CHOOSE_TABLE;
+                }
+                else {
+                    return NO_CORRECT_STATE;
+                }
+            case ADMINISTRATOR:
+                return NO_CORRECT_STATE;
+            case COURIER:
+                return NO_CORRECT_STATE;
+            case DEVELOPER:
+                return NO_CORRECT_STATE;
+            default:
+                return NO_CORRECT_STATE;
+        }
     }
 }

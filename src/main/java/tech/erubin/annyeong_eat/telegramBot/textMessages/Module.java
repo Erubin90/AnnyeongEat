@@ -4,13 +4,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import tech.erubin.annyeong_eat.entity.*;
 import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 
 import java.util.List;
 
@@ -21,7 +26,7 @@ public abstract class Module{
     @Value("${module.message.error}")
     protected String error;
 
-    @Value("${message.error.putButton}")
+    @Value("${error.putButton}")
     protected String putButton;
 
     @Value("${mainMenu.message.help}")
@@ -33,7 +38,7 @@ public abstract class Module{
     @Value("${mainMenu.message.choosingCafe}")
     protected String choosingCafe;
 
-    @Value("${address.noError}")
+    @Value("${noError.address.}")
     protected String addressNoError;
 
     @Value("${order.message.emptyReceipt}")
@@ -69,10 +74,10 @@ public abstract class Module{
     @Value("${order.message.nextToPaymentMethod}")
     protected String nextToPaymentMethod;
 
-    @Value("${regular.errorTrigger}")
+    @Value("${regular.error.trigger}")
     protected String errorTrigger;
 
-    @Value("${message.error.nameCity}")
+    @Value("${error.nameCity}")
     protected String errorNameCity;
 
     //noError Message's
@@ -113,27 +118,42 @@ public abstract class Module{
     @Value("${operator.message.priceNotCalculated}")
     protected String priceNotCalculated;
 
+    @Value("${message.buttonNotWork}")
+    protected String buttonNotWork;
+
+    @Value("${handler.message.addDish}")
+    protected String addDish;
+
+    @Value("${handler.message.subDish}")
+    protected String subDish;
+
+    @Value("${handler.message.emptyDish}")
+    protected String emptyDish;
+
+    @Value("${handler.message.notWork}")
+    protected String notWork;
+
     protected OrderServiceImpl orderService;
     protected UserServiceImpl userService;
     protected UserStatesServiceImpl userStatesService;
     protected OrderStatesServiceImpl orderStatesService;
-    protected EmployeeServiceImpl departmentService;
+    protected EmployeeServiceImpl employeeService;
 
     protected AnnyeongEatWebHook webHook;
 
 
     public Module(OrderServiceImpl orderService, UserServiceImpl userService, UserStatesServiceImpl userStatesService,
-                  OrderStatesServiceImpl orderStatesService, EmployeeServiceImpl departmentService,
+                  OrderStatesServiceImpl orderStatesService, EmployeeServiceImpl employeeService,
                   @Lazy AnnyeongEatWebHook webHook) {
         this.orderService = orderService;
         this.userService = userService;
         this.userStatesService = userStatesService;
         this.orderStatesService = orderStatesService;
-        this.departmentService = departmentService;
+        this.employeeService = employeeService;
         this.webHook = webHook;
     }
 
-    protected SendMessage sendMessage(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState) {
+    protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState) {
         String chatId = update.getMessage().getChatId().toString();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
@@ -143,35 +163,56 @@ public abstract class Module{
         return sendMessage;
     }
 
-    protected SendMessage sendMessage(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState,
-                                      Order order, OrderState orderState) {
-        SendMessage sendMessage = sendMessage(update, replyKeyboard, text, userState);
+    protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState,
+                                  Order order, OrderState orderState) {
+        SendMessage sendMessage = message(update, replyKeyboard, text, userState);
         orderService.save(order);
         orderStatesService.save(orderState);
         return sendMessage;
     }
 
-    protected SendMessage sendMessage(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState,
-                                      Order order) {
-        SendMessage sendMessage = sendMessage(update, replyKeyboard, text, userState);
+    protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState,
+                                  Order order) {
+        SendMessage sendMessage = message(update, replyKeyboard, text, userState);
         orderService.save(order);
         return sendMessage;
     }
 
-    protected SendMessage sendMessage(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState, User user) {
-        SendMessage sendMessage = sendMessage(update, replyKeyboard, text, userState);
+    protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState, User user) {
+        SendMessage sendMessage = message(update, replyKeyboard, text, userState);
         userService.save(user);
         return sendMessage;
     }
 
-    protected void sendMessageOperator(Order order) {
-        List<Employee> listOperatorsInCafe = departmentService.getEmployeeByCafeIdAndDepartmenName(order.getCafeId(), EmployeeEnum.OPERATOR.getValue());
+    protected AnswerCallbackQuery answerCallbackQuery(CallbackQuery callback, String text) {
+        AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
+        answerCallbackQuery.setCallbackQueryId(callback.getId());
+        answerCallbackQuery.setText(text);
+        answerCallbackQuery.setShowAlert(false);
+        return answerCallbackQuery;
+    }
+
+    protected EditMessageText editMessageText(CallbackQuery callback, String text, InlineKeyboardMarkup inlineMarkup) {
+        String chatId = callback.getMessage().getChatId().toString();
+        int messageId = callback.getMessage().getMessageId();
+        return new EditMessageText(chatId, messageId, null, text,
+                null, null, inlineMarkup, null);
+    }
+
+    protected EditMessageReplyMarkup editMessageReplyMarkup(CallbackQuery callback, InlineKeyboardMarkup inlineMarkup) {
+        String chatId = callback.getMessage().getChatId().toString();
+        int messageId = callback.getMessage().getMessageId();
+        return new EditMessageReplyMarkup(chatId, messageId, null, inlineMarkup);
+    }
+
+    protected void sendMessageDepartment(Order order, DepartmentEnum departmentEnum) {
+        List<Employee> listOperatorsInCafe = employeeService.getEmployeeByCafeIdAndDepartmenName(order.getCafeId(), departmentEnum.getValue());
         if (listOperatorsInCafe != null) {
-            webHook.sendMessageDepartment(listOperatorsInCafe, EmployeeEnum.OPERATOR, getChequeText(order, true), order);
+            webHook.sendMessageDepartment(listOperatorsInCafe, departmentEnum, getChequeText(order, true), order);
         }
     }
 
-    public String getChequeText(Order order, boolean isEmployee) {
+    protected String getChequeText(Order order, boolean isEmployee) {
         List<ChequeDish> chequeDishList = order.getChequeDishList();
         if (chequeDishList != null && !chequeDishList.isEmpty()) {
             String receiptPositions = getReceiptPositions(order);
@@ -238,7 +279,7 @@ public abstract class Module{
         }
     }
 
-    public String getReceiptPositions(Order order) {
+    protected String getReceiptPositions(Order order) {
         int count = 1;
         List<ChequeDish> chequeDishList = order.getChequeDishList();
         StringBuilder receiptPositions = new StringBuilder();
@@ -273,7 +314,7 @@ public abstract class Module{
         return receiptPositions.toString();
     }
 
-    public double getSumCheque(Order order) {
+    protected double getSumCheque(Order order) {
         double sumCheque = 0.0;
         for (ChequeDish chequeDish : order.getChequeDishList()) {
             sumCheque += chequeDish.getDishId().getPrice() * chequeDish.getCountDishes();

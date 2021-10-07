@@ -25,10 +25,10 @@ public class RegistrationModule extends Module {
 
     public RegistrationModule(OrderServiceImpl orderService, UserServiceImpl userService,
                               UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
-                              EmployeeServiceImpl departmentService, CafeServiceImpl cafeService,
+                              EmployeeServiceImpl employeeService, CafeServiceImpl cafeService,
                               ReplyButtons replyButtons, CheckMessage checkMessage,
                               @Lazy AnnyeongEatWebHook webHook) {
-        super(orderService, userService, userStatesService, orderStatesService, departmentService, webHook);
+        super(orderService, userService, userStatesService, orderStatesService, employeeService, webHook);
         this.cafeService = cafeService;
         this.replyButtons = replyButtons;
         this.checkMessage = checkMessage;
@@ -39,7 +39,7 @@ public class RegistrationModule extends Module {
         String text = startClientRegistration + "\n" + errorNameCity;
         UserState userState = userStatesService.create(user, ClientEnum.REGISTRATION_CITY.getValue());
         ReplyKeyboard replyKeyboard = replyButtons.userRegistrationCity(allCityName);
-        return sendMessage(update,  replyKeyboard, text, userState);
+        return message(update,  replyKeyboard, text, userState);
     }
 
     public SendMessage city(Update update, User user, String sourceText) {
@@ -55,7 +55,7 @@ public class RegistrationModule extends Module {
         else {
             replyKeyboard = replyButtons.userRegistrationCity(allCityName);
         }
-        return sendMessage(update, replyKeyboard, text, userState, user);
+        return message(update, replyKeyboard, text, userState, user);
     }
 
     public SendMessage name(Update update, User user, String sourceText) {
@@ -67,7 +67,7 @@ public class RegistrationModule extends Module {
             user.setName(sourceText);
             userState = userStatesService.create(user, ClientEnum.REGISTRATION_SURNAME.getValue());
         }
-        return sendMessage(update, replyKeyboard, text, userState, user);
+        return message(update, replyKeyboard, text, userState, user);
     }
 
     public SendMessage surname(Update update, User user, String sourceText) {
@@ -79,7 +79,7 @@ public class RegistrationModule extends Module {
             user.setSurname(sourceText);
             userState = userStatesService.create(user, ClientEnum.REGISTRATION_PHONE_NUMBERS.getValue());
         }
-        return sendMessage(update, replyKeyboard, text, userState, user);
+        return message(update, replyKeyboard, text, userState, user);
     }
 
     public SendMessage phoneNumber(Update update, User user, String sourceText) {
@@ -96,6 +96,6 @@ public class RegistrationModule extends Module {
             userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
         }
-        return sendMessage(update, replyKeyboard, text, userState, user);
+        return message(update, replyKeyboard, text, userState, user);
     }
 }

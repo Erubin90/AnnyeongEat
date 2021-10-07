@@ -56,7 +56,7 @@ public abstract class Buttons {
     @Value("${mainMenu.button.info}")
     protected String clientInfo;
 
-    @Value("${message.error.putButton}")
+    @Value("${error.putButton}")
     protected String putButton;
 
     @Value("${employee.button.editOrder}")
@@ -89,7 +89,7 @@ public abstract class Buttons {
     @Value("${employee.button.changeQuantity}")
     protected String changeQuantity;
 
-    @Value("${employee.button.form}")
+    @Value("${operator.button.form}")
     protected String form;
 
     public List<String> paymentMethod(){
@@ -105,7 +105,7 @@ public abstract class Buttons {
     }
 
     protected List<String> operatorMainMenuButtons() {
-        return List.of(restart);
+        return List.of(createOrder, form);
     }
 
     protected List<List<String>> dishesMenuButtons(Order order) {

@@ -35,7 +35,20 @@ public class ChequeDishServiceImpl implements ChequeDishService {
     }
 
     @Override
+    public void saveOrDeleteChequeDish(ChequeDish chequeDish, int count) {
+        chequeDish.setCountDishes(count);
+        if (count > 0) {
+            repository.save(chequeDish);
+        }
+        else {
+            repository.delete(chequeDish);
+        }
+    }
+
+    @Override
     public ChequeDish create(Order order, Dish dish) {
         return new ChequeDish(order, dish);
     }
+
+
 }

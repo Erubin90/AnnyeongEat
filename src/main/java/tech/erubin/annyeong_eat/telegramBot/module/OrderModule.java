@@ -2,8 +2,13 @@ package tech.erubin.annyeong_eat.telegramBot.module;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import tech.erubin.annyeong_eat.entity.*;
 import tech.erubin.annyeong_eat.service.*;
@@ -11,6 +16,7 @@ import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
 import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Module;
@@ -22,6 +28,7 @@ import java.util.List;
 public class OrderModule extends Module {
     private final CafeServiceImpl cafeService;
     private final DishServiceImpl dishService;
+    private final ChequeDishServiceImpl chequeDishService;
 
     private final ReplyButtons replyButtons;
     private final InlineButtons inlineButtons;
@@ -30,46 +37,45 @@ public class OrderModule extends Module {
 
     public OrderModule(OrderServiceImpl orderService, UserServiceImpl userService,
                        UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
-                       EmployeeServiceImpl departmentService, CafeServiceImpl cafeService,
+                       EmployeeServiceImpl employeeService, CafeServiceImpl cafeService,
                        DishServiceImpl dishService, ReplyButtons replyButtons, InlineButtons inlineButtons,
-                       CheckMessage checkMessage, @Lazy AnnyeongEatWebHook webHook) {
-        super(orderService, userService, userStatesService, orderStatesService, departmentService, webHook);
+                       CheckMessage checkMessage, @Lazy AnnyeongEatWebHook webHook, ChequeDishServiceImpl chequeDishService) {
+        super(orderService, userService, userStatesService, orderStatesService, employeeService, webHook);
         this.cafeService = cafeService;
         this.dishService = dishService;
         this.replyButtons = replyButtons;
         this.inlineButtons = inlineButtons;
         this.checkMessage = checkMessage;
+        this.chequeDishService = chequeDishService;
     }
 
-    public SendMessage choosingCafe(Update update, User user, String sourceText){
+    public SendMessage choosingCafe(Update update, User user, String sourceText) {
         List<String> cafeNames = cafeService.getCafeNameByCity(user.getCity());
         Order order = orderService.getOrderByUser(user);
         UserState userState = null;
         OrderState orderState = null;
         String text;
         ReplyKeyboard replyKeyboard;
-        if (cafeNames.contains(sourceText)){
+        if (cafeNames.contains(sourceText)) {
             text = hello + " " + sourceText;
             Cafe cafe = cafeService.getCafeByName(sourceText);
             order = orderService.getOrderByUserIdAndCafeId(user, cafe);
             order.setUsing(1);
             orderState = orderStatesService.create(order, OrderEnum.ORDER_START_REGISTRATION.getValue());
-            userState = userStatesService.create(user, sourceText);
+            userState = userStatesService.create(user, ClientEnum.ORDER_CAFE_MENU.getValue());
             replyKeyboard = replyButtons.userOrderMenu(order);
-        }
-        else if (sourceText.equals(replyButtons.getBack())) {
+        } else if (sourceText.equals(replyButtons.getBack())) {
             text = backToMainMenu;
             userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
-        }
-        else {
+        } else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderCafe(user);
         }
-        return sendMessage(update, replyKeyboard, text, userState, order, orderState);
+        return message(update, replyKeyboard, text, userState, order, orderState);
     }
 
-    public SendMessage cafeMenu(Update update, User user, String sourceText){
+    public SendMessage cafeMenu(Update update, User user, String sourceText) {
         Order order = orderService.getOrderByUser(user);
         List<String> typeDishes = replyButtons.typeDishesInCafe(order);
         UserState userState = null;
@@ -79,36 +85,31 @@ public class OrderModule extends Module {
             text = sourceText + ":";
             List<Dish> dishList = dishService.getDishListByType(sourceText);
             replyKeyboard = inlineButtons.typeDishesMenu(order, dishList);
-        }
-        else if (sourceText.equals(replyButtons.getBack())) {
+        } else if (sourceText.equals(replyButtons.getBack())) {
             order.setUsing(1);
             text = backToChoosingCafe;
             userState = userStatesService.create(user, ClientEnum.ORDER_CAFE.getValue());
             replyKeyboard = replyButtons.userOrderCafe(user);
-        }
-        else if (sourceText.equals(replyButtons.getNext())) {
+        } else if (sourceText.equals(replyButtons.getNext())) {
             if (order.getChequeDishList().size() == 0) {
                 text = emptyReceipt;
                 replyKeyboard = replyButtons.userOrderMenu(order);
-            }
-            else {
+            } else {
                 text = nextToAddress;
                 userState = userStatesService.create(user, ClientEnum.DELIVERY_ADDRESS.getValue());
                 replyKeyboard = replyButtons.userOrderAddress(user);
             }
-        }
-        else if (sourceText.equals("\uD83D\uDED2")) {
+        } else if (sourceText.equals("\uD83D\uDED2")) {
             text = getChequeText(order, false);
             replyKeyboard = inlineButtons.fullOrderButtons(order);
-        }
-        else {
+        } else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderMenu(order);
         }
-        return sendMessage(update, replyKeyboard, text, userState, order);
+        return message(update, replyKeyboard, text, userState, order);
     }
 
-    public SendMessage deliveryAddress(Update update, User user, String sourceText){
+    public SendMessage deliveryAddress(Update update, User user, String sourceText) {
         Order order = orderService.getOrderByUser(user);
         UserState userState = null;
         String text;
@@ -117,23 +118,21 @@ public class OrderModule extends Module {
             text = backToOrderMenu;
             userState = userStatesService.create(user, ClientEnum.ORDER_CAFE_MENU.getValue());
             replyKeyboard = replyButtons.userOrderMenu(order);
-        }
-        else {
+        } else {
             text = checkMessage.checkAddress(sourceText);
             if (!text.contains(errorTrigger)) {
                 order.setAddress(sourceText);
                 text = nextToPhoneNumber;
                 userState = userStatesService.create(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
                 replyKeyboard = replyButtons.userOrderPhoneNumber(user);
-            }
-            else {
+            } else {
                 replyKeyboard = replyButtons.userOrderAddress(user);
             }
         }
-        return sendMessage(update, replyKeyboard, text, userState, order);
+        return message(update, replyKeyboard, text, userState, order);
     }
 
-    public SendMessage deliveryPhoneNumber(Update update, User user, String sourceText){
+    public SendMessage deliveryPhoneNumber(Update update, User user, String sourceText) {
         Order order = orderService.getOrderByUser(user);
         UserState userState = null;
         String text;
@@ -142,8 +141,7 @@ public class OrderModule extends Module {
             text = backToAddress;
             userState = userStatesService.create(user, ClientEnum.DELIVERY_ADDRESS.getValue());
             replyKeyboard = replyButtons.userOrderAddress(user);
-        }
-        else {
+        } else {
             text = nextToPhoneNumber;
             String checkText = checkMessage.checkPhoneNumber(sourceText);
             if (!checkText.contains(errorTrigger)) {
@@ -156,10 +154,10 @@ public class OrderModule extends Module {
                 replyKeyboard = replyButtons.userOrderPayment();
             }
         }
-        return sendMessage(update, replyKeyboard, text, userState, order);
+        return message(update, replyKeyboard, text, userState, order);
     }
 
-    public SendMessage deliveryPaymentMethod(Update update, User user, String sourceText){
+    public SendMessage deliveryPaymentMethod(Update update, User user, String sourceText) {
         Order order = orderService.getOrderByUser(user);
         List<String> paymentMethod = replyButtons.paymentMethod();
         UserState userState = null;
@@ -170,21 +168,19 @@ public class OrderModule extends Module {
             text = getChequeText(order, false);
             userState = userStatesService.create(user, ClientEnum.DELIVERY_CONFIRMATION.getValue());
             replyKeyboard = replyButtons.userOrderConfirmation();
-        }
-        else if (sourceText.equals(replyButtons.getBack())) {
+        } else if (sourceText.equals(replyButtons.getBack())) {
             text = backToPhoneNumber;
             userState = userStatesService.create(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
             replyKeyboard = replyButtons.userOrderPhoneNumber(user);
-        }
-        else {
+        } else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderPayment();
         }
 
-        return sendMessage(update, replyKeyboard, text, userState, order);
+        return message(update, replyKeyboard, text, userState, order);
     }
 
-    public SendMessage deliveryConfirmation(Update update, User user, String sourceText){
+    public SendMessage deliveryConfirmation(Update update, User user, String sourceText) {
         Order order = orderService.getOrderByUser(user);
         UserState userState = null;
         OrderState orderState = null;
@@ -196,20 +192,73 @@ public class OrderModule extends Module {
             orderState = orderStatesService.create(order, OrderEnum.ORDER_END_REGISTRATION.getValue());
             userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
-            if (user.getEmployeeList() != null) {
-                sendMessageOperator(order);
-            }
-        }
-        else if (sourceText.equals(replyButtons.getBack())) {
+            sendMessageDepartment(order, DepartmentEnum.OPERATOR);
+        } else if (sourceText.equals(replyButtons.getBack())) {
             text = backToPaymentMethod;
             userState = userStatesService.create(user, ClientEnum.DELIVERY_PAYMENT_METHOD.getValue());
             replyKeyboard = replyButtons.userOrderPayment();
-        }
-        else {
+        } else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderConfirmation();
         }
+        return message(update, replyKeyboard, text, userState, order, orderState);
+    }
 
-        return sendMessage(update, replyKeyboard, text, userState, order, orderState);
+    public BotApiMethod<?> callbackOrderCafeMenu(CallbackQuery callback, Order order, Dish dish, String tag) {
+            InlineKeyboardMarkup inlineMarkup;
+            String callbackText = error;
+
+            ChequeDish chequeDish = chequeDishService.getChequeByOrderAndDish(order, dish);
+            int count = chequeDish.getCountDishes();
+            if (tag.equals("m+") || tag.equals("b+")) {
+                count++;
+                callbackText = dish.getName() + " " + addDish;
+            }
+            else if (tag.equals("m-") || tag.equals("b-")) {
+                if (count >= 0) {
+                    if (count > 0) {
+                        count--;
+                        callbackText = dish.getName() + " " + subDish;
+                    }
+                    else {
+                        callbackText = dish.getName() + " " + emptyDish;
+                    }
+                }
+            }
+            else if (tag.equals("mx") || tag.equals("bx")) {
+                callbackText = count + " " + dish.getName() + " " + subDish;
+                count = 0;
+            }
+            chequeDishService.saveOrDeleteChequeDish(chequeDish, count);
+            if (tag.equals(String.valueOf(dish.getId()))) {
+                callbackText = getDishText(dish);
+                inlineMarkup = inlineButtons.clientCheque(chequeDish);
+                if (!webHook.sendPhoto(callback, callbackText, dish.getLinkPhoto(), inlineMarkup)) {
+                    callbackText = error;
+                }
+            }
+            else if (tag.equals("m+") || tag.equals("mx") || tag.equals("m-")) {
+                inlineMarkup = inlineButtons.clientCheque(chequeDish);
+                EditMessageReplyMarkup editMessageReplyMarkup = editMessageReplyMarkup(callback, inlineMarkup);
+                if (!webHook.updateMarkups(editMessageReplyMarkup, count)) {
+                    callbackText = error;
+                }
+            }
+            else if (tag.equals("b+") || tag.equals("bx") || tag.equals("b-")) {
+                inlineMarkup = inlineButtons.fullOrderButtons(order);
+                String editText = getChequeText(order, false);
+                EditMessageText editMessageText = editMessageText(callback, editText, inlineMarkup);
+                if (!webHook.updateText(editMessageText)) {
+                    callbackText = error;
+                }
+            }
+            return answerCallbackQuery(callback, callbackText);
+        }
+
+    private String getDishText(Dish dish) {
+        String dishName = dish.getName();
+        double dishPrice = dish.getPrice();
+        String dishComment = dish.getComment();
+        return String.format("%s %s₽\n%s", dishName, dishPrice, dishComment);
     }
 }

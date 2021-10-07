@@ -88,7 +88,7 @@ public class ReplyButtons extends Buttons {
     }
 
     public ReplyKeyboardMarkup employeeOperator() {
-        return replyKeyboardMarkup(List.of(form));
+        return replyKeyboardMarkup(operatorMainMenuButtons());
     }
 
     private ReplyKeyboardMarkup replyKeyboardMarkup(Collection<String> buttonNames) {

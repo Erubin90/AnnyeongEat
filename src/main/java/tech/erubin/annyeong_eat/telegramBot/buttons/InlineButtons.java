@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import tech.erubin.annyeong_eat.entity.ChequeDish;
 import tech.erubin.annyeong_eat.entity.Dish;
 import tech.erubin.annyeong_eat.entity.Order;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.textMessages.Buttons;
 
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class InlineButtons extends Buttons {
         return new InlineKeyboardMarkup(rows);
     }
 
-    public InlineKeyboardMarkup employeeButtons(EmployeeEnum department, Order order) {
+    public InlineKeyboardMarkup employeeButtons(DepartmentEnum department, Order order) {
         InlineKeyboardMarkup inlineMarkup;
         switch (department) {
             case OPERATOR:

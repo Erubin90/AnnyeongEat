@@ -10,22 +10,7 @@ import org.springframework.stereotype.Component;
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
 public abstract class Handlers {
 
-    @Value("${handler.message.error}")
-    protected String error;
-
-    @Value("${handler.message.addDish}")
-    protected String addDish;
-
-    @Value("${handler.message.subDish}")
-    protected String subDish;
-
-    @Value("${handler.message.emptyDish}")
-    protected String emptyDish;
-
-    @Value("${handler.message.notWork}")
-    protected String notWork;
-
-    @Value("${regular.errorTrigger}")
+    @Value("${regular.error.trigger}")
     protected String errorTrigger;
 
     //Error Messages
@@ -63,7 +48,7 @@ public abstract class Handlers {
     @Value("${registration.message.city}")
     protected String cityNoError;
 
-    @Value("${address.noError}")
+    @Value("${noError.address.}")
     protected String addressNoError;
 
     @Value("${button.tag.info}")
@@ -74,13 +59,4 @@ public abstract class Handlers {
 
     @Value("${message.buttonNotWork}")
     protected String buttonNotWork;
-
-    @Value("${order.message.emptyReceipt}")
-    protected String emptyReceipt;
-
-    @Value("${operator.message.priceNotSpecified}")
-    protected String priceNotSpecified;
-
-    @Value("${operator.message.priceNotCalculated}")
-    protected String priceNotCalculated;
 }

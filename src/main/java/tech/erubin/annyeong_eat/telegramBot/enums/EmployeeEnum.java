@@ -1,5 +1,7 @@
 package tech.erubin.annyeong_eat.telegramBot.enums;
 
+import tech.erubin.annyeong_eat.entity.UserState;
+
 public enum EmployeeEnum {
 
     OPERATOR_MAIN_MENU("главное меню"),
@@ -22,10 +24,14 @@ public enum EmployeeEnum {
         return state;
     }
 
-    public EmployeeEnum employeeState(DepartmentEnum department, String state) {
+    public EmployeeEnum employeeState(DepartmentEnum department, UserState userState) {
+        String state = userState.getState();
         switch (department) {
             case OPERATOR:
-                if (state.equals(OPERATOR_CAFE_MENU.getValue())) {
+                if (state.equals(OPERATOR_MAIN_MENU.getValue())) {
+                    return OPERATOR_MAIN_MENU;
+                }
+                else if (state.equals(OPERATOR_CAFE_MENU.getValue())) {
                     return OPERATOR_CAFE_MENU;
                 }
                 else if (state.equals(OPERATOR_METHOD_OF_OBTAINING.getValue())) {

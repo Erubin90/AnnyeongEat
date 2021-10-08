@@ -34,7 +34,7 @@ public class MessageHandler extends Handlers {
         DepartmentEnum department = DepartmentEnum.GET.department(user);
         if (department != DepartmentEnum.NO_CORRECT_DEPARTMENT) {
             if (department != DepartmentEnum.CLIENT) {
-                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, userState.getState());
+                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, userState);
                 if (employeeEnum != EmployeeEnum.NO_CORRECT_STATE) {
                     return employeeActions(update, user, employeeEnum, sourceText);
                 }
@@ -43,7 +43,7 @@ public class MessageHandler extends Handlers {
                 }
             }
             else {
-                ClientEnum clientEnum = ClientEnum.GET.userState(userState.getState());
+                ClientEnum clientEnum = ClientEnum.GET.userState(userState);
                 if (clientEnum != ClientEnum.NO_CORRECT_STATE) {
                     return clientActions(update, user, clientEnum, sourceText);
                 }
@@ -121,7 +121,7 @@ public class MessageHandler extends Handlers {
                 botApiMethod = registrationModule.phoneNumber(update, user, sourceText);
                 break;
             default:
-                return null;
+                botApiMethod = null;
         }
         return botApiMethod;
     }

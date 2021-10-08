@@ -40,14 +40,15 @@ public class CallbackQueryHandler extends Handlers {
         }
         if (department != DepartmentEnum.NO_CORRECT_DEPARTMENT) {
             if (department != DepartmentEnum.CLIENT) {
-                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, userState.getState());
+                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, userState);
                 if (employeeEnum != EmployeeEnum.NO_CORRECT_STATE) {
                     return employeeCallback(callback, order, dish, employeeEnum, tag);
                 } else {
                     return null;
                 }
-            } else {
-                ClientEnum clientEnum = ClientEnum.GET.userState(userState.getState());
+            }
+            else {
+                ClientEnum clientEnum = ClientEnum.GET.userState(userState);
                 if (clientEnum != ClientEnum.NO_CORRECT_STATE) {
                     return clientCallback(callback, order, dish, clientEnum, tag);
                 } else {

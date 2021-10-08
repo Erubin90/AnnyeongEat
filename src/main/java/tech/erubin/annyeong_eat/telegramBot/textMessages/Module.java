@@ -38,7 +38,7 @@ public abstract class Module{
     @Value("${mainMenu.message.choosingCafe}")
     protected String choosingCafe;
 
-    @Value("${noError.address.}")
+    @Value("${noError.address}")
     protected String addressNoError;
 
     @Value("${order.message.emptyReceipt}")

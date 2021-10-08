@@ -1,5 +1,7 @@
 package tech.erubin.annyeong_eat.telegramBot.enums;
 
+import tech.erubin.annyeong_eat.entity.UserState;
+
 public enum ClientEnum {
     REGISTRATION_START("начало регистрации"),
     REGISTRATION_CITY("регистрация города"),
@@ -36,7 +38,8 @@ public enum ClientEnum {
         return state;
     }
 
-    public ClientEnum userState(String state) {
+    public ClientEnum userState(UserState userState) {
+        String state = userState.getState();
         if (state.equals(REGISTRATION_START.getValue())) {
             return REGISTRATION_START;
         }

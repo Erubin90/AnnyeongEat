@@ -48,7 +48,7 @@ public abstract class Handlers {
     @Value("${registration.message.city}")
     protected String cityNoError;
 
-    @Value("${noError.address.}")
+    @Value("${noError.address}")
     protected String addressNoError;
 
     @Value("${button.tag.info}")

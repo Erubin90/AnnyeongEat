@@ -72,6 +72,7 @@ public enum OrderEnum {
 
     public boolean isOrderEditing(OrderState orderState) {
         OrderEnum orderEnum = orderState(orderState);
+        System.out.println(orderEnum.getValue());
         return orderEnum == ORDER_EDITING;
     }
 }

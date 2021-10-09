@@ -15,14 +15,14 @@ import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
 import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
-import tech.erubin.annyeong_eat.telegramBot.textMessages.Module;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class OperatorModule extends Module {
+public class OperatorModule extends AbstractModule {
     private final ReplyButtons replyButtons;
     private final InlineButtons inlineButtons;
     private final ChequeDishServiceImpl chequeDishService;

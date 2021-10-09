@@ -13,12 +13,12 @@ import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
-import tech.erubin.annyeong_eat.telegramBot.textMessages.Module;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
 
 import java.util.Set;
 
 @Component
-public class RegistrationModule extends Module {
+public class RegistrationModule extends AbstractModule {
     private final CafeServiceImpl cafeService;
     private final ReplyButtons replyButtons;
     private final CheckMessage checkMessage;

@@ -12,11 +12,11 @@ import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
 import tech.erubin.annyeong_eat.telegramBot.module.OperatorModule;
 import tech.erubin.annyeong_eat.telegramBot.module.OrderModule;
-import tech.erubin.annyeong_eat.telegramBot.textMessages.Handlers;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
 
 @Component
 @AllArgsConstructor
-public class CallbackQueryHandler extends Handlers {
+public class CallbackQueryHandler extends AbstractHandler {
     private final UserServiceImpl clientService;
     private final OrderServiceImpl orderService;
     private final DishServiceImpl dishService;
@@ -66,7 +66,7 @@ public class CallbackQueryHandler extends Handlers {
         switch (employeeEnum) {
             case OPERATOR_MAIN_MENU:
                 return operatorModule.callbackOperatorMainMenu(callback, order, dish, tag);
-            case OPERATOR_CAFE_MENU:
+            case OPERATOR_START:
                 return orderModule.callbackOrderCafeMenu(callback, order, dish, tag);
             default:
                 return answerCallbackQuery(callback, buttonNotWork);

@@ -14,12 +14,12 @@ import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
-import tech.erubin.annyeong_eat.telegramBot.textMessages.Module;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
 
 import java.util.List;
 
 @Component
-public class MainMenuModule extends Module {
+public class MainMenuModule extends AbstractModule {
     private final ReplyButtons replyButtons;
 
     public MainMenuModule(OrderServiceImpl orderService, UserServiceImpl userService,

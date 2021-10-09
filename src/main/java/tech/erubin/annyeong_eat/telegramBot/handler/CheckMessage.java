@@ -2,11 +2,11 @@ package tech.erubin.annyeong_eat.telegramBot.handler;
 
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
-import tech.erubin.annyeong_eat.telegramBot.textMessages.Handlers;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
 
 @Component
 @NoArgsConstructor
-public class CheckMessage extends Handlers {
+public class CheckMessage extends AbstractHandler {
 
     //    message.error.obsceneWord = message.error.obsceneWord
     public String checkName(String sourceText) {

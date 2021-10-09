@@ -15,11 +15,11 @@ import tech.erubin.annyeong_eat.telegramBot.module.MainMenuModule;
 import tech.erubin.annyeong_eat.telegramBot.module.OperatorModule;
 import tech.erubin.annyeong_eat.telegramBot.module.OrderModule;
 import tech.erubin.annyeong_eat.telegramBot.module.RegistrationModule;
-import tech.erubin.annyeong_eat.telegramBot.textMessages.Handlers;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
 
 @Component
 @AllArgsConstructor
-public class MessageHandler extends Handlers {
+public class MessageHandler extends AbstractHandler {
     private final RegistrationModule registrationModule;
     private final MainMenuModule mainMenuModule;
     private final OrderModule orderModule;
@@ -61,12 +61,6 @@ public class MessageHandler extends Handlers {
         switch (employeeEnum) {
             case OPERATOR_MAIN_MENU:
                 return operatorModule.mainMenu(update, user, sourceText);
-            case OPERATOR_CAFE_MENU:
-                return null;
-            case OPERATOR_METHOD_OF_OBTAINING:
-                return null;
-            case OPERATOR_CHOOSE_TABLE:
-                return null;
             default:
                 return null;
         }

@@ -7,13 +7,13 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.service.CafeServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.textMessages.Buttons;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractButton;
 
 import java.util.*;
 
 @Component
 @AllArgsConstructor
-public class ReplyButtons extends Buttons {
+public class ReplyButtons extends AbstractButton {
     private final CafeServiceImpl cafeService;
 
     public ReplyKeyboardMarkup userRegistrationCity(Set<String> cafeCits) {

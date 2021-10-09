@@ -19,13 +19,13 @@ import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
 import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
-import tech.erubin.annyeong_eat.telegramBot.textMessages.Module;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
 
 import java.util.List;
 
 
 @Component
-public class OrderModule extends Module {
+public class OrderModule extends AbstractModule {
     private final CafeServiceImpl cafeService;
     private final DishServiceImpl dishService;
     private final ChequeDishServiceImpl chequeDishService;

@@ -8,7 +8,7 @@ import tech.erubin.annyeong_eat.entity.ChequeDish;
 import tech.erubin.annyeong_eat.entity.Dish;
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
-import tech.erubin.annyeong_eat.telegramBot.textMessages.Buttons;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Component
 @NoArgsConstructor
-public class InlineButtons extends Buttons {
+public class InlineButtons extends AbstractButton {
 
     public InlineKeyboardMarkup clientCheque(ChequeDish chequeDish) {
         String count;

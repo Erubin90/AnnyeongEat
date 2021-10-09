@@ -32,6 +32,9 @@ public class Order {
     @Column(name = "order_name")
     private String orderName;
 
+    @Column(name = "obtaining_method")
+    private String obtainingMethod;
+
     @Column(name = "address")
     private String address;
 
@@ -70,6 +73,7 @@ public class Order {
         this.paymentStatus = 0;
         this.priceDelivery = -1;
         this.comment = "";
+        this.obtainingMethod = "";
     }
 
     public Order(User userId, Cafe cafeId, String orderName) {
@@ -78,5 +82,6 @@ public class Order {
         this.orderName = orderName;
         this.priceDelivery = -1;
         this.comment = "";
+        this.obtainingMethod = "";
     }
 }

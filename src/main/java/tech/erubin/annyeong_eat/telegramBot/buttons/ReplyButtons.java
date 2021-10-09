@@ -51,6 +51,10 @@ public class ReplyButtons extends AbstractButton {
         return replyKeyboardMarkup(dishesMenuButtons(order), false);
     }
 
+    public ReplyKeyboardMarkup userOrderObtaining() {
+        return replyKeyboardMarkup(obtainingButtons());
+    }
+
     public ReplyKeyboardMarkup userOrderAddress(User user) {
         Set<String> buttonNames = new LinkedHashSet<>();
         List<Order> orderList = user.getOrderList();

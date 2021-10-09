@@ -85,26 +85,60 @@ public class OrderModule extends AbstractModule {
             text = sourceText + ":";
             List<Dish> dishList = dishService.getDishListByType(sourceText);
             replyKeyboard = inlineButtons.typeDishesMenu(order, dishList);
-        } else if (sourceText.equals(replyButtons.getBack())) {
+        }
+        else if (sourceText.equals(replyButtons.getBack())) {
             order.setUsing(1);
             text = backToChoosingCafe;
             userState = userStatesService.create(user, ClientEnum.ORDER_CAFE.getValue());
             replyKeyboard = replyButtons.userOrderCafe(user);
-        } else if (sourceText.equals(replyButtons.getNext())) {
+        }
+        else if (sourceText.equals(replyButtons.getNext())) {
             if (order.getChequeDishList().size() == 0) {
                 text = emptyReceipt;
                 replyKeyboard = replyButtons.userOrderMenu(order);
-            } else {
-                text = nextToAddress;
-                userState = userStatesService.create(user, ClientEnum.DELIVERY_ADDRESS.getValue());
-                replyKeyboard = replyButtons.userOrderAddress(user);
             }
-        } else if (sourceText.equals("\uD83D\uDED2")) {
+            else {
+                text = nextToObtaining;
+                userState = userStatesService.create(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
+                replyKeyboard = replyButtons.userOrderObtaining();
+            }
+        }
+        else if (sourceText.equals("\uD83D\uDED2")) {
             text = getChequeText(order, false);
             replyKeyboard = inlineButtons.fullOrderButtons(order);
-        } else {
+        }
+        else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderMenu(order);
+        }
+        return message(update, replyKeyboard, text, userState, order);
+    }
+
+    public SendMessage methodObtaining(Update update, User user, String sourceText) {
+        Order order = orderService.getOrderByUser(user);
+        UserState userState = null;
+        String text;
+        ReplyKeyboard replyKeyboard;
+        if (sourceText.equals(replyButtons.getDelivery())) {
+            text = nextToAddress;
+            order.setObtainingMethod(replyButtons.getDelivery());
+            userState = userStatesService.create(user, ClientEnum.DELIVERY_ADDRESS.getValue());
+            replyKeyboard = replyButtons.userOrderAddress(user);
+        }
+        else if (sourceText.equals(replyButtons.getPickup())) {
+            text = nextToPhoneNumber;
+            order.setObtainingMethod(replyButtons.getPickup());
+            userState = userStatesService.create(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
+            replyKeyboard = replyButtons.userOrderPhoneNumber(user);
+        }
+        else if (sourceText.equals(replyButtons.getBack())) {
+            text = backToOrderMenu;
+            userState = userStatesService.create(user, ClientEnum.ORDER_CAFE_MENU.getValue());
+            replyKeyboard = replyButtons.userOrderMenu(order);
+        }
+        else {
+            text = putButton;
+            replyKeyboard = replyButtons.userOrderObtaining();
         }
         return message(update, replyKeyboard, text, userState, order);
     }
@@ -115,7 +149,7 @@ public class OrderModule extends AbstractModule {
         String text;
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getBack())) {
-            text = backToOrderMenu;
+            text = backToObtaining;
             userState = userStatesService.create(user, ClientEnum.ORDER_CAFE_MENU.getValue());
             replyKeyboard = replyButtons.userOrderMenu(order);
         } else {
@@ -138,10 +172,17 @@ public class OrderModule extends AbstractModule {
         String text;
         ReplyKeyboard replyKeyboard = replyButtons.userOrderPhoneNumber(user);
         if (sourceText.equals(replyButtons.getBack())) {
-            text = backToAddress;
-            userState = userStatesService.create(user, ClientEnum.DELIVERY_ADDRESS.getValue());
+            if (order.getObtainingMethod().equals(replyButtons.getPickup())) {
+                text = backToObtaining;
+                userState = userStatesService.create(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
+            }
+            else {
+                text = backToAddress;
+                userState = userStatesService.create(user, ClientEnum.DELIVERY_ADDRESS.getValue());
+            }
             replyKeyboard = replyButtons.userOrderAddress(user);
-        } else {
+        }
+        else {
             text = nextToPhoneNumber;
             String checkText = checkMessage.checkPhoneNumber(sourceText);
             if (!checkText.contains(errorTrigger)) {

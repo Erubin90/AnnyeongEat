@@ -35,6 +35,12 @@ public abstract class AbstractButton {
     @Value("${order.button.cash}")
     protected String cash;
 
+    @Value("${order.button.delivery}")
+    protected String delivery;
+
+    @Value("${order.button.pickup}")
+    protected String pickup;
+
     @Value("${order.button.cards}")
     protected String cards;
 
@@ -102,6 +108,10 @@ public abstract class AbstractButton {
                 .map(Dish::getType)
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    protected List<String> obtainingButtons() {
+        return List.of(delivery, pickup, back);
     }
 
     protected List<String> operatorMainMenuButtons() {

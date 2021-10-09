@@ -56,6 +56,9 @@ public abstract class AbstractModule {
     @Value("${order.message.backToOrderMenu}")
     protected String backToOrderMenu;
 
+    @Value("${order.message.backToObtaining}")
+    protected String backToObtaining;
+
     @Value("${order.message.backToAddress}")
     protected String backToAddress;
 
@@ -64,6 +67,9 @@ public abstract class AbstractModule {
 
     @Value("${order.message.backToPaymentMethod}")
     protected String backToPaymentMethod;
+
+    @Value("${order.message.nextToObtaining}")
+    protected String nextToObtaining;
 
     @Value("${order.message.nextToAddress}")
     protected String nextToAddress;

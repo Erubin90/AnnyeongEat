@@ -87,6 +87,9 @@ public class MessageHandler extends AbstractHandler {
             case ORDER_CAFE_MENU:
                 botApiMethod = orderModule.cafeMenu(update, user, sourceText);
                 break;
+            case ORDER_METHOD_OF_OBTAINING:
+                botApiMethod = orderModule.methodObtaining(update, user, sourceText);
+                break;
             case DELIVERY_ADDRESS:
                 botApiMethod = orderModule.deliveryAddress(update, user, sourceText);
                 break;

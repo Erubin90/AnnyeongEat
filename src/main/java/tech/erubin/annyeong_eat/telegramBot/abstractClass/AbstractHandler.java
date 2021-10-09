@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.textMessages;
+package tech.erubin.annyeong_eat.telegramBot.abstractClass;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
-public abstract class Handlers {
+public abstract class AbstractHandler {
 
     @Value("${regular.error.trigger}")
     protected String errorTrigger;

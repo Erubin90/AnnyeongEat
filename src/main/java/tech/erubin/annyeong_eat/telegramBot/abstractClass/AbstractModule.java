@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.textMessages;
+package tech.erubin.annyeong_eat.telegramBot.abstractClass;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
-public abstract class Module{
+public abstract class AbstractModule {
 
     @Value("${module.message.error}")
     protected String error;
@@ -142,9 +142,9 @@ public abstract class Module{
     protected AnnyeongEatWebHook webHook;
 
 
-    public Module(OrderServiceImpl orderService, UserServiceImpl userService, UserStatesServiceImpl userStatesService,
-                  OrderStatesServiceImpl orderStatesService, EmployeeServiceImpl employeeService,
-                  @Lazy AnnyeongEatWebHook webHook) {
+    public AbstractModule(OrderServiceImpl orderService, UserServiceImpl userService, UserStatesServiceImpl userStatesService,
+                          OrderStatesServiceImpl orderStatesService, EmployeeServiceImpl employeeService,
+                          @Lazy AnnyeongEatWebHook webHook) {
         this.orderService = orderService;
         this.userService = userService;
         this.userStatesService = userStatesService;

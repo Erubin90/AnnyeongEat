@@ -1,4 +1,4 @@
-package tech.erubin.annyeong_eat.telegramBot.textMessages;
+package tech.erubin.annyeong_eat.telegramBot.abstractClass;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Getter
 @Component
 @PropertySource(value = "classpath:messages.properties", encoding = "UTF-8")
-public abstract class Buttons {
+public abstract class AbstractButton {
 
     @Value("${button.back}")
     protected String back;

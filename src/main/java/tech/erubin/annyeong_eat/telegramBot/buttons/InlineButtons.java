@@ -87,6 +87,11 @@ public class InlineButtons extends AbstractButton {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         rows.add(List.of(getInlineButtons(addDishes, order.getId(), 0, "ead")));
         rows.add(List.of(getInlineButtons(changeQuantity, order.getId(), 0, "ec")));
+        String obtaining = order.getObtainingMethod();
+        if (obtaining.equals(delivery)) {
+            rows.add(List.of(getInlineButtons(courier, order.getId(), 0, "cur")));
+            rows.add(List.of(getInlineButtons(taxi, order.getId(), 0, "tax")));
+        }
         rows.add(List.of(getInlineButtons(restart, order.getId(), 0, "er")));
         rows.add(List.of(getInlineButtons(accept, order.getId(), 0, "o+")));
         rows.add(List.of(getInlineButtons(cancel, order.getId(), 0, "o-")));

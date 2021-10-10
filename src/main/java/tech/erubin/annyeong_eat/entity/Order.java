@@ -67,19 +67,11 @@ public class Order {
             cascade = CascadeType.ALL)
     private List<OrderState> orderStateList;
 
-    public Order(User userId, String orderName) {
-        this.userId = userId;
-        this.orderName = orderName;
-        this.paymentStatus = 0;
-        this.priceDelivery = -1;
-        this.comment = "";
-        this.obtainingMethod = "";
-    }
-
     public Order(User userId, Cafe cafeId, String orderName) {
         this.userId = userId;
         this.cafeId = cafeId;
         this.orderName = orderName;
+        this.paymentStatus = 0;
         this.priceDelivery = -1;
         this.comment = "";
         this.obtainingMethod = "";

@@ -26,9 +26,10 @@ public class MessageHandler extends AbstractHandler {
     private final MainMenuModule mainMenuModule;
     private final OrderModule orderModule;
     private final OperatorModule operatorModule;
+
     private final UserServiceImpl clientService;
     private final EmployeeStateServiceImpl employeeStateService;
-    private final ClientStatesServiceImpl stateService;
+    private final ClientStatesServiceImpl clientStateService;
 
     public BotApiMethod<?> handleUpdate(Update update) {
         String sourceText = update.getMessage().getText();
@@ -47,7 +48,7 @@ public class MessageHandler extends AbstractHandler {
                 }
             }
             else {
-                ClientState clientState = stateService.getState(user);
+                ClientState clientState = clientStateService.getState(user);
                 ClientEnum clientEnum = ClientEnum.GET.userState(clientState);
                 if (clientEnum != ClientEnum.NO_CORRECT_STATE) {
                     return clientActions(update, user, clientEnum, sourceText, isEmployee);

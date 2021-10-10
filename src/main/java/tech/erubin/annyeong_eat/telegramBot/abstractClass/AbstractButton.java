@@ -44,6 +44,12 @@ public abstract class AbstractButton {
     @Value("${order.button.pickup}")
     protected String pickup;
 
+    @Value("${order.button.delivery.courier}")
+    protected String courier;
+
+    @Value("${order.button.delivery.taxi}")
+    protected String taxi;
+
     @Value("${order.button.confirm}")
     protected String confirm;
 

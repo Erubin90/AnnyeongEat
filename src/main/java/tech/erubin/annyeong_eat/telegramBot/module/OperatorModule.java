@@ -165,7 +165,14 @@ public class OperatorModule extends AbstractModule {
         if (cafeTable.contains(soursText)) {
             text = cafe.getName();
             replyKeyboard = replyButtons.userOrderMenu(order);
-            order.setObtainingMethod(soursText);
+            String obtaining;
+            if (soursText.equals("_")) {
+                obtaining = replyButtons.getPickup();
+            }
+            else {
+                obtaining = "Стол " + soursText;
+            }
+            order.setObtainingMethod(obtaining);
             order.setAddress(cafe.getAddress());
             order.setPriceDelivery(0);
             order.setPhoneNumber("");
@@ -178,15 +185,14 @@ public class OperatorModule extends AbstractModule {
                 text = choosingCafe;
                 List<String> cafeNames = cafeId.stream().map(Cafe::getName).collect(Collectors.toList());
                 replyKeyboard = replyButtons.userOrderCafe(cafeNames);
-                orderService.delete(order);
                 employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CHOOSING_CAFE.getValue());
             }
             else {
                 text = operatorMainMenu;
                 replyKeyboard = replyButtons.operatorMainMenu();
-                orderService.delete(order);
                 employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_MAIN_MENU.getValue());
             }
+            orderService.save(order);
         }
         else {
             text = putButton;
@@ -336,6 +342,18 @@ public class OperatorModule extends AbstractModule {
                     botApiMethod = answerCallbackQuery(callback, error);
                     break;
             }
+        }
+        else if (tag.equals("cur")) {
+            order.setObtainingMethod(replyButtons.getCourier());
+            orderService.save(order);
+            inlineMarkup = inlineButtons.orderEditButtons(order);
+            botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
+        }
+        else if (tag.equals("tax")) {
+            order.setObtainingMethod(replyButtons.getTaxi());
+            orderService.save(order);
+            inlineMarkup = inlineButtons.orderEditButtons(order);
+            botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
         }
         else if (tag.equals(String.valueOf(dish.getId()))) {
             ChequeDish chequeDish = chequeDishService.getChequeByOrderAndDish(order, dish);

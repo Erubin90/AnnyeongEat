@@ -255,6 +255,11 @@ public abstract class AbstractModule {
                         .append(order.getPaymentMethod())
                         .append("\n");
             }
+            if (order.getObtainingMethod() != null) {
+                fullOrder.append("Способ доставки: ")
+                        .append(order.getObtainingMethod())
+                        .append("\n");
+            }
             if (isEmployee) {
                 fullOrder.append("Комментарий: ")
                         .append(order.getComment())

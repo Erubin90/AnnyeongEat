@@ -36,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
             return repository.getById(orderId);
         }
         else {
-            return createOrder(user, cafe);
+            return create(user, cafe);
         }
     }
 
@@ -68,13 +68,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order create(User user) {
-        String orderName = String.format("заказ %s_%s", user.getId(), user.getOrderList().size() + 1);
-        return new Order(user, orderName);
-    }
-
-    @Override
-    public Order createOrder(User user, Cafe cafe) {
+    public Order create(User user, Cafe cafe) {
         String orderName = String.format("заказ %s_%s", user.getId(), user.getOrderList().size() + 1);
         return new Order(user, cafe, orderName);
     }

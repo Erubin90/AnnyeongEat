@@ -20,7 +20,5 @@ public interface OrderService {
 
     void delete(Order order);
 
-    Order create(User user);
-
-    Order createOrder(User user, Cafe cafe);
+    Order create(User user, Cafe cafe);
 }

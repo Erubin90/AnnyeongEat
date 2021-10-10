@@ -17,14 +17,14 @@ import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
 @Component
 @AllArgsConstructor
 public class CallbackQueryHandler extends AbstractHandler {
+    private final OrderModule orderModule;
+    private final OperatorModule operatorModule;
+
     private final UserServiceImpl clientService;
     private final OrderServiceImpl orderService;
     private final DishServiceImpl dishService;
     private final EmployeeStateServiceImpl employeeStateService;
-    private final ClientStatesServiceImpl stateService;
-
-    private final OrderModule orderModule;
-    private final OperatorModule operatorModule;
+    private final ClientStatesServiceImpl clientStateService;
 
     public BotApiMethod<?> handleUpdate(CallbackQuery callback) {
         String userId = callback.getFrom().getId().toString();
@@ -49,7 +49,7 @@ public class CallbackQueryHandler extends AbstractHandler {
                 }
             }
             else {
-                ClientState clientState = stateService.getState(user);
+                ClientState clientState = clientStateService.getState(user);
                 ClientEnum clientEnum = ClientEnum.GET.userState(clientState);
                 if (clientEnum != ClientEnum.NO_CORRECT_STATE) {
                     return clientCallback(callback, order, dish, clientEnum, tag);

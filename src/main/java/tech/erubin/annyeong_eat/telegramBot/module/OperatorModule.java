@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class OperatorModule extends AbstractModule {
@@ -29,20 +30,19 @@ public class OperatorModule extends AbstractModule {
     private final InlineButtons inlineButtons;
     private final EmployeeStateServiceImpl employeeStateService;
     private final ChequeDishServiceImpl chequeDishService;
-    private final CafeServiceImpl cafeService;
     private final DishServiceImpl dishService;
 
     public OperatorModule(OrderServiceImpl orderService, UserServiceImpl userService,
                           ClientStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
                           EmployeeServiceImpl employeeService, @Lazy AnnyeongEatWebHook webHook,
                           ReplyButtons replyButtons, InlineButtons inlineButtons,
-                          EmployeeStateServiceImpl employeeStateService, ChequeDishServiceImpl chequeDishService, CafeServiceImpl cafeService, DishServiceImpl dishService) {
+                          EmployeeStateServiceImpl employeeStateService, ChequeDishServiceImpl chequeDishService,
+                          DishServiceImpl dishService) {
         super(orderService, userService, userStatesService, orderStatesService, employeeService, webHook);
         this.replyButtons = replyButtons;
         this.inlineButtons = inlineButtons;
         this.employeeStateService = employeeStateService;
         this.chequeDishService = chequeDishService;
-        this.cafeService = cafeService;
         this.dishService = dishService;
     }
 
@@ -58,16 +58,16 @@ public class OperatorModule extends AbstractModule {
             replyKeyboard = replyButtons.operatorMainMenu();
         }
         else if (soursText.equals(replyButtons.getCreateOrder())) {
-            List<Integer> cafeId = employeeService.getCafeByUserId(user);
+            List<Cafe> cafeId = employeeService.getCafeByUserId(user);
             if (cafeId.size() > 1) {
                 text = choosingCafe;
-                List<String> cafeNames = cafeService.getNamesByCafeId(cafeId);
+                List<String> cafeNames = cafeId.stream().map(Cafe::getName).collect(Collectors.toList());
                 replyKeyboard = replyButtons.userOrderCafe(cafeNames);
                 employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CHOOSING_CAFE.getValue());
             }
             else {
                 text = choosingTable;
-                Cafe cafe = cafeService.getCafeById(cafeId.get(0));
+                Cafe cafe = cafeId.get(0);
                 Order order = orderService.getOrderByUserIdAndCafeId(user, cafe);
                 order.setUsing(1);
                 replyKeyboard = replyButtons.operatorChoosingTable(cafe);
@@ -79,45 +79,6 @@ public class OperatorModule extends AbstractModule {
         else {
             text = noCommand;
             replyKeyboard = replyButtons.operatorMainMenu();
-        }
-        return message(update, replyKeyboard, text);
-    }
-
-    public SendMessage choosingTable(Update update, User user, String soursText) {
-        String text;
-        ReplyKeyboard replyKeyboard;
-        Order order = orderService.getOrderByUser(user);
-        Cafe cafe = order.getCafeId();
-        List<String> cafeTable = Arrays.asList(cafe.getTableLayout().replaceAll(":", "\\.").split("\\."));
-        if (cafeTable.contains(soursText)) {
-            text = cafe.getName();
-            replyKeyboard = replyButtons.userOrderMenu(order);
-            order.setObtainingMethod(soursText);
-            order.setAddress(cafe.getAddress());
-            order.setPriceDelivery(0);
-            order.setPhoneNumber("");
-            orderService.save(order);
-            employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CAFE_MENU.getValue());
-        }
-        else if (soursText.equals(replyButtons.getBack())) {
-            List<Integer> cafeId = employeeService.getCafeByUserId(user);
-            if (cafeId.size() > 1) {
-                text = choosingCafe;
-                List<String> cafeNames = cafeService.getNamesByCafeId(cafeId);
-                replyKeyboard = replyButtons.userOrderCafe(cafeNames);
-                orderService.delete(order);
-                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CHOOSING_CAFE.getValue());
-            }
-            else {
-                text = operatorMainMenu;
-                replyKeyboard = replyButtons.operatorMainMenu();
-                orderService.delete(order);
-                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_MAIN_MENU.getValue());
-            }
-        }
-        else {
-            text = putButton;
-            replyKeyboard = replyButtons.operatorChoosingTable(cafe);
         }
         return message(update, replyKeyboard, text);
     }
@@ -193,6 +154,45 @@ public class OperatorModule extends AbstractModule {
                 "Сумма доставки: \n" +
                 "Способ оплаты: \n" +
                 "Комментарий: \n" ;
+    }
+
+    public SendMessage choosingTable(Update update, User user, String soursText) {
+        String text;
+        ReplyKeyboard replyKeyboard;
+        Order order = orderService.getOrderByUser(user);
+        Cafe cafe = order.getCafeId();
+        List<String> cafeTable = Arrays.asList(cafe.getTableLayout().replaceAll(":", "\\.").split("\\."));
+        if (cafeTable.contains(soursText)) {
+            text = cafe.getName();
+            replyKeyboard = replyButtons.userOrderMenu(order);
+            order.setObtainingMethod(soursText);
+            order.setAddress(cafe.getAddress());
+            order.setPriceDelivery(0);
+            order.setPhoneNumber("");
+            orderService.save(order);
+            employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CAFE_MENU.getValue());
+        }
+        else if (soursText.equals(replyButtons.getBack())) {
+            List<Cafe> cafeId = employeeService.getCafeByUserId(user);
+            if (cafeId.size() > 1) {
+                text = choosingCafe;
+                List<String> cafeNames = cafeId.stream().map(Cafe::getName).collect(Collectors.toList());
+                replyKeyboard = replyButtons.userOrderCafe(cafeNames);
+                orderService.delete(order);
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CHOOSING_CAFE.getValue());
+            }
+            else {
+                text = operatorMainMenu;
+                replyKeyboard = replyButtons.operatorMainMenu();
+                orderService.delete(order);
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_MAIN_MENU.getValue());
+            }
+        }
+        else {
+            text = putButton;
+            replyKeyboard = replyButtons.operatorChoosingTable(cafe);
+        }
+        return message(update, replyKeyboard, text);
     }
 
     public BotApiMethod<?> callbackOperatorMainMenu(CallbackQuery callback, Order order, Dish dish, String tag) {

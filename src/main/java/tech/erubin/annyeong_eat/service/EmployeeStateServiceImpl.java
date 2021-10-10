@@ -18,7 +18,7 @@ public class EmployeeStateServiceImpl implements EmployeeStateService {
     @Override
     public EmployeeState getState(User user) {
         List<EmployeeState> employeeStateList = user.getEmployeeStateList();
-        if (employeeStateList != null){
+        if (employeeStateList != null && employeeStateList.size() > 0){
             return employeeStateList.get(employeeStateList.size() - 1);
         }
         else {

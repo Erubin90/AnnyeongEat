@@ -22,8 +22,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Integer> getCafeByUserId(User userId) {
-        return repository.getAllCafeIdByUserId(userId);
+    public List<Cafe> getCafeByUserId(User user) {
+        return repository.getAllCafeIdByUserId(user);
     }
 
     @Override

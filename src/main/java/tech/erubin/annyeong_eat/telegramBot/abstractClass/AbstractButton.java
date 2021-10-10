@@ -35,14 +35,14 @@ public abstract class AbstractButton {
     @Value("${order.button.cash}")
     protected String cash;
 
+    @Value("${order.button.cards}")
+    protected String cards;
+
     @Value("${order.button.delivery}")
     protected String delivery;
 
     @Value("${order.button.pickup}")
     protected String pickup;
-
-    @Value("${order.button.cards}")
-    protected String cards;
 
     @Value("${order.button.confirm}")
     protected String confirm;

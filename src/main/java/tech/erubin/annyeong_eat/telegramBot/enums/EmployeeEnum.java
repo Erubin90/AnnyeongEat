@@ -46,6 +46,12 @@ public enum EmployeeEnum {
                 else if (state.equals(OPERATOR_CAFE_MENU.getValue())) {
                     return OPERATOR_CAFE_MENU;
                 }
+                else if (state.equals(OPERATOR_PAYMENT_METHOD.getValue())) {
+                    return OPERATOR_PAYMENT_METHOD;
+                }
+                else if (state.equals(OPERATOR_CONFIRMATION.getValue())) {
+                    return OPERATOR_CONFIRMATION;
+                }
                 else {
                     return NO_CORRECT_STATE;
                 }

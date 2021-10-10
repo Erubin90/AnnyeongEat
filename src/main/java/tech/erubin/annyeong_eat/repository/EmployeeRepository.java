@@ -13,8 +13,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     List<Employee> getDepartmentsByCafeIdAndName(Cafe cafeId, String name);
 
-    @Query("SELECT cafeId FROM Employee WHERE userId = :user GROUP BY cafeId")
-    List<Integer> getAllCafeIdByUserId(@Param("user") User user);
+    @Query("SELECT e.cafeId FROM Employee e WHERE e.userId = :user GROUP BY e.cafeId")
+    List<Cafe> getAllCafeIdByUserId(@Param("user") User user);
 
     @Query("SELECT id FROM Employee WHERE name like 'Разработчик'")
     List<Integer> getAllDevelopers();

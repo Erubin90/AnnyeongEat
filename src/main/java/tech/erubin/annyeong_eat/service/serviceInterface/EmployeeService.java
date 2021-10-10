@@ -10,7 +10,7 @@ public interface EmployeeService {
 
     List<Employee> getEmployeeByCafeIdAndDepartmenName(Cafe cafeId, String name);
 
-    List<Integer> getCafeByUserId(User userId);
+    List<Cafe> getCafeByUserId(User userId);
 
     List<Employee> getDeveloperList();
 }

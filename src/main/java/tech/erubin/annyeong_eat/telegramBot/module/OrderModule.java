@@ -23,6 +23,7 @@ import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -58,8 +59,8 @@ public class OrderModule extends AbstractModule {
         ReplyKeyboard replyKeyboard;
         List<String> cafeNames;
         if (isEmployee) {
-            List<Integer> cafeIdList = employeeService.getCafeByUserId(user);
-            cafeNames = cafeService.getNamesByCafeId(cafeIdList);
+            List<Cafe> cafeIdList = employeeService.getCafeByUserId(user);
+            cafeNames = cafeIdList.stream().map(Cafe::getName).collect(Collectors.toList());
         }
         else {
             cafeNames = cafeService.getCafeNameByCity(user.getCity());
@@ -191,7 +192,7 @@ public class OrderModule extends AbstractModule {
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getBack())) {
             text = backToObtaining;
-            replyKeyboard = replyButtons.userOrderMenu(order);
+            replyKeyboard = replyButtons.userOrderObtaining();
             userStatesService.createAndSave(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
         }
         else {
@@ -217,13 +218,15 @@ public class OrderModule extends AbstractModule {
         if (sourceText.equals(replyButtons.getBack())) {
             if (order.getObtainingMethod().equals(replyButtons.getPickup())) {
                 text = backToObtaining;
+                replyKeyboard = replyButtons.userOrderObtaining();
                 userStatesService.createAndSave(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
             }
             else {
                 text = backToAddress;
+                replyKeyboard = replyButtons.userOrderAddress(user);
                 userStatesService.createAndSave(user, ClientEnum.DELIVERY_ADDRESS.getValue());
             }
-            replyKeyboard = replyButtons.userOrderAddress(user);
+
         }
         else {
             text = nextToPhoneNumber;
@@ -236,21 +239,13 @@ public class OrderModule extends AbstractModule {
                 order.setPhoneNumber(sourceText);
                 replyKeyboard = replyButtons.userOrderPayment();
                 orderService.save(order);
-                userStatesService.create(user, ClientEnum.DELIVERY_PAYMENT_METHOD.getValue());
+                userStatesService.createAndSave(user, ClientEnum.DELIVERY_PAYMENT_METHOD.getValue());
             }
         }
         return message(update, replyKeyboard, text);
     }
 
-    public SendMessage deliveryPaymentMethodClient(Update update, User user, String sourceText) {
-        return deliveryPaymentMethod(update, user, sourceText, false);
-    }
-
-    public SendMessage deliveryPaymentMethodEmployee(Update update, User user, String sourceText) {
-        return deliveryPaymentMethod(update, user, sourceText, true);
-    }
-
-    private SendMessage deliveryPaymentMethod(Update update, User user, String sourceText, boolean isEmployee) {
+    public SendMessage deliveryPaymentMethod(Update update, User user, String sourceText, boolean isEmployee) {
         Order order = orderService.getOrderByUser(user);
         String text;
         ReplyKeyboard replyKeyboard;
@@ -287,7 +282,6 @@ public class OrderModule extends AbstractModule {
             else {
                 userStatesService.createAndSave(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
             }
-
         }
         else {
             text = putButton;

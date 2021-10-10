@@ -73,7 +73,7 @@ public class MessageHandler extends AbstractHandler {
             case OPERATOR_CAFE_MENU:
                 return orderModule.cafeMenu(update, user, sourceText, isEmployee);
             case OPERATOR_PAYMENT_METHOD:
-                return orderModule.deliveryPaymentMethodEmployee(update, user, sourceText);
+                return orderModule.deliveryPaymentMethod(update, user, sourceText, isEmployee);
             case OPERATOR_CONFIRMATION:
                 return orderModule.deliveryConfirmation(update, user, sourceText, isEmployee);
             default:
@@ -102,7 +102,7 @@ public class MessageHandler extends AbstractHandler {
             case DELIVERY_PHONE_NUMBER:
                 return orderModule.deliveryPhoneNumber(update,user, sourceText);
             case DELIVERY_PAYMENT_METHOD:
-                return orderModule.deliveryPaymentMethodClient(update, user, sourceText);
+                return orderModule.deliveryPaymentMethod(update, user, sourceText, isEmployee);
             case DELIVERY_CONFIRMATION:
                 return orderModule.deliveryConfirmation(update, user, sourceText, isEmployee);
             case REGISTRATION_START:

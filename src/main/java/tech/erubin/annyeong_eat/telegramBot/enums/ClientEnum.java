@@ -20,7 +20,7 @@ public enum ClientEnum {
     ORDER_COMMENT("оставить комментарий"),
     DELIVERY_ADDRESS("указание адреса"),
     DELIVERY_PHONE_NUMBER("указание номера"),
-    DELIVERY_PAYMENT_METHOD("указание способа оплаты"),
+    DELIVERY_PAYMENT_METHOD("способ оплаты"),
     DELIVERY_CONFIRMATION("подтверждение заказа"),
 
     NO_CORRECT_STATE("не корректное состояние"),

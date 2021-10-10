@@ -98,10 +98,6 @@ public abstract class AbstractButton {
     @Value("${operator.button.form}")
     protected String form;
 
-    public List<String> paymentMethod(){
-        return List.of(cash, cards);
-    }
-
     public List<String> typeDishesInCafe(Order order) {
         return order.getCafeId().getDishesMenu()
                 .stream()

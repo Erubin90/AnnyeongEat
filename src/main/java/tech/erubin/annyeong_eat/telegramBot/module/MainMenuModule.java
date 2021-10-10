@@ -8,93 +8,94 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.OrderState;
 import tech.erubin.annyeong_eat.entity.User;
-import tech.erubin.annyeong_eat.entity.UserState;
 import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
+import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
-import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
 
 import java.util.List;
 
 @Component
 public class MainMenuModule extends AbstractModule {
+    private final CafeServiceImpl cafeService;
     private final ReplyButtons replyButtons;
 
     public MainMenuModule(OrderServiceImpl orderService, UserServiceImpl userService,
-                          UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
+                          ClientStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
                           EmployeeServiceImpl employeeService, ReplyButtons replyButtons,
-                          @Lazy AnnyeongEatWebHook webHook) {
+                          @Lazy AnnyeongEatWebHook webHook, CafeServiceImpl cafeService) {
         super(orderService, userService, userStatesService, orderStatesService, employeeService, webHook);
         this.replyButtons = replyButtons;
+        this.cafeService = cafeService;
     }
 
     public SendMessage mainMenu(Update update, User user, String sourceText) {
         String text;
-        UserState userState = null;
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getCreateOrder())) {
             text = choosingCafe;
-            userState = userStatesService.create(user, ClientEnum.ORDER_CAFE.getValue());
-            replyKeyboard = replyButtons.userOrderCafe(user);
+            List<String> buttonName = cafeService.getCafeNameByCity(user.getCity());
+            replyKeyboard = replyButtons.userOrderCafe(buttonName);
+            userStatesService.createAndSave(user, ClientEnum.ORDER_CAFE.getValue());
         }
         else if (sourceText.equals(replyButtons.getCheckOrder())) {
             text = "Просмотр статуса заказа";
-            userState = userStatesService.create(user, ClientEnum.ORDER_CHECK.getValue());
             replyKeyboard = replyButtons.userCheckOrder();
+            userStatesService.createAndSave(user, ClientEnum.ORDER_CHECK.getValue());
         }
         else if (sourceText.equals(replyButtons.getHelp())) {
             text = help;
-            userState = userStatesService.create(user, ClientEnum.HELP.getValue());
             replyKeyboard = replyButtons.userHelp();
+            userStatesService.createAndSave(user, ClientEnum.HELP.getValue());
         }
         else if (sourceText.equals(replyButtons.getClientInfo())) {
             text = clientProfile(user);
-            userState = userStatesService.create(user, ClientEnum.PROFILE.getValue());
             replyKeyboard = replyButtons.userProfileInfo();
+            userStatesService.createAndSave(user, ClientEnum.PROFILE.getValue());
         }
         else {
             text = putButton;
             replyKeyboard = replyButtons.userMainMenu();
         }
-        return message(update, replyKeyboard, text, userState);
+        return message(update, replyKeyboard, text);
     }
 
     public SendMessage orderChek(Update update, User user, String sourceText) {
-        ReplyKeyboard replyKeyboard = replyButtons.userCheckOrder();
-        UserState userState = null;
-        String text = putButton;
+        ReplyKeyboard replyKeyboard;
+        String text;
         if (sourceText.equals(replyButtons.getBack())){
             text = returnMainMenu;
-            userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
+            userStatesService.createAndSave(user, ClientEnum.MAIN_MENU.getValue());
         }
-        return message(update, replyKeyboard, text, userState);
+        else {
+            text = putButton;
+            replyKeyboard = replyButtons.userCheckOrder();
+        }
+        return message(update, replyKeyboard, text);
     }
 
     public SendMessage help(Update update, User user, String sourceText) {
         ReplyKeyboard replyKeyboard = replyButtons.userHelp();
-        UserState userState = null;
         String text = putButton;
         if (sourceText.equals(replyButtons.getBack())) {
             text = returnMainMenu;
-            userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
             replyKeyboard = replyButtons.userMainMenu();
+            userStatesService.createAndSave(user, ClientEnum.MAIN_MENU.getValue());
         }
-        return message(update, replyKeyboard, text, userState);
+        return message(update, replyKeyboard, text);
     }
 
-    public SendMessage profile(Update update, User user, String sourceText) {
+    public SendMessage profile(Update update, User user,  String sourceText) {
         ReplyKeyboard replyKeyboard = replyButtons.userProfileInfo();
-        UserState userState = null;
         String text = putButton;
         if (sourceText.equals(replyButtons.getBack())) {
             text = returnMainMenu;
-            userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
-            replyKeyboard = replyButtons.userMainMenu();
+            userStatesService.createAndSave(user, ClientEnum.MAIN_MENU.getValue());
         }
-        return message(update, replyKeyboard, text, userState);
+        return message(update, replyKeyboard, text);
     }
 
     private String clientProfile(User user) {

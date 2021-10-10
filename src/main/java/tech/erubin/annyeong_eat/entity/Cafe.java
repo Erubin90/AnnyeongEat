@@ -27,6 +27,9 @@ public class Cafe {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "table_layout")
+    private String tableLayout;
+
     @OneToMany(mappedBy = "cafeId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     private List<Dish> dishesMenu;

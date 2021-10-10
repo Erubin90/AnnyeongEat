@@ -20,7 +20,8 @@ public class CallbackQueryHandler extends AbstractHandler {
     private final UserServiceImpl clientService;
     private final OrderServiceImpl orderService;
     private final DishServiceImpl dishService;
-    private final UserStatesServiceImpl stateService;
+    private final EmployeeStateServiceImpl employeeStateService;
+    private final ClientStatesServiceImpl stateService;
 
     private final OrderModule orderModule;
     private final OperatorModule operatorModule;
@@ -32,7 +33,6 @@ public class CallbackQueryHandler extends AbstractHandler {
         Order order = orderService.getOrderByStringId(idList[0]);
         Dish dish = dishService.getDishById(idList[1]);
         User user = clientService.getUser(userId);
-        UserState userState = stateService.getState(user);
         String tag = idList[2];
         DepartmentEnum department = DepartmentEnum.GET.department(user);
         if (tag.equals(tagInfo)) {
@@ -40,7 +40,8 @@ public class CallbackQueryHandler extends AbstractHandler {
         }
         if (department != DepartmentEnum.NO_CORRECT_DEPARTMENT) {
             if (department != DepartmentEnum.CLIENT) {
-                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, userState);
+                EmployeeState employeeState = employeeStateService.getState(user);
+                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, employeeState);
                 if (employeeEnum != EmployeeEnum.NO_CORRECT_STATE) {
                     return employeeCallback(callback, order, dish, employeeEnum, tag);
                 } else {
@@ -48,7 +49,8 @@ public class CallbackQueryHandler extends AbstractHandler {
                 }
             }
             else {
-                ClientEnum clientEnum = ClientEnum.GET.userState(userState);
+                ClientState clientState = stateService.getState(user);
+                ClientEnum clientEnum = ClientEnum.GET.userState(clientState);
                 if (clientEnum != ClientEnum.NO_CORRECT_STATE) {
                     return clientCallback(callback, order, dish, clientEnum, tag);
                 } else {
@@ -66,7 +68,7 @@ public class CallbackQueryHandler extends AbstractHandler {
         switch (employeeEnum) {
             case OPERATOR_MAIN_MENU:
                 return operatorModule.callbackOperatorMainMenu(callback, order, dish, tag);
-            case OPERATOR_START:
+            case OPERATOR_CAFE_MENU:
                 return orderModule.callbackOrderCafeMenu(callback, order, dish, tag);
             default:
                 return answerCallbackQuery(callback, buttonNotWork);

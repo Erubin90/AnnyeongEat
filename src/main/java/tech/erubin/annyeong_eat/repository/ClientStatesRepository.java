@@ -2,8 +2,8 @@ package tech.erubin.annyeong_eat.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import tech.erubin.annyeong_eat.entity.UserState;
+import tech.erubin.annyeong_eat.entity.ClientState;
 
 @Repository
-public interface UserStatesRepository extends JpaRepository<UserState, Integer> {
+public interface ClientStatesRepository extends JpaRepository<ClientState, Integer> {
 }

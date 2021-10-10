@@ -10,5 +10,5 @@ public interface OrderStatesService {
 
     OrderState create(Order order, String state);
 
-    OrderState getLastOrderState(Order order);
+    void createAndSave(Order order, String state);
 }

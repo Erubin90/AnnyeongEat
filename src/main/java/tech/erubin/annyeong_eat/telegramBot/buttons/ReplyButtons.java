@@ -4,17 +4,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
+import tech.erubin.annyeong_eat.entity.Cafe;
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.User;
-import tech.erubin.annyeong_eat.service.CafeServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractButton;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
 public class ReplyButtons extends AbstractButton {
-    private final CafeServiceImpl cafeService;
 
     public ReplyKeyboardMarkup userRegistrationCity(Set<String> cafeCits) {
         List<List<String>> buttonNames = getCityListButtons(cafeCits);
@@ -37,14 +37,9 @@ public class ReplyButtons extends AbstractButton {
         return replyKeyboardMarkup(profileInfoButtons());
     }
 
-    public ReplyKeyboardMarkup userOrderCafe(User user) {
-        List<String> cafeNames = cafeService.getCafeNameByCity(user.getCity());
-        List<List<String>> buttonName = new ArrayList<>();
-        for (String cafeName : cafeNames) {
-            buttonName.add(List.of(cafeName));
-        }
-        buttonName.add(List.of(back));
-        return replyKeyboardMarkup(buttonName, false);
+    public ReplyKeyboardMarkup userOrderCafe(List<String> buttonName) {
+        buttonName.add(back);
+        return replyKeyboardMarkup(buttonName);
     }
 
     public ReplyKeyboardMarkup userOrderMenu(Order order) {
@@ -91,8 +86,16 @@ public class ReplyButtons extends AbstractButton {
         return replyKeyboardMarkup(confirmButtons(), false);
     }
 
-    public ReplyKeyboardMarkup employeeOperator() {
+    public ReplyKeyboardMarkup operatorMainMenu() {
         return replyKeyboardMarkup(operatorMainMenuButtons());
+    }
+
+    public ReplyKeyboardMarkup operatorChoosingTable(Cafe cafe) {
+        List<List<String>> tables = Arrays.stream(cafe.getTableLayout().split(":"))
+                .map(x -> List.of(x.split("\\.")))
+                .collect(Collectors.toList());
+        tables.add(List.of(back));
+        return replyKeyboardMarkup(tables, false);
     }
 
     private ReplyKeyboardMarkup replyKeyboardMarkup(Collection<String> buttonNames) {

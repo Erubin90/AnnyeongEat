@@ -35,9 +35,6 @@ public abstract class AbstractModule {
     @Value("${mainMenu.message.returnMainMenu}")
     protected String returnMainMenu;
 
-    @Value("${mainMenu.message.choosingCafe}")
-    protected String choosingCafe;
-
     @Value("${noError.address}")
     protected String addressNoError;
 
@@ -139,16 +136,25 @@ public abstract class AbstractModule {
     @Value("${handler.message.notWork}")
     protected String notWork;
 
+    @Value("${mainMenu.message.choosingCafe}")
+    protected String choosingCafe;
+
+    @Value("${operator.message.choosingTable}")
+    protected String choosingTable;
+
+    @Value("${operator.message.mainMenu}")
+    protected String operatorMainMenu;
+
     protected OrderServiceImpl orderService;
     protected UserServiceImpl userService;
-    protected UserStatesServiceImpl userStatesService;
+    protected ClientStatesServiceImpl userStatesService;
     protected OrderStatesServiceImpl orderStatesService;
     protected EmployeeServiceImpl employeeService;
 
     protected AnnyeongEatWebHook webHook;
 
 
-    public AbstractModule(OrderServiceImpl orderService, UserServiceImpl userService, UserStatesServiceImpl userStatesService,
+    public AbstractModule(OrderServiceImpl orderService, UserServiceImpl userService, ClientStatesServiceImpl userStatesService,
                           OrderStatesServiceImpl orderStatesService, EmployeeServiceImpl employeeService,
                           @Lazy AnnyeongEatWebHook webHook) {
         this.orderService = orderService;
@@ -159,34 +165,12 @@ public abstract class AbstractModule {
         this.webHook = webHook;
     }
 
-    protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState) {
+    protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text) {
         String chatId = update.getMessage().getChatId().toString();
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(text);
         sendMessage.setReplyMarkup(replyKeyboard);
-        userStatesService.save(userState);
-        return sendMessage;
-    }
-
-    protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState,
-                                  Order order, OrderState orderState) {
-        SendMessage sendMessage = message(update, replyKeyboard, text, userState);
-        orderService.save(order);
-        orderStatesService.save(orderState);
-        return sendMessage;
-    }
-
-    protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState,
-                                  Order order) {
-        SendMessage sendMessage = message(update, replyKeyboard, text, userState);
-        orderService.save(order);
-        return sendMessage;
-    }
-
-    protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text, UserState userState, User user) {
-        SendMessage sendMessage = message(update, replyKeyboard, text, userState);
-        userService.save(user);
         return sendMessage;
     }
 

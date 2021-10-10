@@ -27,15 +27,21 @@ public class CafeServiceImpl implements CafeService {
     }
 
     @Override
-    public List<String> getAllCafeNames() {
-        return repository.findAll().stream()
-                .map(Cafe::getName)
-                .collect(Collectors.toList());
+    public Cafe getCafeById(Integer id) {
+        return repository.findById(id).get();
     }
 
     @Override
     public List<String> getCafeNameByCity(String city) {
         return repository.findAllByCity(city).stream()
+                .map(Cafe::getName)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getNamesByCafeId(List<Integer> cafeId) {
+        return cafeId.stream()
+                .map(this::getCafeById)
                 .map(Cafe::getName)
                 .collect(Collectors.toList());
     }

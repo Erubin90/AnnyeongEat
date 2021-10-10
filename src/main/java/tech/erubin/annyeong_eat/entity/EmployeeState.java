@@ -8,11 +8,11 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "user_states")
+@Table(name = "employee_states")
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserState {
+public class EmployeeState {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,7 @@ public class UserState {
     @Column(name = "usage_time")
     private Timestamp usageTime;
 
-    public UserState(User userId, String state) {
+    public EmployeeState (User userId, String state) {
         this.userId = userId;
         this.state = state;
         this.usageTime = new Timestamp(System.currentTimeMillis());

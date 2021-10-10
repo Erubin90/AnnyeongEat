@@ -1,6 +1,6 @@
 package tech.erubin.annyeong_eat.telegramBot.enums;
 
-import tech.erubin.annyeong_eat.entity.UserState;
+import tech.erubin.annyeong_eat.entity.ClientState;
 
 public enum ClientEnum {
     REGISTRATION_START("начало регистрации"),
@@ -22,6 +22,7 @@ public enum ClientEnum {
     DELIVERY_PHONE_NUMBER("указание номера"),
     DELIVERY_PAYMENT_METHOD("указание способа оплаты"),
     DELIVERY_CONFIRMATION("подтверждение заказа"),
+
     NO_CORRECT_STATE("не корректное состояние"),
     GET;
 
@@ -38,8 +39,8 @@ public enum ClientEnum {
         return state;
     }
 
-    public ClientEnum userState(UserState userState) {
-        String state = userState.getState();
+    public ClientEnum userState(ClientState clientState) {
+        String state = clientState.getState();
         if (state.equals(REGISTRATION_START.getValue())) {
             return REGISTRATION_START;
         }

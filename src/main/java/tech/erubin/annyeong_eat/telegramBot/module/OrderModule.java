@@ -17,6 +17,7 @@ import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
 import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
@@ -29,6 +30,7 @@ public class OrderModule extends AbstractModule {
     private final CafeServiceImpl cafeService;
     private final DishServiceImpl dishService;
     private final ChequeDishServiceImpl chequeDishService;
+    private final EmployeeStateServiceImpl employeeStateService;
 
     private final ReplyButtons replyButtons;
     private final InlineButtons inlineButtons;
@@ -36,10 +38,11 @@ public class OrderModule extends AbstractModule {
     private final CheckMessage checkMessage;
 
     public OrderModule(OrderServiceImpl orderService, UserServiceImpl userService,
-                       UserStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
+                       ClientStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
                        EmployeeServiceImpl employeeService, CafeServiceImpl cafeService,
                        DishServiceImpl dishService, ReplyButtons replyButtons, InlineButtons inlineButtons,
-                       CheckMessage checkMessage, @Lazy AnnyeongEatWebHook webHook, ChequeDishServiceImpl chequeDishService) {
+                       CheckMessage checkMessage, @Lazy AnnyeongEatWebHook webHook,
+                       ChequeDishServiceImpl chequeDishService, EmployeeStateServiceImpl employeeStateService) {
         super(orderService, userService, userStatesService, orderStatesService, employeeService, webHook);
         this.cafeService = cafeService;
         this.dishService = dishService;
@@ -47,38 +50,59 @@ public class OrderModule extends AbstractModule {
         this.inlineButtons = inlineButtons;
         this.checkMessage = checkMessage;
         this.chequeDishService = chequeDishService;
+        this.employeeStateService = employeeStateService;
     }
 
-    public SendMessage choosingCafe(Update update, User user, String sourceText) {
-        List<String> cafeNames = cafeService.getCafeNameByCity(user.getCity());
-        Order order = orderService.getOrderByUser(user);
-        UserState userState = null;
-        OrderState orderState = null;
+    public SendMessage choosingCafe(Update update, User user, String sourceText, boolean isEmployee) {
         String text;
         ReplyKeyboard replyKeyboard;
-        if (cafeNames.contains(sourceText)) {
-            text = hello + " " + sourceText;
-            Cafe cafe = cafeService.getCafeByName(sourceText);
-            order = orderService.getOrderByUserIdAndCafeId(user, cafe);
-            order.setUsing(1);
-            orderState = orderStatesService.create(order, OrderEnum.ORDER_START_REGISTRATION.getValue());
-            userState = userStatesService.create(user, ClientEnum.ORDER_CAFE_MENU.getValue());
-            replyKeyboard = replyButtons.userOrderMenu(order);
-        } else if (sourceText.equals(replyButtons.getBack())) {
-            text = backToMainMenu;
-            userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
-            replyKeyboard = replyButtons.userMainMenu();
-        } else {
-            text = putButton;
-            replyKeyboard = replyButtons.userOrderCafe(user);
+        List<String> cafeNames;
+        if (isEmployee) {
+            List<Integer> cafeIdList = employeeService.getCafeByUserId(user);
+            cafeNames = cafeService.getNamesByCafeId(cafeIdList);
         }
-        return message(update, replyKeyboard, text, userState, order, orderState);
+        else {
+            cafeNames = cafeService.getCafeNameByCity(user.getCity());
+        }
+        if (cafeNames.contains(sourceText)) {
+            Cafe cafe = cafeService.getCafeByName(sourceText);
+            Order order = orderService.getOrderByUserIdAndCafeId(user, cafe);
+            order.setUsing(1);
+            if (isEmployee) {
+                text = choosingTable;
+                replyKeyboard = replyButtons.operatorChoosingTable(cafe);
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CHOOSING_TABLE.getValue());
+            }
+            else {
+                text = hello + " " + sourceText;
+                replyKeyboard = replyButtons.userOrderMenu(order);
+                userStatesService.createAndSave(user, ClientEnum.ORDER_CAFE_MENU.getValue());
+            }
+            orderService.save(order);
+            orderStatesService.createAndSave(order, OrderEnum.ORDER_START_REGISTRATION.getValue());
+        }
+        else if (sourceText.equals(replyButtons.getBack())) {
+            text = backToMainMenu;
+            if (isEmployee) {
+                replyKeyboard = replyButtons.operatorMainMenu();
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_MAIN_MENU.getValue());
+            }
+            else {
+                replyKeyboard = replyButtons.userMainMenu();
+                userStatesService.createAndSave(user, ClientEnum.MAIN_MENU.getValue());
+            }
+        }
+        else {
+            text = putButton;
+            List<String> buttonName = cafeService.getCafeNameByCity(user.getCity());
+            replyKeyboard = replyButtons.userOrderCafe(buttonName);
+        }
+        return message(update, replyKeyboard, text);
     }
 
-    public SendMessage cafeMenu(Update update, User user, String sourceText) {
+    public SendMessage cafeMenu(Update update, User user, String sourceText, boolean isEmployee) {
         Order order = orderService.getOrderByUser(user);
         List<String> typeDishes = replyButtons.typeDishesInCafe(order);
-        UserState userState = null;
         String text;
         ReplyKeyboard replyKeyboard;
         if (typeDishes.contains(sourceText)) {
@@ -88,9 +112,19 @@ public class OrderModule extends AbstractModule {
         }
         else if (sourceText.equals(replyButtons.getBack())) {
             order.setUsing(1);
-            text = backToChoosingCafe;
-            userState = userStatesService.create(user, ClientEnum.ORDER_CAFE.getValue());
-            replyKeyboard = replyButtons.userOrderCafe(user);
+            orderService.save(order);
+            if (isEmployee) {
+                text = choosingTable;
+                Cafe cafe = order.getCafeId();
+                replyKeyboard = replyButtons.operatorChoosingTable(cafe);
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CHOOSING_TABLE.getValue());
+            }
+            else {
+                text = backToChoosingCafe;
+                List<String> buttonName = cafeService.getCafeNameByCity(user.getCity());
+                replyKeyboard = replyButtons.userOrderCafe(buttonName);
+                userStatesService.createAndSave(user, ClientEnum.ORDER_CAFE.getValue());
+            }
         }
         else if (sourceText.equals(replyButtons.getNext())) {
             if (order.getChequeDishList().size() == 0) {
@@ -98,87 +132,96 @@ public class OrderModule extends AbstractModule {
                 replyKeyboard = replyButtons.userOrderMenu(order);
             }
             else {
-                text = nextToObtaining;
-                userState = userStatesService.create(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
-                replyKeyboard = replyButtons.userOrderObtaining();
+                if (isEmployee) {
+                    text = nextToPaymentMethod;
+                    replyKeyboard = replyButtons.userOrderPayment();
+                    employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_PAYMENT_METHOD.getValue());
+                }
+                else {
+                    text = nextToObtaining;
+                    replyKeyboard = replyButtons.userOrderObtaining();
+                    userStatesService.createAndSave(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
+                }
             }
         }
         else if (sourceText.equals("\uD83D\uDED2")) {
-            text = getChequeText(order, false);
+            text = getChequeText(order, isEmployee);
             replyKeyboard = inlineButtons.fullOrderButtons(order);
         }
         else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderMenu(order);
         }
-        return message(update, replyKeyboard, text, userState, order);
+        return message(update, replyKeyboard, text);
     }
 
     public SendMessage methodObtaining(Update update, User user, String sourceText) {
         Order order = orderService.getOrderByUser(user);
-        UserState userState = null;
         String text;
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getDelivery())) {
             text = nextToAddress;
-            order.setObtainingMethod(replyButtons.getDelivery());
-            userState = userStatesService.create(user, ClientEnum.DELIVERY_ADDRESS.getValue());
             replyKeyboard = replyButtons.userOrderAddress(user);
+            order.setObtainingMethod(replyButtons.getDelivery());
+            orderService.save(order);
+            userStatesService.createAndSave(user, ClientEnum.DELIVERY_ADDRESS.getValue());
         }
         else if (sourceText.equals(replyButtons.getPickup())) {
             text = nextToPhoneNumber;
-            order.setObtainingMethod(replyButtons.getPickup());
-            userState = userStatesService.create(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
             replyKeyboard = replyButtons.userOrderPhoneNumber(user);
+            order.setObtainingMethod(replyButtons.getPickup());
+            orderService.save(order);
+            userStatesService.createAndSave(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
         }
         else if (sourceText.equals(replyButtons.getBack())) {
             text = backToOrderMenu;
-            userState = userStatesService.create(user, ClientEnum.ORDER_CAFE_MENU.getValue());
             replyKeyboard = replyButtons.userOrderMenu(order);
+            userStatesService.createAndSave(user, ClientEnum.ORDER_CAFE_MENU.getValue());
         }
         else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderObtaining();
         }
-        return message(update, replyKeyboard, text, userState, order);
+        return message(update, replyKeyboard, text);
     }
 
     public SendMessage deliveryAddress(Update update, User user, String sourceText) {
         Order order = orderService.getOrderByUser(user);
-        UserState userState = null;
         String text;
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getBack())) {
             text = backToObtaining;
-            userState = userStatesService.create(user, ClientEnum.ORDER_CAFE_MENU.getValue());
             replyKeyboard = replyButtons.userOrderMenu(order);
-        } else {
+            userStatesService.createAndSave(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
+        }
+        else {
             text = checkMessage.checkAddress(sourceText);
             if (!text.contains(errorTrigger)) {
                 order.setAddress(sourceText);
                 text = nextToPhoneNumber;
-                userState = userStatesService.create(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
                 replyKeyboard = replyButtons.userOrderPhoneNumber(user);
-            } else {
+                orderService.save(order);
+                userStatesService.createAndSave(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
+            }
+            else {
                 replyKeyboard = replyButtons.userOrderAddress(user);
             }
         }
-        return message(update, replyKeyboard, text, userState, order);
+        return message(update, replyKeyboard, text);
     }
 
     public SendMessage deliveryPhoneNumber(Update update, User user, String sourceText) {
         Order order = orderService.getOrderByUser(user);
-        UserState userState = null;
         String text;
         ReplyKeyboard replyKeyboard = replyButtons.userOrderPhoneNumber(user);
         if (sourceText.equals(replyButtons.getBack())) {
             if (order.getObtainingMethod().equals(replyButtons.getPickup())) {
                 text = backToObtaining;
-                userState = userStatesService.create(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
+                userStatesService.createAndSave(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
             }
             else {
                 text = backToAddress;
-                userState = userStatesService.create(user, ClientEnum.DELIVERY_ADDRESS.getValue());
+                userStatesService.createAndSave(user, ClientEnum.DELIVERY_ADDRESS.getValue());
             }
             replyKeyboard = replyButtons.userOrderAddress(user);
         }
@@ -187,62 +230,102 @@ public class OrderModule extends AbstractModule {
             String checkText = checkMessage.checkPhoneNumber(sourceText);
             if (!checkText.contains(errorTrigger)) {
                 text = nextToPaymentMethod;
-                userState = userStatesService.create(user, ClientEnum.DELIVERY_PAYMENT_METHOD.getValue());
                 if (sourceText.length() == 12) {
                     order.setPhoneNumber("8" + sourceText.substring(2, 12));
                 }
                 order.setPhoneNumber(sourceText);
                 replyKeyboard = replyButtons.userOrderPayment();
+                orderService.save(order);
+                userStatesService.create(user, ClientEnum.DELIVERY_PAYMENT_METHOD.getValue());
             }
         }
-        return message(update, replyKeyboard, text, userState, order);
+        return message(update, replyKeyboard, text);
     }
 
-    public SendMessage deliveryPaymentMethod(Update update, User user, String sourceText) {
+    public SendMessage deliveryPaymentMethodClient(Update update, User user, String sourceText) {
+        return deliveryPaymentMethod(update, user, sourceText, false);
+    }
+
+    public SendMessage deliveryPaymentMethodEmployee(Update update, User user, String sourceText) {
+        return deliveryPaymentMethod(update, user, sourceText, true);
+    }
+
+    private SendMessage deliveryPaymentMethod(Update update, User user, String sourceText, boolean isEmployee) {
         Order order = orderService.getOrderByUser(user);
-        List<String> paymentMethod = replyButtons.paymentMethod();
-        UserState userState = null;
         String text;
         ReplyKeyboard replyKeyboard;
-        if (paymentMethod.contains(sourceText)) {
+        if (sourceText.equals(replyButtons.getCards())) {
+            text = getChequeText(order, isEmployee);
             order.setPaymentMethod(sourceText);
-            text = getChequeText(order, false);
-            userState = userStatesService.create(user, ClientEnum.DELIVERY_CONFIRMATION.getValue());
             replyKeyboard = replyButtons.userOrderConfirmation();
-        } else if (sourceText.equals(replyButtons.getBack())) {
+            orderService.save(order);
+            if (isEmployee) {
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CONFIRMATION.getValue());
+            }
+            else {
+                userStatesService.createAndSave(user, ClientEnum.DELIVERY_CONFIRMATION.getValue());
+            }
+        }
+        else if (sourceText.equals(replyButtons.getCash())) {
+            text = getChequeText(order, isEmployee);
+            order.setPaymentMethod(sourceText);
+            replyKeyboard = replyButtons.userOrderConfirmation();
+            orderService.save(order);
+            if (isEmployee) {
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CONFIRMATION.getValue());
+            }
+            else {
+                userStatesService.createAndSave(user, ClientEnum.DELIVERY_CONFIRMATION.getValue());
+            }
+        }
+        else if (sourceText.equals(replyButtons.getBack())) {
             text = backToPhoneNumber;
-            userState = userStatesService.create(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
             replyKeyboard = replyButtons.userOrderPhoneNumber(user);
-        } else {
+            if (isEmployee) {
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CAFE_MENU.getValue());
+            }
+            else {
+                userStatesService.createAndSave(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
+            }
+
+        }
+        else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderPayment();
         }
-
-        return message(update, replyKeyboard, text, userState, order);
+        return message(update, replyKeyboard, text);
     }
 
-    public SendMessage deliveryConfirmation(Update update, User user, String sourceText) {
+    public SendMessage deliveryConfirmation(Update update, User user, String sourceText, boolean isEmployee) {
         Order order = orderService.getOrderByUser(user);
-        UserState userState = null;
-        OrderState orderState = null;
         String text;
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getConfirm())) {
             order.setUsing(0);
-            text = returnMainMenu;
-            orderState = orderStatesService.create(order, OrderEnum.ORDER_END_REGISTRATION.getValue());
-            userState = userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
-            replyKeyboard = replyButtons.userMainMenu();
+            if (isEmployee) {
+                text = operatorMainMenu;
+                replyKeyboard = replyButtons.operatorMainMenu();
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_MAIN_MENU.getValue());
+            }
+            else {
+                text = returnMainMenu;
+                replyKeyboard = replyButtons.userMainMenu();
+                userStatesService.createAndSave(user, ClientEnum.MAIN_MENU.getValue());
+            }
             sendMessageDepartment(order, DepartmentEnum.OPERATOR);
-        } else if (sourceText.equals(replyButtons.getBack())) {
+            orderService.save(order);
+            orderStatesService.createAndSave(order, OrderEnum.ORDER_END_REGISTRATION.getValue());
+        }
+        else if (sourceText.equals(replyButtons.getBack())) {
             text = backToPaymentMethod;
-            userState = userStatesService.create(user, ClientEnum.DELIVERY_PAYMENT_METHOD.getValue());
             replyKeyboard = replyButtons.userOrderPayment();
-        } else {
+            userStatesService.createAndSave(user, ClientEnum.DELIVERY_PAYMENT_METHOD.getValue());
+        }
+        else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderConfirmation();
         }
-        return message(update, replyKeyboard, text, userState, order, orderState);
+        return message(update, replyKeyboard, text);
     }
 
     public BotApiMethod<?> callbackOrderCafeMenu(CallbackQuery callback, Order order, Dish dish, String tag) {

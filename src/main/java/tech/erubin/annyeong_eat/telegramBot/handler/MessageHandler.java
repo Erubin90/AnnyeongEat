@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import tech.erubin.annyeong_eat.entity.EmployeeState;
 import tech.erubin.annyeong_eat.entity.User;
-import tech.erubin.annyeong_eat.entity.UserState;
+import tech.erubin.annyeong_eat.entity.ClientState;
+import tech.erubin.annyeong_eat.service.EmployeeStateServiceImpl;
 import tech.erubin.annyeong_eat.service.UserServiceImpl;
-import tech.erubin.annyeong_eat.service.UserStatesServiceImpl;
+import tech.erubin.annyeong_eat.service.ClientStatesServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
@@ -25,27 +27,30 @@ public class MessageHandler extends AbstractHandler {
     private final OrderModule orderModule;
     private final OperatorModule operatorModule;
     private final UserServiceImpl clientService;
-    private final UserStatesServiceImpl stateService;
+    private final EmployeeStateServiceImpl employeeStateService;
+    private final ClientStatesServiceImpl stateService;
 
     public BotApiMethod<?> handleUpdate(Update update) {
         String sourceText = update.getMessage().getText();
         User user = getUser(update);
-        UserState userState = stateService.getState(user);
         DepartmentEnum department = DepartmentEnum.GET.department(user);
         if (department != DepartmentEnum.NO_CORRECT_DEPARTMENT) {
-            if (department != DepartmentEnum.CLIENT) {
-                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, userState);
+            boolean isEmployee = department != DepartmentEnum.CLIENT;
+            if (isEmployee) {
+                EmployeeState employeeState = employeeStateService.getState(user);
+                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, employeeState);
                 if (employeeEnum != EmployeeEnum.NO_CORRECT_STATE) {
-                    return employeeActions(update, user, employeeEnum, sourceText);
+                    return employeeActions(update, user, employeeEnum, sourceText, isEmployee);
                 }
                 else {
                     return null;
                 }
             }
             else {
-                ClientEnum clientEnum = ClientEnum.GET.userState(userState);
+                ClientState clientState = stateService.getState(user);
+                ClientEnum clientEnum = ClientEnum.GET.userState(clientState);
                 if (clientEnum != ClientEnum.NO_CORRECT_STATE) {
-                    return clientActions(update, user, clientEnum, sourceText);
+                    return clientActions(update, user, clientEnum, sourceText, isEmployee);
                 }
                 else {
                     return null;
@@ -57,70 +62,62 @@ public class MessageHandler extends AbstractHandler {
         }
     }
 
-    private BotApiMethod<?> employeeActions(Update update, User user, EmployeeEnum employeeEnum, String sourceText) {
+    private BotApiMethod<?> employeeActions(Update update, User user, EmployeeEnum employeeEnum, String sourceText, boolean isEmployee) {
         switch (employeeEnum) {
             case OPERATOR_MAIN_MENU:
                 return operatorModule.mainMenu(update, user, sourceText);
+            case OPERATOR_CHOOSING_CAFE:
+                return orderModule.choosingCafe(update, user, sourceText, isEmployee);
+            case OPERATOR_CHOOSING_TABLE:
+                return operatorModule.choosingTable(update, user, sourceText);
+            case OPERATOR_CAFE_MENU:
+                return orderModule.cafeMenu(update, user, sourceText, isEmployee);
+            case OPERATOR_PAYMENT_METHOD:
+                return orderModule.deliveryPaymentMethodEmployee(update, user, sourceText);
+            case OPERATOR_CONFIRMATION:
+                return orderModule.deliveryConfirmation(update, user, sourceText, isEmployee);
             default:
                 return null;
         }
     }
 
-    private BotApiMethod<?> clientActions(Update update, User user, ClientEnum clientEnum, String sourceText) {
-        BotApiMethod<?> botApiMethod;
+    private BotApiMethod<?> clientActions(Update update, User user, ClientEnum clientEnum, String sourceText, boolean isEmployee) {
         switch (clientEnum) {
             case MAIN_MENU:
-                botApiMethod = mainMenuModule.mainMenu(update, user, sourceText);
-                break;
+                return mainMenuModule.mainMenu(update, user, sourceText);
             case ORDER_CHECK:
-                botApiMethod = mainMenuModule.orderChek(update, user, sourceText);
-                break;
+                return mainMenuModule.orderChek(update, user, sourceText);
             case HELP:
-                botApiMethod = mainMenuModule.help(update, user, sourceText);
-                break;
+                return mainMenuModule.help(update, user, sourceText);
             case PROFILE:
-                botApiMethod = mainMenuModule.profile(update, user, sourceText);
-                break;
+                return mainMenuModule.profile(update, user, sourceText);
             case ORDER_CAFE:
-                botApiMethod = orderModule.choosingCafe(update, user, sourceText);
-                break;
+                return orderModule.choosingCafe(update, user, sourceText, isEmployee);
             case ORDER_CAFE_MENU:
-                botApiMethod = orderModule.cafeMenu(update, user, sourceText);
-                break;
+                return orderModule.cafeMenu(update, user, sourceText, isEmployee);
             case ORDER_METHOD_OF_OBTAINING:
-                botApiMethod = orderModule.methodObtaining(update, user, sourceText);
-                break;
+                return orderModule.methodObtaining(update, user, sourceText);
             case DELIVERY_ADDRESS:
-                botApiMethod = orderModule.deliveryAddress(update, user, sourceText);
-                break;
+                return orderModule.deliveryAddress(update, user, sourceText);
             case DELIVERY_PHONE_NUMBER:
-                botApiMethod = orderModule.deliveryPhoneNumber(update,user, sourceText);
-                break;
+                return orderModule.deliveryPhoneNumber(update,user, sourceText);
             case DELIVERY_PAYMENT_METHOD:
-                botApiMethod = orderModule.deliveryPaymentMethod(update, user, sourceText);
-                break;
+                return orderModule.deliveryPaymentMethodClient(update, user, sourceText);
             case DELIVERY_CONFIRMATION:
-                botApiMethod = orderModule.deliveryConfirmation(update, user, sourceText);
-                break;
+                return orderModule.deliveryConfirmation(update, user, sourceText, isEmployee);
             case REGISTRATION_START:
-                botApiMethod = registrationModule.start(update, user);
-                break;
+                return registrationModule.start(update, user);
             case REGISTRATION_CITY:
-                botApiMethod = registrationModule.city(update, user, sourceText);
-                break;
+                return registrationModule.city(update, user, sourceText);
             case REGISTRATION_NAME:
-                botApiMethod = registrationModule.name(update, user, sourceText);
-                break;
+                return registrationModule.name(update, user, sourceText);
             case REGISTRATION_SURNAME:
-                botApiMethod = registrationModule.surname(update, user, sourceText);
-                break;
+                return registrationModule.surname(update, user, sourceText);
             case REGISTRATION_PHONE_NUMBERS:
-                botApiMethod = registrationModule.phoneNumber(update, user, sourceText);
-                break;
+                return registrationModule.phoneNumber(update, user, sourceText);
             default:
-                botApiMethod = null;
+                return null;
         }
-        return botApiMethod;
     }
 
     private User getUser(Update update) {

@@ -11,7 +11,9 @@ public interface CafeService {
 
     Cafe getCafeByName(String name);
 
-    List<String> getAllCafeNames();
+    Cafe getCafeById(Integer id);
+
+    List<String> getNamesByCafeId(List<Integer> cafeId);
 
     List<String> getCafeNameByCity(String city);
 

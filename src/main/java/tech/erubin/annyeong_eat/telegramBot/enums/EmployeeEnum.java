@@ -1,11 +1,19 @@
 package tech.erubin.annyeong_eat.telegramBot.enums;
 
-import tech.erubin.annyeong_eat.entity.UserState;
+import tech.erubin.annyeong_eat.entity.EmployeeState;
 
 public enum EmployeeEnum {
-    OPERATOR_MAIN_MENU("главное меню"),
-    OPERATOR_CHOOSE_TABLE("выбор стола"),
-    OPERATOR_START("создание заказа"),
+    OPERATOR_MAIN_MENU("главное меню Оператора"),
+    OPERATOR_CHOOSING_CAFE("выбор кафе"),
+    OPERATOR_CHOOSING_TABLE("выбор стола"),
+    OPERATOR_CAFE_MENU("выбор блюд"),
+    OPERATOR_PAYMENT_METHOD("указание способа оплаты"),
+    OPERATOR_CONFIRMATION("подтверждение заказа"),
+
+    ADMINISTRATOR_MAIN_MENU("главное меню Оператора"),
+    COURIER_MAIN_MENU("главное меню Курьер"),
+    DEVELOPER_MAIN_MENU("главное меню Разработчик"),
+
     NO_CORRECT_STATE("не корректное состояние"),
     GET;
 
@@ -22,28 +30,34 @@ public enum EmployeeEnum {
         return state;
     }
 
-    public EmployeeEnum employeeState(DepartmentEnum department, UserState userState) {
-        String state = userState.getState();
+    public EmployeeEnum employeeState(DepartmentEnum department, EmployeeState employeeState) {
+        String state = employeeState.getState();
         switch (department) {
             case OPERATOR:
                 if (state.equals(OPERATOR_MAIN_MENU.getValue())) {
                     return OPERATOR_MAIN_MENU;
                 }
-                else if (state.equals(OPERATOR_START.getValue())) {
-                    return OPERATOR_START;
+                else if (state.equals(OPERATOR_CHOOSING_CAFE.getValue())) {
+                    return OPERATOR_CHOOSING_CAFE;
                 }
-                else if (state.equals(OPERATOR_CHOOSE_TABLE.getValue())) {
-                    return OPERATOR_CHOOSE_TABLE;
+                else if (state.equals(OPERATOR_CHOOSING_TABLE.getValue())) {
+                    return OPERATOR_CHOOSING_TABLE;
+                }
+                else if (state.equals(OPERATOR_CAFE_MENU.getValue())) {
+                    return OPERATOR_CAFE_MENU;
                 }
                 else {
                     return NO_CORRECT_STATE;
                 }
             case ADMINISTRATOR:
-                return NO_CORRECT_STATE;
             case COURIER:
-                return NO_CORRECT_STATE;
             case DEVELOPER:
-                return NO_CORRECT_STATE;
+                if (state.equals(OPERATOR_MAIN_MENU.getValue())) {
+                    return OPERATOR_MAIN_MENU;
+                }
+                else {
+                    return NO_CORRECT_STATE;
+                }
             default:
                 return NO_CORRECT_STATE;
         }

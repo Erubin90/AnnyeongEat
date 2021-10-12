@@ -22,6 +22,11 @@ public class CafeServiceImpl implements CafeService {
     }
 
     @Override
+    public List<String> getAllAddressCafe() {
+        return repository.findAllAddressCafe();
+    }
+
+    @Override
     public Cafe getCafeByName(String name) {
         return repository.findCafeByName(name);
     }

@@ -99,6 +99,9 @@ public abstract class AbstractModule {
     @Value("${operator.message.noCommand}")
     protected String noCommand;
 
+    @Value("${operator.message.noTable}")
+    protected String noTable;
+
     @Value("${operator.message.noOrderName}")
     protected String noOrderName;
 
@@ -213,9 +216,15 @@ public abstract class AbstractModule {
                 fullOrder.append("Имя: ")
                         .append(order.getUserId().getName())
                         .append("\n")
-                        .append("Адрес: ")
-                        .append(order.getAddress())
-                        .append("\n")
+                        .append("Адрес: ");
+                String address = order.getAddress();
+                if (address.equals("-")) {
+                    fullOrder.append(order.getCafeId().getAddress());
+                }
+                else {
+                    fullOrder.append(order.getAddress());
+                }
+                fullOrder.append("\n")
                         .append("Номер: ")
                         .append(order.getPhoneNumber())
                         .append("\n\n");
@@ -224,7 +233,17 @@ public abstract class AbstractModule {
                 fullOrder.append(receiptPositions)
                         .append("\n");
             }
-            fullOrder.append("Сумма заказа: ")
+            if (order.getObtainingMethod() != null) {
+                fullOrder.append("Способ доставки: ")
+                        .append(order.getObtainingMethod())
+                        .append("\n");
+            }
+            if (order.getPaymentMethod() != null) {
+                fullOrder.append("Способ оплаты: ")
+                        .append(order.getPaymentMethod())
+                        .append("\n");
+            }
+            fullOrder.append("\nСумма заказа: ")
                     .append(sumCheque)
                     .append("₽\n")
                     .append("Сумма доставки: ");
@@ -249,16 +268,6 @@ public abstract class AbstractModule {
                             .append(sumCheque)
                             .append("₽\n");
                 }
-            }
-            if (order.getPaymentMethod() != null) {
-                fullOrder.append("Способ оплаты: ")
-                        .append(order.getPaymentMethod())
-                        .append("\n");
-            }
-            if (order.getObtainingMethod() != null) {
-                fullOrder.append("Способ доставки: ")
-                        .append(order.getObtainingMethod())
-                        .append("\n");
             }
             if (isEmployee) {
                 fullOrder.append("Комментарий: ")

@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import tech.erubin.annyeong_eat.entity.Cafe;
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.User;
+import tech.erubin.annyeong_eat.service.CafeServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractButton;
 
 import java.util.*;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @Component
 @AllArgsConstructor
 public class ReplyButtons extends AbstractButton {
+    private CafeServiceImpl cafeService;
 
     public ReplyKeyboardMarkup userRegistrationCity(Set<String> cafeCits) {
         List<List<String>> buttonNames = getCityListButtons(cafeCits);
@@ -51,14 +53,11 @@ public class ReplyButtons extends AbstractButton {
     }
 
     public ReplyKeyboardMarkup userOrderAddress(User user) {
-        Set<String> buttonNames = new LinkedHashSet<>();
-        List<Order> orderList = user.getOrderList();
-
-        for (Order order : orderList){
-            if(order.getAddress() != null){
-                buttonNames.add(order.getAddress());
-            }
-        }
+        List<String> buttonNames = user.getOrderList()
+                .stream()
+                .map(Order::getAddress)
+                .filter(x -> !x.equals("-"))
+                .collect(Collectors.toList());
         buttonNames.add(back);
         return replyKeyboardMarkup(buttonNames);
     }
@@ -91,11 +90,26 @@ public class ReplyButtons extends AbstractButton {
     }
 
     public ReplyKeyboardMarkup operatorChoosingTable(Cafe cafe) {
-        List<List<String>> tables = Arrays.stream(cafe.getTableLayout().split(":"))
-                .map(x -> List.of(x.split("\\.")))
-                .collect(Collectors.toList());
-        tables.add(List.of(back));
-        return replyKeyboardMarkup(tables, false);
+        int tableQuantity = cafe.getTableQuantity();
+        List<List<String>> buttons = new ArrayList<>();
+        for (int i = 1; i <= tableQuantity; i++) {
+            List<String> row = new ArrayList<>();
+            while (i % 5 != 0) {
+                row.add(Integer.toString(i));
+                i++;
+                if (i == tableQuantity) {
+                    row.add(Integer.toString(i));
+                    break;
+                }
+                if (i % 5 == 0) {
+                    row.add(Integer.toString(i));
+                }
+            }
+            buttons.add(row);
+        }
+        buttons.add(List.of(pickup));
+        buttons.add(List.of(back));
+        return replyKeyboardMarkup(buttons, false);
     }
 
     private ReplyKeyboardMarkup replyKeyboardMarkup(Collection<String> buttonNames) {

@@ -170,6 +170,8 @@ public class OrderModule extends AbstractModule {
         else if (sourceText.equals(replyButtons.getPickup())) {
             text = nextToPhoneNumber;
             replyKeyboard = replyButtons.userOrderPhoneNumber(user);
+            order.setPriceDelivery(0);
+            order.setAddress("-");
             order.setObtainingMethod(replyButtons.getPickup());
             orderService.save(order);
             userStatesService.createAndSave(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());

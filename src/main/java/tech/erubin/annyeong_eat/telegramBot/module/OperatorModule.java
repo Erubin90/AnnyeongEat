@@ -18,7 +18,6 @@ import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -161,17 +160,29 @@ public class OperatorModule extends AbstractModule {
         ReplyKeyboard replyKeyboard;
         Order order = orderService.getOrderByUser(user);
         Cafe cafe = order.getCafeId();
-        List<String> cafeTable = Arrays.asList(cafe.getTableLayout().replaceAll(":", "\\.").split("\\."));
-        if (cafeTable.contains(soursText)) {
-            text = cafe.getName();
-            replyKeyboard = replyButtons.userOrderMenu(order);
-            String obtaining;
-            if (soursText.equals("_")) {
-                obtaining = replyButtons.getPickup();
+
+        if (soursText.matches("\\d+")) {
+            int tableNum = Integer.parseInt(soursText);
+            if (tableNum > 0 && tableNum < cafe.getTableQuantity()) {
+                text = cafe.getName();
+                replyKeyboard = replyButtons.userOrderMenu(order);
+                String obtaining = "Стол " + soursText;
+                order.setObtainingMethod(obtaining);
+                order.setAddress(cafe.getAddress());
+                order.setPriceDelivery(0);
+                order.setPhoneNumber("");
+                orderService.save(order);
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CAFE_MENU.getValue());
             }
             else {
-                obtaining = "Стол " + soursText;
+                text = noTable;
+                replyKeyboard = replyButtons.operatorChoosingTable(cafe);
             }
+        }
+        else if (soursText.equals(replyButtons.getPickup())) {
+            String obtaining = replyButtons.getPickup();
+            text = cafe.getName();
+            replyKeyboard = replyButtons.userOrderMenu(order);
             order.setObtainingMethod(obtaining);
             order.setAddress(cafe.getAddress());
             order.setPriceDelivery(0);
@@ -239,6 +250,11 @@ public class OperatorModule extends AbstractModule {
                 orderStatesService.save(orderState);
                 inlineMarkup = inlineButtons.orderCancelButtons();
                 botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
+                break;
+            case "or":
+                String text = getChequeText(order, true);
+                inlineMarkup = inlineButtons.orderAndRegistrationButtons(order);
+                botApiMethod = editMessageText(callback, text, inlineMarkup);
                 break;
             case "oe":
                 orderState = orderStatesService.create(order, OrderEnum.ORDER_EDITING.getValue());

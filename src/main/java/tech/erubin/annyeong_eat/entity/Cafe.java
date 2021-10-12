@@ -27,8 +27,8 @@ public class Cafe {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "table_layout")
-    private String tableLayout;
+    @Column(name = "table_quantity")
+    private int tableQuantity;
 
     @OneToMany(mappedBy = "cafeId",
             cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})

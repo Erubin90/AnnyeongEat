@@ -9,6 +9,8 @@ public interface CafeService {
 
     Set<String> getAllCity();
 
+    List<String> getAllAddressCafe();
+
     Cafe getCafeByName(String name);
 
     Cafe getCafeById(Integer id);

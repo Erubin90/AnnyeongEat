@@ -18,9 +18,7 @@ import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -242,7 +240,7 @@ public class OperatorModule extends AbstractModule {
             case "o+":
                 orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
                 orderStatesService.save(orderState);
-                inlineMarkup = inlineButtons.orderAcceptButtons();
+                inlineMarkup = inlineButtons.orderAcceptButtons(order);
                 botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
                 break;
             case "o-":
@@ -274,21 +272,34 @@ public class OperatorModule extends AbstractModule {
         OrderState orderState;
         InlineKeyboardMarkup inlineMarkup;
         String text;
-        List<String> typeDishList = inlineButtons.typeDishesInCafe(order);
+        List<String> typeDishList = replyButtons.typeDishesInCafe(order.getCafeId());
         if (tag.matches("o.")) {
             switch (tag) {
                 case "o+":
-                    orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
-                    orderStatesService.save(orderState);
-                    inlineMarkup = inlineButtons.orderAcceptButtons();
-                    sendMessageDepartment(order, DepartmentEnum.COURIER);
-                    botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
+                    int priceDelivery = order.getPriceDelivery();
+                    String address = order.getAddress();
+                    String obtainingMethod = order.getObtainingMethod();
+                    boolean isCorrectAddressAndObtainingMethod = ((address.isBlank() && obtainingMethod.equals(replyButtons.getPickup())) ||
+                            (!address.isBlank() && (obtainingMethod.equals(replyButtons.getTaxi()) ||
+                                    obtainingMethod.equals(replyButtons.getCourier()))));
+                    boolean correctFillOrder = priceDelivery > -1 && isCorrectAddressAndObtainingMethod;
+                    if (correctFillOrder) {
+                        orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
+                        inlineMarkup = inlineButtons.orderAcceptButtons(order);
+                        sendMessageDepartment(order, DepartmentEnum.COURIER);
+                        botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
+                        orderStatesService.save(orderState);
+                    }
+                    else {
+                        text = getErrorText(priceDelivery, isCorrectAddressAndObtainingMethod);
+                        botApiMethod = answerCallbackQuery(callback, text);
+                    }
                     break;
                 case "o-":
                     orderState = orderStatesService.create(order, OrderEnum.ORDER_CANCEL.getValue());
-                    orderStatesService.save(orderState);
                     inlineMarkup = inlineButtons.orderCancelButtons();
                     botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
+                    orderStatesService.save(orderState);
                     break;
                 case "oe":
                     inlineMarkup = inlineButtons.orderEditButtons(order);
@@ -371,7 +382,7 @@ public class OperatorModule extends AbstractModule {
             inlineMarkup = inlineButtons.orderEditButtons(order);
             botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
         }
-        else if (tag.equals(String.valueOf(dish.getId()))) {
+        else if (dish != null) {
             ChequeDish chequeDish = chequeDishService.getChequeByOrderAndDish(order, dish);
             chequeDish.setCountDishes(1);
             chequeDishService.save(chequeDish);
@@ -389,5 +400,25 @@ public class OperatorModule extends AbstractModule {
             botApiMethod = answerCallbackQuery(callback, error);
         }
         return botApiMethod;
+    }
+
+    private String getErrorText(int pD, boolean b) {
+        List<String> textError = new ArrayList<>();
+        if (!(pD > -1)) {
+            textError.add("не указана стоимость доставки");
+        }
+        if (b) {
+            textError.add("не правильный адрес или статус заказа");
+        }
+        ListIterator<String> listIterator = textError.listIterator();
+        StringBuilder stringBuilder = new StringBuilder();
+        while (listIterator.hasNext()) {
+            String s = listIterator.next();
+            stringBuilder.append(s);
+            if  (listIterator.hasNext()) {
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
     }
 }

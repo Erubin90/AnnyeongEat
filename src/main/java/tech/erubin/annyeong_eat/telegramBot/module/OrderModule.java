@@ -103,7 +103,7 @@ public class OrderModule extends AbstractModule {
 
     public SendMessage cafeMenu(Update update, User user, String sourceText, boolean isEmployee) {
         Order order = orderService.getOrderByUser(user);
-        List<String> typeDishes = replyButtons.typeDishesInCafe(order);
+        List<String> typeDishes = replyButtons.typeDishesInCafe(order.getCafeId());
         String text;
         ReplyKeyboard replyKeyboard;
         if (typeDishes.contains(sourceText)) {
@@ -171,7 +171,6 @@ public class OrderModule extends AbstractModule {
             text = nextToPhoneNumber;
             replyKeyboard = replyButtons.userOrderPhoneNumber(user);
             order.setPriceDelivery(0);
-            order.setAddress("-");
             order.setObtainingMethod(replyButtons.getPickup());
             orderService.save(order);
             userStatesService.createAndSave(user, ClientEnum.DELIVERY_PHONE_NUMBER.getValue());
@@ -193,8 +192,10 @@ public class OrderModule extends AbstractModule {
         String text;
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getBack())) {
+            order.setAddress("");
             text = backToObtaining;
             replyKeyboard = replyButtons.userOrderObtaining();
+            orderService.save(order);
             userStatesService.createAndSave(user, ClientEnum.ORDER_METHOD_OF_OBTAINING.getValue());
         }
         else {

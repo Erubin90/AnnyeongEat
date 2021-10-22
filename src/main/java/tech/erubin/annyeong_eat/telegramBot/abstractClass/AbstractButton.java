@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import tech.erubin.annyeong_eat.entity.Cafe;
 import tech.erubin.annyeong_eat.entity.Dish;
 import tech.erubin.annyeong_eat.entity.Order;
 
@@ -104,8 +105,8 @@ public abstract class AbstractButton {
     @Value("${operator.button.form}")
     protected String form;
 
-    public List<String> typeDishesInCafe(Order order) {
-        return order.getCafeId().getDishesMenu()
+    public List<String> typeDishesInCafe(Cafe cafe) {
+        return cafe.getDishesMenu()
                 .stream()
                 .map(Dish::getType)
                 .distinct()
@@ -122,7 +123,7 @@ public abstract class AbstractButton {
 
     protected List<List<String>> dishesMenuButtons(Order order) {
         List<List<String>> orderMenuRows = new ArrayList<>();
-        List<String> typeDishes = typeDishesInCafe(order);
+        List<String> typeDishes = typeDishesInCafe(order.getCafeId());
         List<String> littleButtonName = typeDishes.stream()
                 .filter(x -> x.length() < 15)
                 .collect(Collectors.toList());

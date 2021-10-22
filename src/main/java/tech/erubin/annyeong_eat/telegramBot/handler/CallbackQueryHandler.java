@@ -10,6 +10,7 @@ import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.telegramBot.module.CourierModule;
 import tech.erubin.annyeong_eat.telegramBot.module.OperatorModule;
 import tech.erubin.annyeong_eat.telegramBot.module.OrderModule;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
@@ -19,6 +20,7 @@ import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
 public class CallbackQueryHandler extends AbstractHandler {
     private final OrderModule orderModule;
     private final OperatorModule operatorModule;
+    private final CourierModule courierModule;
 
     private final UserServiceImpl clientService;
     private final OrderServiceImpl orderService;
@@ -31,7 +33,7 @@ public class CallbackQueryHandler extends AbstractHandler {
         String[] idList = callback.getData().split("/");
 
         Order order = orderService.getOrderByStringId(idList[0]);
-        Dish dish = dishService.getDishById(idList[1]);
+        Dish dish = dishService.getDishByName(idList[1]);
         User user = clientService.getUser(userId);
         String tag = idList[2];
         DepartmentEnum department = DepartmentEnum.GET.department(user);
@@ -70,6 +72,8 @@ public class CallbackQueryHandler extends AbstractHandler {
                 return operatorModule.callbackOperatorMainMenu(callback, order, dish, tag);
             case OPERATOR_CAFE_MENU:
                 return orderModule.callbackOrderCafeMenu(callback, order, dish, tag);
+            case COURIER_MAIN_MENU:
+                return courierModule.callbackCourierMainMenu(callback, order, tag);
             default:
                 return answerCallbackQuery(callback, buttonNotWork);
         }

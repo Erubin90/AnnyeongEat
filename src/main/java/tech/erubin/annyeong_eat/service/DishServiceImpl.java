@@ -2,6 +2,7 @@ package tech.erubin.annyeong_eat.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import tech.erubin.annyeong_eat.entity.Cafe;
 import tech.erubin.annyeong_eat.entity.Dish;
 import tech.erubin.annyeong_eat.repository.DishRepository;
 import tech.erubin.annyeong_eat.service.serviceInterface.DishService;
@@ -14,8 +15,18 @@ public class DishServiceImpl implements DishService {
     private final DishRepository repository;
 
     @Override
-    public Dish getDishById(String dishId) {
-        return dishId.matches("\\d+") ? repository.getById(Integer.parseInt(dishId)) : null;
+    public Dish getDishByName(String name) {
+        return name.isBlank() && name.matches("\\d+") ? null : repository.findDishByName(name);
+    }
+
+    @Override
+    public List<String> getAllNameByCafe(Cafe cafe) {
+        return repository.findAllNameByCafeId(cafe);
+    }
+
+    @Override
+    public List<String> getAllDishTypeByCafe(Cafe cafe) {
+        return repository.findAllDishTypeByCafe(cafe);
     }
 
     @Override

@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import tech.erubin.annyeong_eat.entity.Cafe;
 import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.User;
-import tech.erubin.annyeong_eat.service.CafeServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractButton;
 
 import java.util.*;
@@ -16,8 +15,6 @@ import java.util.stream.Collectors;
 @Component
 @AllArgsConstructor
 public class ReplyButtons extends AbstractButton {
-    private CafeServiceImpl cafeService;
-
     public ReplyKeyboardMarkup userRegistrationCity(Set<String> cafeCits) {
         List<List<String>> buttonNames = getCityListButtons(cafeCits);
         return replyKeyboardMarkup(buttonNames, true);
@@ -56,6 +53,7 @@ public class ReplyButtons extends AbstractButton {
         List<String> buttonNames = user.getOrderList()
                 .stream()
                 .map(Order::getAddress)
+                .distinct()
                 .filter(x -> !x.equals("-"))
                 .collect(Collectors.toList());
         buttonNames.add(back);
@@ -63,16 +61,14 @@ public class ReplyButtons extends AbstractButton {
     }
 
     public ReplyKeyboardMarkup userOrderPhoneNumber(User user) {
-        String clientPhoneNumber = user.getPhoneNumber();
         List<String> buttonNames = new ArrayList<>();
-        buttonNames.add(clientPhoneNumber);
-        List<Order> orderList = user.getOrderList();
-        for (int i = 1, j = 0; i <= orderList.size() && j < 3; i++) {
-            Order order = orderList.get(orderList.size() - i);
-            if (order.getPhoneNumber() != null && !buttonNames.contains(order.getPhoneNumber())) {
-                j++;
-            }
-        }
+        buttonNames.add(user.getPhoneNumber());
+        List<String> phoneNumberList = user.getOrderList()
+                .stream()
+                .map(Order::getAddress)
+                .distinct()
+                .filter(x -> !x.isBlank())
+                .collect(Collectors.toList());
         buttonNames.add(back);
         return replyKeyboardMarkup(buttonNames);
     }

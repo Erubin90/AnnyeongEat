@@ -13,10 +13,7 @@ import tech.erubin.annyeong_eat.service.ClientStatesServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
 import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
-import tech.erubin.annyeong_eat.telegramBot.module.MainMenuModule;
-import tech.erubin.annyeong_eat.telegramBot.module.OperatorModule;
-import tech.erubin.annyeong_eat.telegramBot.module.OrderModule;
-import tech.erubin.annyeong_eat.telegramBot.module.RegistrationModule;
+import tech.erubin.annyeong_eat.telegramBot.module.*;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
 
 @Component
@@ -41,7 +38,7 @@ public class MessageHandler extends AbstractHandler {
                 EmployeeState employeeState = employeeStateService.getState(user);
                 EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, employeeState);
                 if (employeeEnum != EmployeeEnum.NO_CORRECT_STATE) {
-                    return employeeActions(update, user, employeeEnum, sourceText, isEmployee);
+                    return employeeActions(update, user, department, employeeEnum, sourceText, isEmployee);
                 }
                 else {
                     return null;
@@ -63,20 +60,25 @@ public class MessageHandler extends AbstractHandler {
         }
     }
 
-    private BotApiMethod<?> employeeActions(Update update, User user, EmployeeEnum employeeEnum, String sourceText, boolean isEmployee) {
-        switch (employeeEnum) {
-            case OPERATOR_MAIN_MENU:
-                return operatorModule.mainMenu(update, user, sourceText);
-            case OPERATOR_CHOOSING_CAFE:
-                return orderModule.choosingCafe(update, user, sourceText, isEmployee);
-            case OPERATOR_CHOOSING_TABLE:
-                return operatorModule.choosingTable(update, user, sourceText);
-            case OPERATOR_CAFE_MENU:
-                return orderModule.cafeMenu(update, user, sourceText, isEmployee);
-            case OPERATOR_PAYMENT_METHOD:
-                return orderModule.deliveryPaymentMethod(update, user, sourceText, isEmployee);
-            case OPERATOR_CONFIRMATION:
-                return orderModule.deliveryConfirmation(update, user, sourceText, isEmployee);
+    private BotApiMethod<?> employeeActions(Update update, User user, DepartmentEnum department, EmployeeEnum employeeEnum, String sourceText, boolean isEmployee) {
+        switch (department){
+            case OPERATOR:
+                switch (employeeEnum) {
+                    case OPERATOR_MAIN_MENU:
+                        return operatorModule.mainMenu(update, user, sourceText);
+                    case OPERATOR_CHOOSING_CAFE:
+                        return orderModule.choosingCafe(update, user, sourceText, isEmployee);
+                    case OPERATOR_CHOOSING_TABLE:
+                        return operatorModule.choosingTable(update, user, sourceText);
+                    case OPERATOR_CAFE_MENU:
+                        return orderModule.cafeMenu(update, user, sourceText, isEmployee);
+                    case OPERATOR_PAYMENT_METHOD:
+                        return orderModule.deliveryPaymentMethod(update, user, sourceText, isEmployee);
+                    case OPERATOR_CONFIRMATION:
+                        return orderModule.deliveryConfirmation(update, user, sourceText, isEmployee);
+                    default:
+                        return null;
+                }
             default:
                 return null;
         }

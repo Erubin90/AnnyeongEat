@@ -51,4 +51,8 @@ public enum DepartmentEnum {
             return CLIENT;
         }
     }
+
+    public boolean isCourier(String obtainingMethod) {
+        return obtainingMethod.equals(CLIENT.getValue());
+    }
 }

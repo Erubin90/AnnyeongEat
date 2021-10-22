@@ -11,7 +11,11 @@ public enum EmployeeEnum {
     OPERATOR_CONFIRMATION("подтверждение заказа"),
 
     ADMINISTRATOR_MAIN_MENU("главное меню Оператора"),
+
     COURIER_MAIN_MENU("главное меню Курьер"),
+    COURIER_WEEKEND("выходной"),
+    COURIER_FREE("свободен"),
+    COURIER_BUSY("на заказе"),
     DEVELOPER_MAIN_MENU("главное меню Разработчик"),
 
     NO_CORRECT_STATE("не корректное состояние"),
@@ -32,6 +36,10 @@ public enum EmployeeEnum {
 
     public EmployeeEnum employeeState(DepartmentEnum department, EmployeeState employeeState) {
         String state = employeeState.getState();
+        return employeeState(department, state);
+    }
+
+    public EmployeeEnum employeeState(DepartmentEnum department, String state) {
         switch (department) {
             case OPERATOR:
                 if (state.equals(OPERATOR_MAIN_MENU.getValue())) {
@@ -56,10 +64,31 @@ public enum EmployeeEnum {
                     return NO_CORRECT_STATE;
                 }
             case ADMINISTRATOR:
+                if (state.equals(ADMINISTRATOR_MAIN_MENU.getValue())) {
+                    return ADMINISTRATOR_MAIN_MENU;
+                }
+                else {
+                    return NO_CORRECT_STATE;
+                }
             case COURIER:
+                if  (state.equals(COURIER_MAIN_MENU.getValue())) {
+                    return COURIER_MAIN_MENU;
+                }
+                else if (state.equals(COURIER_WEEKEND.getValue())) {
+                    return COURIER_WEEKEND;
+                }
+                else if (state.equals(COURIER_FREE.getValue())) {
+                    return COURIER_FREE;
+                }
+                else if (state.equals(COURIER_BUSY.getValue())) {
+                    return COURIER_BUSY;
+                }
+                else {
+                    return NO_CORRECT_STATE;
+                }
             case DEVELOPER:
-                if (state.equals(OPERATOR_MAIN_MENU.getValue())) {
-                    return OPERATOR_MAIN_MENU;
+                if (state.equals(DEVELOPER_MAIN_MENU.getValue())) {
+                    return DEVELOPER_MAIN_MENU;
                 }
                 else {
                     return NO_CORRECT_STATE;
@@ -67,5 +96,14 @@ public enum EmployeeEnum {
             default:
                 return NO_CORRECT_STATE;
         }
+    }
+
+    public boolean isCourierFree (EmployeeEnum employeeEnum) {
+        return employeeEnum == COURIER_FREE;
+    }
+
+    public boolean isCourierFree (String employee) {
+        EmployeeEnum employeeEnum = employeeState(DepartmentEnum.COURIER, employee);
+        return employeeEnum == COURIER_FREE;
     }
 }

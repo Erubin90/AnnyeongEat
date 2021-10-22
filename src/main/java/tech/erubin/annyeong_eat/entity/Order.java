@@ -73,6 +73,7 @@ public class Order {
         this.orderName = orderName;
         this.paymentStatus = 0;
         this.priceDelivery = -1;
+        this.address = "";
         this.comment = "";
         this.obtainingMethod = "";
     }

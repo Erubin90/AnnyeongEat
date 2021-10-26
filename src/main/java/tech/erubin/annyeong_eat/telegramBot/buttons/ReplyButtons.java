@@ -77,6 +77,11 @@ public class ReplyButtons extends AbstractButton {
         return replyKeyboardMarkup(paymentButtons(), false);
     }
 
+    public ReplyKeyboardMarkup userComment() {
+        List<List<String>> buttonNames = List.of(List.of(back, next));
+        return replyKeyboardMarkup(buttonNames, false);
+    }
+
     public ReplyKeyboardMarkup userOrderConfirmation() {
         return replyKeyboardMarkup(confirmButtons(), false);
     }

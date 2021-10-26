@@ -65,6 +65,9 @@ public abstract class AbstractModule {
     @Value("${order.message.backToPaymentMethod}")
     protected String backToPaymentMethod;
 
+    @Value("${order.message.backToComment}")
+    protected String backToComment;
+
     @Value("${order.message.nextToObtaining}")
     protected String nextToObtaining;
 
@@ -77,11 +80,17 @@ public abstract class AbstractModule {
     @Value("${order.message.nextToPaymentMethod}")
     protected String nextToPaymentMethod;
 
+    @Value("${order.message.nextToComment}")
+    protected String nextToComment;
+
     @Value("${regular.error.trigger}")
     protected String errorTrigger;
 
     @Value("${error.nameCity}")
     protected String errorNameCity;
+
+    @Value("${error.comment}")
+    protected String errorComment;
 
     //noError Message's
     @Value("${registration.message.name}")
@@ -209,8 +218,6 @@ public abstract class AbstractModule {
         List<ChequeDish> chequeDishList = order.getChequeDishList();
         if (chequeDishList != null && !chequeDishList.isEmpty()) {
             String receiptPositions = getReceiptPositions(order);
-            double sumCheque = getSumCheque(order);
-            int priceDelivery = order.getPriceDelivery();
             StringBuilder fullOrder = new StringBuilder(order.getOrderName() + ":\n\n");
             if (isEmployee) {
                 fullOrder.append("Имя: ")
@@ -227,60 +234,67 @@ public abstract class AbstractModule {
                 fullOrder.append("\n")
                         .append("Номер: ")
                         .append(order.getPhoneNumber())
-                        .append("\n\n");
+                        .append("\n\n")
+                        .append(getTextToChequeText(order, isEmployee))
+                        .append("Товары:\n")
+                        .append(receiptPositions);
             }
             else {
                 fullOrder.append(receiptPositions)
-                        .append("\n");
-            }
-            if (order.getObtainingMethod() != null) {
-                fullOrder.append("Способ доставки: ")
-                        .append(order.getObtainingMethod())
-                        .append("\n");
-            }
-            if (order.getPaymentMethod() != null) {
-                fullOrder.append("Способ оплаты: ")
-                        .append(order.getPaymentMethod())
-                        .append("\n");
-            }
-            fullOrder.append("\nСумма заказа: ")
-                    .append(sumCheque)
-                    .append("₽\n")
-                    .append("Сумма доставки: ");
-            if (priceDelivery >= 0) {
-                double sumOrder = sumCheque + priceDelivery;
-                fullOrder.append(priceDelivery)
-                        .append("₽\n")
-                        .append("Итоговая сумма заказа: ")
-                        .append(sumOrder)
-                        .append("₽\n");
-            }
-            else {
-                if (isEmployee) {
-                    fullOrder.append(priceNotSpecified).append("\n")
-                            .append("Итоговая сумма заказа: ")
-                            .append(priceNotCalculated)
-                            .append("\n");
-                }
-                else {
-                    fullOrder.append(noCorrectPriceDelivery)
-                            .append("\nПредворительная сумма заказа без доставки: ")
-                            .append(sumCheque)
-                            .append("₽\n");
-                }
-            }
-            if (isEmployee) {
-                fullOrder.append("Комментарий: ")
-                        .append(order.getComment())
-                        .append("\n\n")
-                        .append("Товары:\n")
-                        .append(receiptPositions);
+                        .append("\n")
+                        .append(getTextToChequeText(order, isEmployee));
             }
             return fullOrder.toString();
         }
         else {
             return emptyReceipt;
         }
+    }
+
+    private StringBuilder getTextToChequeText(Order order, boolean isEmployee) {
+        double sumCheque = getSumCheque(order);
+        int priceDelivery = order.getPriceDelivery();
+        StringBuilder text = new StringBuilder();
+        if (order.getObtainingMethod() != null) {
+            text.append("Способ доставки: ")
+                    .append(order.getObtainingMethod())
+                    .append("\n");
+        }
+        if (order.getPaymentMethod() != null) {
+            text.append("Способ оплаты: ")
+                    .append(order.getPaymentMethod())
+                    .append("\n");
+        }
+        text.append("\nСумма заказа: ")
+                .append(sumCheque)
+                .append("₽\n")
+                .append("Сумма доставки: ");
+        if (priceDelivery >= 0) {
+            double sumOrder = sumCheque + priceDelivery;
+            text.append(priceDelivery)
+                    .append("₽\n")
+                    .append("Итоговая сумма заказа: ")
+                    .append(sumOrder)
+                    .append("₽\n");
+        }
+        else {
+            if (isEmployee) {
+                text.append(priceNotSpecified).append("\n")
+                        .append("Итоговая сумма заказа: ")
+                        .append(priceNotCalculated)
+                        .append("\n");
+            }
+            else {
+                text.append(noCorrectPriceDelivery)
+                        .append("\nПредворительная сумма заказа без доставки: ")
+                        .append(sumCheque)
+                        .append("₽\n");
+            }
+        }
+        text.append("Комментарий: ")
+                .append(order.getComment())
+                .append("\n\n");
+        return text;
     }
 
     protected String getReceiptPositions(Order order) {

@@ -253,27 +253,27 @@ public class OrderModule extends AbstractModule {
         String text;
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getCards())) {
-            text = getChequeText(order, isEmployee);
+            text = nextToComment;
             order.setPaymentMethod(sourceText);
-            replyKeyboard = replyButtons.userOrderConfirmation();
+            replyKeyboard = replyButtons.userComment();
             orderService.save(order);
             if (isEmployee) {
-                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CONFIRMATION.getValue());
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_COMMENT.getValue());
             }
             else {
-                userStatesService.createAndSave(user, ClientEnum.DELIVERY_CONFIRMATION.getValue());
+                userStatesService.createAndSave(user, ClientEnum.ORDER_COMMENT.getValue());
             }
         }
         else if (sourceText.equals(replyButtons.getCash())) {
-            text = getChequeText(order, isEmployee);
+            text = nextToComment;
             order.setPaymentMethod(sourceText);
-            replyKeyboard = replyButtons.userOrderConfirmation();
+            replyKeyboard = replyButtons.userComment();
             orderService.save(order);
             if (isEmployee) {
-                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CONFIRMATION.getValue());
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_COMMENT.getValue());
             }
             else {
-                userStatesService.createAndSave(user, ClientEnum.DELIVERY_CONFIRMATION.getValue());
+                userStatesService.createAndSave(user, ClientEnum.ORDER_COMMENT.getValue());
             }
         }
         else if (sourceText.equals(replyButtons.getBack())) {
@@ -289,6 +289,41 @@ public class OrderModule extends AbstractModule {
         else {
             text = putButton;
             replyKeyboard = replyButtons.userOrderPayment();
+        }
+        return message(update, replyKeyboard, text);
+    }
+
+    public SendMessage comment (Update update, User user, String sourceText, boolean isEmployee) {
+        Order order = orderService.getOrderByUser(user);
+        String text;
+        ReplyKeyboard replyKeyboard;
+        if (sourceText.equals(replyButtons.getBack())) {
+            text = backToPaymentMethod;
+            replyKeyboard = replyButtons.userOrderPayment();
+            if (isEmployee) {
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_PAYMENT_METHOD.getValue());
+            }
+            else {
+                userStatesService.createAndSave(user, ClientEnum.DELIVERY_PAYMENT_METHOD.getValue());
+            }
+        }
+        else {
+            if (sourceText.length() <= 200) {
+                text = getChequeText(order, isEmployee);
+                replyKeyboard = replyButtons.userOrderConfirmation();
+                if (!sourceText.equals(replyButtons.getNext())) {
+                    order.setComment(sourceText);
+                    orderService.save(order);
+                }
+                if (isEmployee) {
+                    employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CONFIRMATION.getValue());
+                } else {
+                    userStatesService.createAndSave(user, ClientEnum.DELIVERY_CONFIRMATION.getValue());
+                }
+            } else {
+                text = errorComment;
+                replyKeyboard = replyButtons.userComment();
+            }
         }
         return message(update, replyKeyboard, text);
     }
@@ -314,9 +349,14 @@ public class OrderModule extends AbstractModule {
             orderStatesService.createAndSave(order, OrderEnum.ORDER_END_REGISTRATION.getValue());
         }
         else if (sourceText.equals(replyButtons.getBack())) {
-            text = backToPaymentMethod;
-            replyKeyboard = replyButtons.userOrderPayment();
-            userStatesService.createAndSave(user, ClientEnum.DELIVERY_PAYMENT_METHOD.getValue());
+            text = backToComment;
+            replyKeyboard = replyButtons.userComment();
+            if (isEmployee) {
+                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_COMMENT.getValue());
+            }
+            else {
+                userStatesService.createAndSave(user, ClientEnum.ORDER_COMMENT.getValue());
+            }
         }
         else {
             text = putButton;

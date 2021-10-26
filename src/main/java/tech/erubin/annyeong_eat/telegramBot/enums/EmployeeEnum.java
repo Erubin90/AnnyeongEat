@@ -8,6 +8,7 @@ public enum EmployeeEnum {
     OPERATOR_CHOOSING_TABLE("выбор стола"),
     OPERATOR_CAFE_MENU("выбор блюд"),
     OPERATOR_PAYMENT_METHOD("указание способа оплаты"),
+    OPERATOR_COMMENT("оставить комментарий"),
     OPERATOR_CONFIRMATION("подтверждение заказа"),
 
     ADMINISTRATOR_MAIN_MENU("главное меню Оператора"),
@@ -56,6 +57,9 @@ public enum EmployeeEnum {
                 }
                 else if (state.equals(OPERATOR_PAYMENT_METHOD.getValue())) {
                     return OPERATOR_PAYMENT_METHOD;
+                }
+                else if (state.equals(OPERATOR_COMMENT.getValue())) {
+                    return OPERATOR_COMMENT;
                 }
                 else if (state.equals(OPERATOR_CONFIRMATION.getValue())) {
                     return OPERATOR_CONFIRMATION;

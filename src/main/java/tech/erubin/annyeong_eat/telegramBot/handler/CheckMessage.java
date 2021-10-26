@@ -41,7 +41,7 @@ public class CheckMessage extends AbstractHandler {
         StringBuilder resultText = new StringBuilder();
         resultText.append(checkFormAddress(sourceText));
         resultText.append(checkNoCorrectCharAddress(sourceText));
-        resultText.append(checkLength(sourceText,5,100));
+        resultText.append(checkLength(sourceText,1,200));
         return checkCorrectlyAddress(resultText);
     }
 

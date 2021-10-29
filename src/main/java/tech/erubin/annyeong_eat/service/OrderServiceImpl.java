@@ -3,10 +3,11 @@ package tech.erubin.annyeong_eat.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import tech.erubin.annyeong_eat.entity.Cafe;
-import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.entity.Order;
+import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.repository.OrderRepository;
 import tech.erubin.annyeong_eat.service.serviceInterface.OrderService;
+import tech.erubin.annyeong_eat.telegramBot.enums.OrderStates;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,10 +31,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<Order> getOrdersInProgress(User user) {
+        return repository.getAllOrdersInProgress(user, OrderStates.ORDER_END_DELIVERY.getState(),
+                OrderStates.ORDER_CANCEL.getState());
+    }
+
+    @Override
     public Order getOrderByUserIdAndCafeId(User user, Cafe cafe) {
-        Integer orderId = repository.getOrderByUserIdAndCafeId(cafe, user);
-        if (orderId != null) {
-            return repository.getById(orderId);
+        Order order = repository.getOrderByUserIdAndCafeId(cafe, user);
+        if (order != null) {
+            return order;
         }
         else {
             return create(user, cafe);

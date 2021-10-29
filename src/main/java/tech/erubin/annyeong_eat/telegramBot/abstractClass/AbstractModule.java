@@ -15,7 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import tech.erubin.annyeong_eat.entity.*;
 import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
-import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.Departments;
 
 import java.util.List;
 
@@ -136,6 +136,12 @@ public abstract class AbstractModule {
     @Value("${message.buttonNotWork}")
     protected String buttonNotWork;
 
+    @Value("${mainMenu.message.checkOrder}")
+    protected String checkOrder;
+
+    @Value("${mainMenu.message.listOrder}")
+    protected String listOrder;
+
     @Value("${handler.message.addDish}")
     protected String addDish;
 
@@ -207,10 +213,10 @@ public abstract class AbstractModule {
         return new EditMessageReplyMarkup(chatId, messageId, null, inlineMarkup);
     }
 
-    protected void sendMessageDepartment(Order order, DepartmentEnum departmentEnum) {
-        List<Employee> listOperatorsInCafe = employeeService.getEmployeeByCafeIdAndDepartmenName(order.getCafeId(), departmentEnum.getValue());
+    protected void sendMessageDepartment(Order order, Departments departments) {
+        List<Employee> listOperatorsInCafe = employeeService.getEmployeeByCafeIdAndDepartmenName(order.getCafeId(), departments.getDepartment());
         if (listOperatorsInCafe != null) {
-            webHook.sendMessageDepartment(listOperatorsInCafe, departmentEnum, getChequeText(order, true), order);
+            webHook.sendMessageDepartment(listOperatorsInCafe, departments, getChequeText(order, true), order);
         }
     }
 

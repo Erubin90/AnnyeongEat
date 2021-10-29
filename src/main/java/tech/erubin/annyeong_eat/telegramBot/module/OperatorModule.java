@@ -14,9 +14,9 @@ import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
 import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
-import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.OrderEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.Departments;
+import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeStates;
+import tech.erubin.annyeong_eat.telegramBot.enums.OrderStates;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,7 +60,7 @@ public class OperatorModule extends AbstractModule {
                 text = choosingCafe;
                 List<String> cafeNames = cafeId.stream().map(Cafe::getName).collect(Collectors.toList());
                 replyKeyboard = replyButtons.userOrderCafe(cafeNames);
-                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CHOOSING_CAFE.getValue());
+                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CHOOSING_CAFE.getState());
             }
             else {
                 text = choosingTable;
@@ -69,8 +69,8 @@ public class OperatorModule extends AbstractModule {
                 order.setUsing(1);
                 replyKeyboard = replyButtons.operatorChoosingTable(cafe);
                 orderService.save(order);
-                orderStatesService.createAndSave(order, OrderEnum.ORDER_START_REGISTRATION.getValue());
-                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CHOOSING_TABLE.getValue());
+                orderStatesService.createAndSave(order, OrderStates.ORDER_START_REGISTRATION.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CHOOSING_TABLE.getState());
             }
         }
         else {
@@ -86,7 +86,7 @@ public class OperatorModule extends AbstractModule {
         String text;
         if (order != null) {
             OrderState orderState = order.getOrderStateList().get(order.getOrderStateList().size() - 1);
-            if (OrderEnum.GET.isOrderEditing(orderState)) {
+            if (OrderStates.isOrderEditing(orderState)) {
                 String address = map.get("Адрес");
                 String priceDelivery = map.get("Сумма доставки");
                 String paymentMethod = map.get("Способ оплаты");
@@ -114,7 +114,7 @@ public class OperatorModule extends AbstractModule {
                     builder.append("\n- комментарий");
                 }
                 orderService.save(order);
-                sendMessageDepartment(order, DepartmentEnum.OPERATOR);
+                sendMessageDepartment(order, Departments.OPERATOR);
                 text = builder.toString();
             }
             else {
@@ -170,7 +170,7 @@ public class OperatorModule extends AbstractModule {
                 order.setPriceDelivery(0);
                 order.setPhoneNumber("");
                 orderService.save(order);
-                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CAFE_MENU.getValue());
+                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CAFE_MENU.getState());
             }
             else {
                 text = noTable;
@@ -186,7 +186,7 @@ public class OperatorModule extends AbstractModule {
             order.setPriceDelivery(0);
             order.setPhoneNumber("");
             orderService.save(order);
-            employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CAFE_MENU.getValue());
+            employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CAFE_MENU.getState());
         }
         else if (soursText.equals(replyButtons.getBack())) {
             List<Cafe> cafeId = employeeService.getCafeByUserId(user);
@@ -194,12 +194,12 @@ public class OperatorModule extends AbstractModule {
                 text = choosingCafe;
                 List<String> cafeNames = cafeId.stream().map(Cafe::getName).collect(Collectors.toList());
                 replyKeyboard = replyButtons.userOrderCafe(cafeNames);
-                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_CHOOSING_CAFE.getValue());
+                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CHOOSING_CAFE.getState());
             }
             else {
                 text = operatorMainMenu;
                 replyKeyboard = replyButtons.operatorMainMenu();
-                employeeStateService.createAndSave(user, EmployeeEnum.OPERATOR_MAIN_MENU.getValue());
+                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_MAIN_MENU.getState());
             }
             orderService.save(order);
         }
@@ -211,8 +211,8 @@ public class OperatorModule extends AbstractModule {
     }
 
     public BotApiMethod<?> callbackOperatorMainMenu(CallbackQuery callback, Order order, Dish dish, String tag) {
-        OrderEnum orderEnum = getOrderEnum(order);
-        switch (orderEnum) {
+        OrderStates orderStates = getOrderEnum(order);
+        switch (orderStates) {
             case ORDER_END_REGISTRATION:
                 return callbackOrderAndRegistration(callback, order, tag);
             case ORDER_EDITING:
@@ -226,10 +226,10 @@ public class OperatorModule extends AbstractModule {
         }
     }
 
-    private OrderEnum getOrderEnum(Order order) {
+    private OrderStates getOrderEnum(Order order) {
         int size = order.getOrderStateList().size() - 1;
         OrderState orderState = order.getOrderStateList().get(size);
-        return OrderEnum.GET.orderState(orderState);
+        return OrderStates.orderState(orderState);
     }
 
     private BotApiMethod<?> callbackOrderAndRegistration(CallbackQuery callback, Order order, String tag) {
@@ -238,13 +238,13 @@ public class OperatorModule extends AbstractModule {
         InlineKeyboardMarkup inlineMarkup;
         switch (tag) {
             case "o+":
-                orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
+                orderState = orderStatesService.create(order, OrderStates.ORDER_ACCEPT.getState());
                 orderStatesService.save(orderState);
                 inlineMarkup = inlineButtons.orderAcceptButtons(order);
                 botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
                 break;
             case "o-":
-                orderState = orderStatesService.create(order, OrderEnum.ORDER_CANCEL.getValue());
+                orderState = orderStatesService.create(order, OrderStates.ORDER_CANCEL.getState());
                 orderStatesService.save(orderState);
                 inlineMarkup = inlineButtons.orderCancelButtons();
                 botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
@@ -255,7 +255,7 @@ public class OperatorModule extends AbstractModule {
                 botApiMethod = editMessageText(callback, text, inlineMarkup);
                 break;
             case "oe":
-                orderState = orderStatesService.create(order, OrderEnum.ORDER_EDITING.getValue());
+                orderState = orderStatesService.create(order, OrderStates.ORDER_EDITING.getState());
                 orderStatesService.save(orderState);
                 inlineMarkup = inlineButtons.orderEditButtons(order);
                 botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
@@ -284,9 +284,9 @@ public class OperatorModule extends AbstractModule {
                                     obtainingMethod.equals(replyButtons.getCourier()))));
                     boolean correctFillOrder = priceDelivery > -1 && isCorrectAddressAndObtainingMethod;
                     if (correctFillOrder) {
-                        orderState = orderStatesService.create(order, OrderEnum.ORDER_ACCEPT.getValue());
+                        orderState = orderStatesService.create(order, OrderStates.ORDER_ACCEPT.getState());
                         inlineMarkup = inlineButtons.orderAcceptButtons(order);
-                        sendMessageDepartment(order, DepartmentEnum.COURIER);
+                        sendMessageDepartment(order, Departments.COURIER);
                         botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
                         orderStatesService.save(orderState);
                     }
@@ -296,7 +296,7 @@ public class OperatorModule extends AbstractModule {
                     }
                     break;
                 case "o-":
-                    orderState = orderStatesService.create(order, OrderEnum.ORDER_CANCEL.getValue());
+                    orderState = orderStatesService.create(order, OrderStates.ORDER_CANCEL.getState());
                     inlineMarkup = inlineButtons.orderCancelButtons();
                     botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
                     orderStatesService.save(orderState);

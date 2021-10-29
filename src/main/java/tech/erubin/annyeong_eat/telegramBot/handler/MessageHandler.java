@@ -10,9 +10,9 @@ import tech.erubin.annyeong_eat.entity.ClientState;
 import tech.erubin.annyeong_eat.service.EmployeeStateServiceImpl;
 import tech.erubin.annyeong_eat.service.UserServiceImpl;
 import tech.erubin.annyeong_eat.service.ClientStatesServiceImpl;
-import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.ClientStates;
+import tech.erubin.annyeong_eat.telegramBot.enums.Departments;
+import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeStates;
 import tech.erubin.annyeong_eat.telegramBot.module.*;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
 
@@ -31,14 +31,14 @@ public class MessageHandler extends AbstractHandler {
     public BotApiMethod<?> handleUpdate(Update update) {
         String sourceText = update.getMessage().getText();
         User user = getUser(update);
-        DepartmentEnum department = DepartmentEnum.GET.department(user);
-        if (department != DepartmentEnum.NO_CORRECT_DEPARTMENT) {
-            boolean isEmployee = department != DepartmentEnum.CLIENT;
+        Departments department = Departments.department(user);
+        if (department != Departments.UNKNOWN) {
+            boolean isEmployee = department != Departments.CLIENT;
             if (isEmployee) {
                 EmployeeState employeeState = employeeStateService.getState(user);
-                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, employeeState);
-                if (employeeEnum != EmployeeEnum.NO_CORRECT_STATE) {
-                    return employeeActions(update, user, department, employeeEnum, sourceText, isEmployee);
+                EmployeeStates employeeStates = EmployeeStates.employeeState(employeeState);
+                if (employeeStates != EmployeeStates.UNKNOWN) {
+                    return employeeActions(update, user, department, employeeStates, sourceText, isEmployee);
                 }
                 else {
                     return null;
@@ -46,9 +46,9 @@ public class MessageHandler extends AbstractHandler {
             }
             else {
                 ClientState clientState = clientStateService.getState(user);
-                ClientEnum clientEnum = ClientEnum.GET.userState(clientState);
-                if (clientEnum != ClientEnum.NO_CORRECT_STATE) {
-                    return clientActions(update, user, clientEnum, sourceText, isEmployee);
+                ClientStates clientStates = ClientStates.userState(clientState);
+                if (clientStates != ClientStates.UNKNOWN) {
+                    return clientActions(update, user, clientStates, sourceText, isEmployee);
                 }
                 else {
                     return null;
@@ -60,10 +60,10 @@ public class MessageHandler extends AbstractHandler {
         }
     }
 
-    private BotApiMethod<?> employeeActions(Update update, User user, DepartmentEnum department, EmployeeEnum employeeEnum, String sourceText, boolean isEmployee) {
+    private BotApiMethod<?> employeeActions(Update update, User user, Departments department, EmployeeStates employeeStates, String sourceText, boolean isEmployee) {
         switch (department){
             case OPERATOR:
-                switch (employeeEnum) {
+                switch (employeeStates) {
                     case OPERATOR_MAIN_MENU:
                         return operatorModule.mainMenu(update, user, sourceText);
                     case OPERATOR_CHOOSING_CAFE:
@@ -86,12 +86,12 @@ public class MessageHandler extends AbstractHandler {
         }
     }
 
-    private BotApiMethod<?> clientActions(Update update, User user, ClientEnum clientEnum, String sourceText, boolean isEmployee) {
-        switch (clientEnum) {
+    private BotApiMethod<?> clientActions(Update update, User user, ClientStates clientStates, String sourceText, boolean isEmployee) {
+        switch (clientStates) {
             case MAIN_MENU:
                 return mainMenuModule.mainMenu(update, user, sourceText);
             case ORDER_CHECK:
-                return mainMenuModule.orderChek(update, user, sourceText);
+                return mainMenuModule.orderCheck(update, user, sourceText);
             case HELP:
                 return mainMenuModule.help(update, user, sourceText);
             case PROFILE:

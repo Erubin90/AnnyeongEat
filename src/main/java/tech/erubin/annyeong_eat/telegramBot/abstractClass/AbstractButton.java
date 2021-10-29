@@ -33,6 +33,9 @@ public abstract class AbstractButton {
     @Value("${button.sub}")
     protected String sub;
 
+    @Value("${mainMenu.button.historyOrder}")
+    protected String historyOrder;
+
     @Value("${order.button.cash}")
     protected String cash;
 

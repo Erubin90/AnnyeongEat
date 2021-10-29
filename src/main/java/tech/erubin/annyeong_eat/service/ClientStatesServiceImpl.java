@@ -6,7 +6,7 @@ import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.entity.ClientState;
 import tech.erubin.annyeong_eat.repository.ClientStatesRepository;
 import tech.erubin.annyeong_eat.service.serviceInterface.ClientStateService;
-import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.ClientStates;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class ClientStatesServiceImpl implements ClientStateService {
             return clientStateList.get(clientStateList.size() - 1);
         }
         else {
-            return create(user, ClientEnum.REGISTRATION_START.getValue());
+            return create(user, ClientStates.REGISTRATION_START.getState());
         }
     }
 

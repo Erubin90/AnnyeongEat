@@ -6,7 +6,7 @@ import tech.erubin.annyeong_eat.entity.EmployeeState;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.repository.EmployeeStatesRepository;
 import tech.erubin.annyeong_eat.service.serviceInterface.EmployeeStateService;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeStates;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class EmployeeStateServiceImpl implements EmployeeStateService {
             return employeeStateList.get(employeeStateList.size() - 1);
         }
         else {
-            return create(user, EmployeeEnum.OPERATOR_MAIN_MENU.getValue());
+            return create(user, EmployeeStates.OPERATOR_MAIN_MENU.getState());
         }
     }
 

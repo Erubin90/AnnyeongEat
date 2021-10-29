@@ -17,7 +17,7 @@ import tech.erubin.annyeong_eat.entity.Order;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.service.EmployeeServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
-import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.Departments;
 import tech.erubin.annyeong_eat.telegramBot.handler.CallbackQueryHandler;
 import tech.erubin.annyeong_eat.telegramBot.handler.MessageHandler;
 
@@ -67,7 +67,7 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
             e.printStackTrace();
             String errorText = e.getMessage() != null? e.getMessage() : "Произошла ошибка но текс ошибки не выявлен. Посмотри логи";
             List<Employee> developerList = departmentService.getDeveloperList();
-            sendMessageDepartment(developerList, DepartmentEnum.DEVELOPER, errorText, null);
+            sendMessageDepartment(developerList, Departments.DEVELOPER, errorText, null);
         }
         return botApiMethod;
     }
@@ -116,12 +116,12 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
         }
     }
 
-    public void sendMessageDepartment(List<Employee> employeeList, DepartmentEnum departmentEnum,
+    public void sendMessageDepartment(List<Employee> employeeList, Departments departments,
                                       String text, Order order) {
         List<User> userList = employeeList.stream()
                 .map(Employee::getUserId)
                 .collect(Collectors.toList());
-        InlineKeyboardMarkup inlineKeyboardMarkup = inlineButtons.employeeButtons(departmentEnum, order);
+        InlineKeyboardMarkup inlineKeyboardMarkup = inlineButtons.employeeButtons(departments, order);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setText(text);
         try {
@@ -130,6 +130,14 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
                 sendMessage.setReplyMarkup(inlineKeyboardMarkup);
                 execute(sendMessage);
             }
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessage(SendMessage sendMessage) {
+        try {
+            execute(sendMessage);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

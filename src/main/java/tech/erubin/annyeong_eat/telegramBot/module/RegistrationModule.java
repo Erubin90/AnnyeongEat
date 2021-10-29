@@ -11,7 +11,7 @@ import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
-import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.ClientStates;
 import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
 
 import java.util.Set;
@@ -37,7 +37,7 @@ public class RegistrationModule extends AbstractModule {
         Set<String> allCityName = cafeService.getAllCity();
         String text = startClientRegistration + "\n" + errorNameCity;
         ReplyKeyboard replyKeyboard = replyButtons.userRegistrationCity(allCityName);
-        userStatesService.createAndSave(user, ClientEnum.REGISTRATION_CITY.getValue());
+        userStatesService.createAndSave(user, ClientStates.REGISTRATION_CITY.getState());
         return message(update,  replyKeyboard, text);
     }
 
@@ -50,7 +50,7 @@ public class RegistrationModule extends AbstractModule {
             user.setCity(sourceText);
             replyKeyboard = new ReplyKeyboardRemove(true);
             userService.save(user);
-            userStatesService.createAndSave(user, ClientEnum.REGISTRATION_NAME.getValue());
+            userStatesService.createAndSave(user, ClientStates.REGISTRATION_NAME.getState());
         }
         else {
             text = errorNameCity;
@@ -66,7 +66,7 @@ public class RegistrationModule extends AbstractModule {
             text = nameNoError;
             user.setName(sourceText);
             userService.save(user);
-            userStatesService.createAndSave(user, ClientEnum.REGISTRATION_SURNAME.getValue());
+            userStatesService.createAndSave(user, ClientStates.REGISTRATION_SURNAME.getState());
         }
         return message(update, replyKeyboard, text);
     }
@@ -78,7 +78,7 @@ public class RegistrationModule extends AbstractModule {
             text = surnameNoError;
             user.setSurname(sourceText);
             userService.save(user);
-            userStatesService.createAndSave(user, ClientEnum.REGISTRATION_PHONE_NUMBERS.getValue());
+            userStatesService.createAndSave(user, ClientStates.REGISTRATION_PHONE_NUMBERS.getState());
         }
         return message(update, replyKeyboard, text);
     }
@@ -95,7 +95,7 @@ public class RegistrationModule extends AbstractModule {
             user.setPhoneNumber(sourceText);
             replyKeyboard = replyButtons.userMainMenu();
             userService.save(user);
-            userStatesService.create(user, ClientEnum.MAIN_MENU.getValue());
+            userStatesService.create(user, ClientStates.MAIN_MENU.getState());
         }
         return message(update, replyKeyboard, text);
     }

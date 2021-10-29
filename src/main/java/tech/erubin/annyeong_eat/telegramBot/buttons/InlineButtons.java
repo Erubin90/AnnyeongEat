@@ -6,8 +6,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import tech.erubin.annyeong_eat.entity.*;
 import tech.erubin.annyeong_eat.service.EmployeeServiceImpl;
+import tech.erubin.annyeong_eat.service.OrderServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractButton;
-import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.Departments;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,27 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class InlineButtons extends AbstractButton {
     private final EmployeeServiceImpl employeeService;
+    private final OrderServiceImpl orderService;
+
+    public InlineKeyboardMarkup checkOrderMainMenu(User user) {
+        List<Order> orderList = orderService.getOrdersInProgress(user);
+//        List<Order> orderList = user.getOrderList()
+//                .stream()
+//                .map(x -> x.getOrderStateList().get(x.getOrderStateList().size() - 1))
+//                .filter(OrderStates::isOrderNoEndDelivery)
+//                .map(OrderState::getOrderId)
+//                .collect(Collectors.toList());
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        for (Order order: orderList) {
+            OrderState orderState = order.getOrderStateList().get(order.getOrderStateList().size() - 1);
+            List<InlineKeyboardButton> line = new ArrayList<>();
+            line.add(getInlineButtons(order.getOrderName(), order.getId(), order.getOrderName()));
+            line.add(getInlineButtons(orderState.getState(), order.getId(), tagInfo));
+            rows.add(line);
+        }
+        rows.add(List.of(getInlineButtons(restart, 1, restart)));
+        return new InlineKeyboardMarkup(rows);
+    }
 
     public InlineKeyboardMarkup clientCheque(ChequeDish chequeDish) {
         String count;
@@ -52,7 +74,7 @@ public class InlineButtons extends AbstractButton {
         return new InlineKeyboardMarkup(rows);
     }
 
-    public InlineKeyboardMarkup employeeButtons(DepartmentEnum department, Order order) {
+    public InlineKeyboardMarkup employeeButtons(Departments department, Order order) {
         InlineKeyboardMarkup inlineMarkup;
         switch (department) {
             case OPERATOR:
@@ -137,7 +159,7 @@ public class InlineButtons extends AbstractButton {
     public InlineKeyboardMarkup orderAcceptButtons(Order order) {
         List<List<InlineKeyboardButton>> buttonNames = new ArrayList<>();
         buttonNames.add(List.of(getInlineButtons(acceptState, 0, tagInfo)));
-        if (DepartmentEnum.GET.isCourier(order.getObtainingMethod())) {
+        if (Departments.isCourier(order.getObtainingMethod())) {
             List<User> userList = employeeService.getCourierIsFree(order.getCafeId());
             for (User user : userList) {
                 buttonNames.add(List.of(getInlineButtons(user.getName(), order.getId(), Integer.toString(user.getId()))));

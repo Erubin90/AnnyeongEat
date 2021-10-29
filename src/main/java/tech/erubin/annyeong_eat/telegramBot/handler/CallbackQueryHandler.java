@@ -7,10 +7,11 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import tech.erubin.annyeong_eat.entity.*;
 import tech.erubin.annyeong_eat.service.*;
-import tech.erubin.annyeong_eat.telegramBot.enums.ClientEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.ClientStates;
+import tech.erubin.annyeong_eat.telegramBot.enums.Departments;
+import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeStates;
 import tech.erubin.annyeong_eat.telegramBot.module.CourierModule;
+import tech.erubin.annyeong_eat.telegramBot.module.MainMenuModule;
 import tech.erubin.annyeong_eat.telegramBot.module.OperatorModule;
 import tech.erubin.annyeong_eat.telegramBot.module.OrderModule;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
@@ -18,6 +19,7 @@ import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractHandler;
 @Component
 @AllArgsConstructor
 public class CallbackQueryHandler extends AbstractHandler {
+    private final MainMenuModule mainMenuModule;
     private final OrderModule orderModule;
     private final OperatorModule operatorModule;
     private final CourierModule courierModule;
@@ -36,25 +38,25 @@ public class CallbackQueryHandler extends AbstractHandler {
         Dish dish = dishService.getDishByName(idList[1]);
         User user = clientService.getUser(userId);
         String tag = idList[2];
-        DepartmentEnum department = DepartmentEnum.GET.department(user);
+        Departments department = Departments.department(user);
         if (tag.equals(tagInfo)) {
             return answerCallbackQuery(callback, messageInfo);
         }
-        if (department != DepartmentEnum.NO_CORRECT_DEPARTMENT) {
-            if (department != DepartmentEnum.CLIENT) {
+        if (department != Departments.UNKNOWN) {
+            if (department != Departments.CLIENT) {
                 EmployeeState employeeState = employeeStateService.getState(user);
-                EmployeeEnum employeeEnum = EmployeeEnum.GET.employeeState(department, employeeState);
-                if (employeeEnum != EmployeeEnum.NO_CORRECT_STATE) {
-                    return employeeCallback(callback, order, dish, employeeEnum, tag);
+                EmployeeStates employeeStates = EmployeeStates.employeeState(employeeState);
+                if (employeeStates != EmployeeStates.UNKNOWN) {
+                    return employeeCallback(callback, order, dish, employeeStates, tag);
                 } else {
                     return null;
                 }
             }
             else {
                 ClientState clientState = clientStateService.getState(user);
-                ClientEnum clientEnum = ClientEnum.GET.userState(clientState);
-                if (clientEnum != ClientEnum.NO_CORRECT_STATE) {
-                    return clientCallback(callback, order, dish, clientEnum, tag);
+                ClientStates clientStates = ClientStates.userState(clientState);
+                if (clientStates != ClientStates.UNKNOWN) {
+                    return clientCallback(callback, user, order, dish, clientStates, tag);
                 } else {
                     return null;
                 }
@@ -66,8 +68,8 @@ public class CallbackQueryHandler extends AbstractHandler {
     }
 
     private BotApiMethod<?> employeeCallback(CallbackQuery callback, Order order, Dish dish,
-                                             EmployeeEnum employeeEnum, String tag) {
-        switch (employeeEnum) {
+                                             EmployeeStates employeeStates, String tag) {
+        switch (employeeStates) {
             case OPERATOR_MAIN_MENU:
                 return operatorModule.callbackOperatorMainMenu(callback, order, dish, tag);
             case OPERATOR_CAFE_MENU:
@@ -79,11 +81,13 @@ public class CallbackQueryHandler extends AbstractHandler {
         }
     }
 
-    private BotApiMethod<?> clientCallback(CallbackQuery callback, Order order, Dish dish,
-                                           ClientEnum clientEnum, String tag) {
-        switch (clientEnum) {
+    private BotApiMethod<?> clientCallback(CallbackQuery callback, User user, Order order, Dish dish,
+                                           ClientStates clientStates, String tag) {
+        switch (clientStates) {
             case ORDER_CAFE_MENU:
                 return orderModule.callbackOrderCafeMenu(callback, order, dish, tag);
+            case ORDER_CHECK:
+                return mainMenuModule.callbackOrderCheck(callback, user, tag);
             default:
                 return answerCallbackQuery(callback, buttonNotWork);
         }

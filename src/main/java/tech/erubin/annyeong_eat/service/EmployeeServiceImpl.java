@@ -8,8 +8,8 @@ import tech.erubin.annyeong_eat.entity.EmployeeState;
 import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.repository.EmployeeRepository;
 import tech.erubin.annyeong_eat.service.serviceInterface.EmployeeService;
-import tech.erubin.annyeong_eat.telegramBot.enums.DepartmentEnum;
-import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeEnum;
+import tech.erubin.annyeong_eat.telegramBot.enums.Departments;
+import tech.erubin.annyeong_eat.telegramBot.enums.EmployeeStates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +27,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<User> getCourierIsFree(Cafe cafeId) {
-        return getEmployeeByCafeIdAndDepartmenName(cafeId, DepartmentEnum.COURIER.getValue())
+        return getEmployeeByCafeIdAndDepartmenName(cafeId, Departments.COURIER.getDepartment())
                 .stream()
                 .map(Employee::getUserId)
                 .map(User::getEmployeeStateList)
                 .map(x -> x.get(x.size() - 1))
-                .filter(x -> EmployeeEnum.GET.isCourierFree(x.getState()))
+                .filter(EmployeeStates::isCourierFree)
                 .map(EmployeeState::getUserId)
                 .collect(Collectors.toList());
     }

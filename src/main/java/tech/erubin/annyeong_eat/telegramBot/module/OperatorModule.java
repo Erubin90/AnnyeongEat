@@ -43,18 +43,19 @@ public class OperatorModule extends AbstractModule {
         this.dishService = dishService;
     }
 
-    public SendMessage mainMenu(Update update, User user, String soursText) {
+    public SendMessage mainMenu(Update update, User user, String sourceText) {
         String text;
         ReplyKeyboard replyKeyboard;
-        if (soursText.indexOf("Заказ:") == 0) {
-            text = getTextEditingOrder(soursText);
+        String[] textArray = sourceText.split("\n");
+        if (textArray.length > 1 || textArray[0].matches("((Заказ)|З|з):.+")) {
+            text = getTextEditingOrder(textArray);
             replyKeyboard = replyButtons.operatorMainMenu();
         }
-        else if (soursText.equals(replyButtons.getForm())) {
+        else if (sourceText.equals(replyButtons.getForm())) {
             text = getForm();
             replyKeyboard = replyButtons.operatorMainMenu();
         }
-        else if (soursText.equals(replyButtons.getCreateOrder())) {
+        else if (sourceText.equals(replyButtons.getCreateOrder())) {
             List<Cafe> cafeId = employeeService.getCafeByUserId(user);
             if (cafeId.size() > 1) {
                 text = choosingCafe;
@@ -69,7 +70,7 @@ public class OperatorModule extends AbstractModule {
                 order.setUsing(1);
                 replyKeyboard = replyButtons.operatorChoosingTable(cafe);
                 orderService.save(order);
-                orderStatesService.createAndSave(order, OrderStates.ORDER_START_REGISTRATION.getState());
+                orderStatesService.createAndSave(order, OrderStates.START_REGISTRATION.getState());
                 employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CHOOSING_TABLE.getState());
             }
         }
@@ -80,45 +81,50 @@ public class OperatorModule extends AbstractModule {
         return message(update, replyKeyboard, text);
     }
 
-    private String getTextEditingOrder(String sourceText) {
-        Map<String, String> map = getMap(sourceText);
-        Order order = orderService.getOrderByOrderName(map.get("Заказ"));
+    private String getTextEditingOrder(String[] textArray) {
+        Map<String, String> map = getMap(textArray);
+        System.out.println("map\n" + map);
+        Order order = orderService.getOrderByOrderName(map.get("з"));
         String text;
         if (order != null) {
             OrderState orderState = order.getOrderStateList().get(order.getOrderStateList().size() - 1);
-            if (OrderStates.isOrderEditing(orderState)) {
-                String address = map.get("Адрес");
-                String priceDelivery = map.get("Сумма доставки");
-                String paymentMethod = map.get("Способ оплаты");
-                String comment = map.get("Комментарий");
+            if (map.size() > 1) {
+                if (OrderStates.isOrderEditing(orderState)) {
+                    String address = map.get("а");
+                    String priceDelivery = map.get("д");
+                    String paymentMethod = map.get("о");
+                    String comment = map.get("к");
 
-                StringBuilder builder = new StringBuilder();
-                builder.append("В заказе \"")
-                        .append(order.getOrderName())
-                        .append("\" изменен(ы):");
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("В заказе \"")
+                            .append(order.getOrderName())
+                            .append("\" изменен(ы):");
 
-                if ((address != null) && !address.isBlank()) {
-                    order.setAddress(address);
-                    builder.append("\n- адрес");
+                    if ((address != null) && !address.isBlank()) {
+                        order.setAddress(address);
+                        builder.append("\n- адрес");
+                    }
+                    if ((priceDelivery != null) && priceDelivery.matches("\\d{1,4}")) {
+                        order.setPriceDelivery(Integer.parseInt(priceDelivery));
+                        builder.append("\n- сумма доставки");
+                    }
+                    if ((paymentMethod != null) && !paymentMethod.isBlank()) {
+                        order.setPaymentMethod(paymentMethod);
+                        builder.append("\n- способ оплаты");
+                    }
+                    if ((comment != null) && !comment.isBlank()) {
+                        order.setComment(comment);
+                        builder.append("\n- комментарий");
+                    }
+                    orderService.save(order);
+                    text = builder.toString();
                 }
-                if ((priceDelivery != null) && priceDelivery.matches("\\d{1,4}")) {
-                    order.setPriceDelivery(Integer.parseInt(priceDelivery));
-                    builder.append("\n- сумма доставки");
+                else {
+                    text = noEditingOrder;
                 }
-                if ((paymentMethod != null) && !paymentMethod.isBlank()) {
-                    order.setPaymentMethod(paymentMethod);
-                    builder.append("\n- способ оплаты");
-                }
-                if ((comment != null) && !comment.isBlank()) {
-                    order.setComment(comment);
-                    builder.append("\n- комментарий");
-                }
-                orderService.save(order);
-                sendMessageDepartment(order, Departments.OPERATOR);
-                text = builder.toString();
             }
             else {
-                text = noEditingOrder;
+                text = "Форма редактирования заполнена не полностью";
             }
         }
         else {
@@ -127,19 +133,21 @@ public class OperatorModule extends AbstractModule {
         return text;
     }
 
-    private Map<String, String> getMap (String sourceText) {
-        String[] textArray = sourceText.split("\n");
+    private Map<String, String> getMap (String[] textArray) {
         Map<String, String> map = new HashMap<>();
         for (String rows : textArray) {
             String[] kayValue = rows.split(":[ ]*");
             if (kayValue.length > 1) {
-                if (rows.matches("Заказ:.+") ||
-                        rows.matches("Адрес:.+") ||
-                        rows.matches("Сумма доставки:.+") ||
-                        rows.matches("Способ оплаты:.+") ||
-                        rows.matches("Комментарий:.+")) {
-                    map.put(kayValue[0], kayValue[1]);
-                }
+                if (rows.matches("((Заказ)|З|з):.+"))
+                    map.put("з", kayValue[1]);
+                else if (rows.matches("((Адрес)|А|а):.+"))
+                    map.put("а", kayValue[1]);
+                else if (rows.matches("((Сумма доставки)|Д|д):.+"))
+                    map.put("д", kayValue[1]);
+                else if (rows.matches("((Способ оплаты)|О|о):.+"))
+                    map.put("о", kayValue[1]);
+                else if (rows.matches("((Комментарий)|К|к):.+"))
+                    map.put("к", kayValue[1]);
             }
         }
         return map;
@@ -213,13 +221,17 @@ public class OperatorModule extends AbstractModule {
     public BotApiMethod<?> callbackOperatorMainMenu(CallbackQuery callback, Order order, Dish dish, String tag) {
         OrderStates orderStates = getOrderEnum(order);
         switch (orderStates) {
-            case ORDER_END_REGISTRATION:
+            case END_REGISTRATION:
                 return callbackOrderAndRegistration(callback, order, tag);
-            case ORDER_EDITING:
+            case EDITING:
                 return callbackOrderEditing(callback, order, dish, tag);
-            case ORDER_ACCEPT:
-                return answerCallbackQuery(callback, inlineButtons.getAccept());
-            case ORDER_CANCEL:
+            case ACCEPT:
+                return callbackOrderAccept(callback, order, tag);
+            case START_DELIVERY:
+                return callbackOrderStartDelivery(callback, order, tag);
+            case END_DELIVERY:
+                return answerCallbackQuery(callback, inlineButtons.getOrderDelivered());
+            case CANCEL:
                 return answerCallbackQuery(callback, inlineButtons.getCancel());
             default:
                 return answerCallbackQuery(callback, notWork);
@@ -237,14 +249,8 @@ public class OperatorModule extends AbstractModule {
         OrderState orderState;
         InlineKeyboardMarkup inlineMarkup;
         switch (tag) {
-            case "o+":
-                orderState = orderStatesService.create(order, OrderStates.ORDER_ACCEPT.getState());
-                orderStatesService.save(orderState);
-                inlineMarkup = inlineButtons.orderAcceptButtons(order);
-                botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
-                break;
             case "o-":
-                orderState = orderStatesService.create(order, OrderStates.ORDER_CANCEL.getState());
+                orderState = orderStatesService.create(order, OrderStates.CANCEL.getState());
                 orderStatesService.save(orderState);
                 inlineMarkup = inlineButtons.orderCancelButtons();
                 botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
@@ -255,7 +261,7 @@ public class OperatorModule extends AbstractModule {
                 botApiMethod = editMessageText(callback, text, inlineMarkup);
                 break;
             case "oe":
-                orderState = orderStatesService.create(order, OrderStates.ORDER_EDITING.getState());
+                orderState = orderStatesService.create(order, OrderStates.EDITING.getState());
                 orderStatesService.save(orderState);
                 inlineMarkup = inlineButtons.orderEditButtons(order);
                 botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
@@ -284,7 +290,7 @@ public class OperatorModule extends AbstractModule {
                                     obtainingMethod.equals(replyButtons.getCourier()))));
                     boolean correctFillOrder = priceDelivery > -1 && isCorrectAddressAndObtainingMethod;
                     if (correctFillOrder) {
-                        orderState = orderStatesService.create(order, OrderStates.ORDER_ACCEPT.getState());
+                        orderState = orderStatesService.create(order, OrderStates.ACCEPT.getState());
                         inlineMarkup = inlineButtons.orderAcceptButtons(order);
                         sendMessageDepartment(order, Departments.COURIER);
                         botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
@@ -296,7 +302,7 @@ public class OperatorModule extends AbstractModule {
                     }
                     break;
                 case "o-":
-                    orderState = orderStatesService.create(order, OrderStates.ORDER_CANCEL.getState());
+                    orderState = orderStatesService.create(order, OrderStates.CANCEL.getState());
                     inlineMarkup = inlineButtons.orderCancelButtons();
                     botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
                     orderStatesService.save(orderState);
@@ -398,6 +404,41 @@ public class OperatorModule extends AbstractModule {
         }
         else {
             botApiMethod = answerCallbackQuery(callback, error);
+        }
+        return botApiMethod;
+    }
+
+    private BotApiMethod<?> callbackOrderAccept(CallbackQuery callback, Order order, String tag) {
+        BotApiMethod<?> botApiMethod;
+        InlineKeyboardMarkup inlineMarkup;
+        if (tag.matches("c\\d+")) {
+            System.out.println(tag.substring(1));
+            order.setDeliveryId(Integer.parseInt(tag.substring(1)));
+            orderService.save(order);
+            inlineMarkup = inlineButtons.orderStartDelivery(order);
+            botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
+        }
+        else if (tag.equals("tds")) {
+            inlineMarkup = inlineButtons.orderStartDelivery(order);
+            botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
+            orderStatesService.createAndSave(order ,OrderStates.START_DELIVERY.getState());
+        }
+        else {
+            botApiMethod = answerCallbackQuery(callback, putButton);
+        }
+        return  botApiMethod;
+    }
+
+    private BotApiMethod<?> callbackOrderStartDelivery(CallbackQuery callback, Order order, String tag) {
+        BotApiMethod<?> botApiMethod;
+        InlineKeyboardMarkup inlineMarkup;
+        if (tag.equals("end")) {
+            inlineMarkup = inlineButtons.orderEndDelivery();
+            botApiMethod = editMessageReplyMarkup(callback, inlineMarkup);
+            orderStatesService.createAndSave(order, OrderStates.END_DELIVERY.getState());
+        }
+        else {
+            botApiMethod = answerCallbackQuery(callback, putButton);
         }
         return botApiMethod;
     }

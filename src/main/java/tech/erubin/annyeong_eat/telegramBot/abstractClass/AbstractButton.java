@@ -93,6 +93,21 @@ public abstract class AbstractButton {
     @Value("${employee.button.restart}")
     protected String restart;
 
+    @Value("${employee.button.transferOrderCourier}")
+    protected String transferOrderCourier;
+
+    @Value("${employee.button.transferOrderTaxi}")
+    protected String transferOrderTaxi;
+
+    @Value("${employee.button.taxiDeliveryOrder}")
+    protected String taxiDeliveryOrder;
+
+    @Value("${employee.button.courierDeliveryOrder}")
+    protected String courierDeliveryOrder;
+
+    @Value("${employee.button.orderDelivered}")
+    protected String orderDelivered;
+
     @Value("${button.tag.info}")
     protected String tagInfo;
 

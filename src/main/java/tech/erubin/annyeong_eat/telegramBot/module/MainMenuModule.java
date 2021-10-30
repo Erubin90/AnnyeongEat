@@ -37,7 +37,7 @@ public class MainMenuModule extends AbstractModule {
         this.cafeService = cafeService;
     }
 
-    public BotApiMethod<?> mainMenu(Update update, User user, String sourceText) {
+    public SendMessage mainMenu(Update update, User user, String sourceText) {
         String text;
         ReplyKeyboard replyKeyboard;
         if (sourceText.equals(replyButtons.getCreateOrder())) {
@@ -127,11 +127,11 @@ public class MainMenuModule extends AbstractModule {
                 }
             }
         }
-        return "Имя - " + user.getName() + "\n" +
-                "Фамилия - " + user.getSurname() + "\n" +
-                "Номер - " + user.getPhoneNumber() + "\n" +
-                "Город - " + user.getCity() + "\n" +
-                "Количество заказов - " + countOrder;
+        return "Имя - " + user.getName() +
+                "\nФамилия - " + user.getSurname() +
+                "\nНомер - " + user.getPhoneNumber() +
+                "\nГород - " + user.getCity() +
+                "\nКоличество заказов - " + countOrder;
     }
 
     public BotApiMethod<?> callbackOrderCheck(CallbackQuery callback, User user, String tag) {

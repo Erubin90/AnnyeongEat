@@ -12,9 +12,14 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repository;
 
     @Override
-    public User getUser(String userId) {
+    public User getOrCreateUser(String userId) {
         User user = repository.findByTelegramUserId(userId);
         return user != null ? user : create(userId);
+    }
+
+    @Override
+    public User getUser(int id) {
+        return repository.getById(id);
     }
 
     @Override

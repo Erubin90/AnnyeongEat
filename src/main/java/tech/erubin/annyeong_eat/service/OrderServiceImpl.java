@@ -32,8 +32,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> getOrdersInProgress(User user) {
-        return repository.getAllOrdersInProgress(user, OrderStates.ORDER_END_DELIVERY.getState(),
-                OrderStates.ORDER_CANCEL.getState());
+        return repository.getAllOrdersInProgress(user, OrderStates.END_DELIVERY.getState(),
+                OrderStates.CANCEL.getState());
     }
 
     @Override

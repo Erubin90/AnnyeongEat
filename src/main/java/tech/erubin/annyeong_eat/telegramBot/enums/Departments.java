@@ -15,6 +15,7 @@ public enum Departments {
     OPERATOR("Оператор"),
     ADMINISTRATOR("Администратор"),
     COURIER("Курьер"),
+    TAXI("Такси"),
     DEVELOPER("Разработчик"),
     CLIENT("Клиент"),
     UNKNOWN(Strings.EMPTY);
@@ -35,11 +36,15 @@ public enum Departments {
     public static Departments department(User user) {
         List<Employee> el = user.getEmployeeList();
         if (el != null && el.size() > 0) {
-            return Optional.ofNullable(DEPARTMENTS_MAP.get(el.get(0).getName())).orElse(UNKNOWN);
+            return department(el.get(0).getName());
         }
         else {
             return CLIENT;
         }
+    }
+
+    public static Departments department(String department) {
+        return Optional.ofNullable(DEPARTMENTS_MAP.get(department)).orElse(UNKNOWN);
     }
 
     public static boolean isCourier(String obtainingMethod) {

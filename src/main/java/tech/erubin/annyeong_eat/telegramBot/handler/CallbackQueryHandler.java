@@ -36,7 +36,7 @@ public class CallbackQueryHandler extends AbstractHandler {
 
         Order order = orderService.getOrderByStringId(idList[0]);
         Dish dish = dishService.getDishByName(idList[1]);
-        User user = clientService.getUser(userId);
+        User user = clientService.getOrCreateUser(userId);
         String tag = idList[2];
         Departments department = Departments.department(user);
         if (tag.equals(tagInfo)) {

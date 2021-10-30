@@ -4,7 +4,9 @@ import tech.erubin.annyeong_eat.entity.User;
 
 public interface UserService {
 
-    User getUser(String userid);
+    User getOrCreateUser(String userid);
+
+    User getUser(int id);
 
     void save(User user);
 

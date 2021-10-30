@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import tech.erubin.annyeong_eat.entity.*;
 import tech.erubin.annyeong_eat.service.EmployeeServiceImpl;
 import tech.erubin.annyeong_eat.service.OrderServiceImpl;
+import tech.erubin.annyeong_eat.service.UserServiceImpl;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractButton;
 import tech.erubin.annyeong_eat.telegramBot.enums.Departments;
 
@@ -19,15 +20,10 @@ import java.util.stream.Collectors;
 public class InlineButtons extends AbstractButton {
     private final EmployeeServiceImpl employeeService;
     private final OrderServiceImpl orderService;
+    private final UserServiceImpl userService;
 
     public InlineKeyboardMarkup checkOrderMainMenu(User user) {
         List<Order> orderList = orderService.getOrdersInProgress(user);
-//        List<Order> orderList = user.getOrderList()
-//                .stream()
-//                .map(x -> x.getOrderStateList().get(x.getOrderStateList().size() - 1))
-//                .filter(OrderStates::isOrderNoEndDelivery)
-//                .map(OrderState::getOrderId)
-//                .collect(Collectors.toList());
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         for (Order order: orderList) {
             OrderState orderState = order.getOrderStateList().get(order.getOrderStateList().size() - 1);
@@ -100,7 +96,6 @@ public class InlineButtons extends AbstractButton {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         rows.add(List.of(getInlineButtons(editOrder, order.getId(), "oe")));
         rows.add(List.of(getInlineButtons(restart, order.getId(), "or")));
-        rows.add(List.of(getInlineButtons(accept, order.getId(), "o+")));
         rows.add(List.of(getInlineButtons(cancel, order.getId(), "o-")));
         return new InlineKeyboardMarkup(rows);
     }
@@ -159,13 +154,37 @@ public class InlineButtons extends AbstractButton {
     public InlineKeyboardMarkup orderAcceptButtons(Order order) {
         List<List<InlineKeyboardButton>> buttonNames = new ArrayList<>();
         buttonNames.add(List.of(getInlineButtons(acceptState, 0, tagInfo)));
-        if (Departments.isCourier(order.getObtainingMethod())) {
-            List<User> userList = employeeService.getCourierIsFree(order.getCafeId());
-            for (User user : userList) {
-                buttonNames.add(List.of(getInlineButtons(user.getName(), order.getId(), Integer.toString(user.getId()))));
-            }
+        Departments departments = Departments.department(order.getObtainingMethod());
+        switch (departments) {
+            case COURIER:
+                List<User> userList = employeeService.getCourierIsFree(order.getCafeId());
+                for (User user : userList) {
+                    buttonNames.add(List.of(getInlineButtons(transferOrderCourier + user.getName(), order.getId(), "c" + user.getId())));
+                }
+                break;
+            case TAXI:
+                buttonNames.add(List.of(getInlineButtons( transferOrderTaxi, order.getId(), "tds")));
+                break;
         }
         return new InlineKeyboardMarkup(buttonNames);
+    }
+
+    public InlineKeyboardMarkup orderStartDelivery(Order order) {
+        int courierId = order.getDeliveryId();
+        List<List<InlineKeyboardButton>> buttonNames = new ArrayList<>();
+        buttonNames.add(List.of(getInlineButtons(acceptState, 0, tagInfo)));
+        if (courierId == 0) {
+            buttonNames.add(List.of(getInlineButtons(taxiDeliveryOrder, order.getId(), "end")));
+        }
+        else {
+            String name = userService.getUser(courierId).getName();
+            buttonNames.add(List.of(getInlineButtons(courierDeliveryOrder + name, 0, tagInfo)));
+        }
+        return new InlineKeyboardMarkup(buttonNames);
+    }
+
+    public InlineKeyboardMarkup orderEndDelivery() {
+        return new InlineKeyboardMarkup(List.of(List.of(getInlineButtons(orderDelivered, 0, tagInfo))));
     }
 
     public InlineKeyboardMarkup orderCancelButtons() {

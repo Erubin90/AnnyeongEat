@@ -129,6 +129,6 @@ public class MessageHandler extends AbstractHandler {
 
     private User getUser(Update update) {
         String userId = update.getMessage().getFrom().getId().toString();
-        return  clientService.getUser(userId);
+        return  clientService.getOrCreateUser(userId);
     }
 }

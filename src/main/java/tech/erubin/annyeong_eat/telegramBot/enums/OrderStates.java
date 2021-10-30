@@ -11,17 +11,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum OrderStates {
-    ORDER_START_REGISTRATION("начало оформление заказа"),
-    ORDER_END_REGISTRATION("заказ оформлен"),
-
-    ORDER_EDITING("редактирование заказа"),
-
-    ORDER_ACCEPT("заказ принят"),
-    ORDER_CANCEL("заказ отменен"),
-    ORDER_START_COOK("заказ начал готовиться"),
-    ORDER_END_COOK("заказ готов к отправке"),
-    ORDER_START_DELIVERY("курьер забрал заказ"),
-    ORDER_END_DELIVERY("курьер доставил заказ"),
+    START_REGISTRATION("начало оформление заказа"),
+    END_REGISTRATION("заказ оформлен"),
+    EDITING("редактирование заказа"),
+    ACCEPT("заказ принят"),
+    CANCEL("заказ отменен"),
+    START_COOK("заказ начал готовиться"),
+    END_COOK("заказ готов к отправке"),
+    START_DELIVERY("курьер забрал заказ"),
+    END_DELIVERY("курьер доставил заказ"),
     UNKNOWN(Strings.EMPTY);
     
     private final String state;
@@ -41,18 +39,13 @@ public enum OrderStates {
         return Optional.ofNullable(ORDER_STATES.get(os.getState())).orElse(UNKNOWN);
     }
 
-    public static boolean isOrderNoEndDelivery(OrderState os) {
-        OrderStates s = orderState(os);
-        return !(s == ORDER_END_DELIVERY || s == ORDER_CANCEL);
-    }
-
     public static boolean isOrderAccepted(OrderState os) {
         OrderStates s = orderState(os);
-        return s != ORDER_START_REGISTRATION && s != ORDER_CANCEL;
+        return s != START_REGISTRATION && s != CANCEL;
     }
 
     public static boolean isOrderEditing(OrderState os) {
         OrderStates s = orderState(os);
-        return s == ORDER_EDITING;
+        return s == EDITING;
     }
 }

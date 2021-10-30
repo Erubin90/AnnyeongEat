@@ -80,7 +80,7 @@ public class OrderModule extends AbstractModule {
                 userStatesService.createAndSave(user, ClientStates.ORDER_CAFE_MENU.getState());
             }
             orderService.save(order);
-            orderStatesService.createAndSave(order, OrderStates.ORDER_START_REGISTRATION.getState());
+            orderStatesService.createAndSave(order, OrderStates.START_REGISTRATION.getState());
         }
         else if (sourceText.equals(replyButtons.getBack())) {
             text = backToMainMenu;
@@ -346,7 +346,7 @@ public class OrderModule extends AbstractModule {
             }
             sendMessageDepartment(order, Departments.OPERATOR);
             orderService.save(order);
-            orderStatesService.createAndSave(order, OrderStates.ORDER_END_REGISTRATION.getState());
+            orderStatesService.createAndSave(order, OrderStates.END_REGISTRATION.getState());
         }
         else if (sourceText.equals(replyButtons.getBack())) {
             text = backToComment;

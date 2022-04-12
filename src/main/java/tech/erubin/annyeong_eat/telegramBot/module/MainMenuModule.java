@@ -128,7 +128,6 @@ public class MainMenuModule extends AbstractModule {
             }
         }
         return "Имя - " + user.getName() +
-                "\nФамилия - " + user.getSurname() +
                 "\nНомер - " + user.getPhoneNumber() +
                 "\nГород - " + user.getCity() +
                 "\nКоличество заказов - " + countOrder;

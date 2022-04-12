@@ -28,7 +28,7 @@ public class MessageHandler extends AbstractHandler {
     private final EmployeeStateServiceImpl employeeStateService;
     private final ClientStatesServiceImpl clientStateService;
 
-    public BotApiMethod<?> handleUpdate(Update update) {
+    public BotApiMethod<?> handleUpdate(Update update, String posterToken) {
         String sourceText = update.getMessage().getText();
         User user = getUser(update);
         Departments department = Departments.department(user);
@@ -68,15 +68,15 @@ public class MessageHandler extends AbstractHandler {
                         return operatorModule.mainMenu(update, user, sourceText);
                     case OPERATOR_CHOOSING_CAFE:
                         return orderModule.choosingCafe(update, user, sourceText, isEmployee);
-                    case OPERATOR_CHOOSING_TABLE:
+                    case CHOOSING_TABLE:
                         return operatorModule.choosingTable(update, user, sourceText);
-                    case OPERATOR_CAFE_MENU:
+                    case CAFE_MENU:
                         return orderModule.cafeMenu(update, user, sourceText, isEmployee);
-                    case OPERATOR_PAYMENT_METHOD:
+                    case PAYMENT_METHOD:
                         return orderModule.deliveryPaymentMethod(update, user, sourceText, isEmployee);
-                    case OPERATOR_COMMENT:
+                    case COMMENT:
                         return orderModule.comment(update, user, sourceText, isEmployee);
-                    case OPERATOR_CONFIRMATION:
+                    case CONFIRMATION:
                         return orderModule.deliveryConfirmation(update, user, sourceText, isEmployee);
                     default:
                         return null;
@@ -118,8 +118,6 @@ public class MessageHandler extends AbstractHandler {
                 return registrationModule.city(update, user, sourceText);
             case REGISTRATION_NAME:
                 return registrationModule.name(update, user, sourceText);
-            case REGISTRATION_SURNAME:
-                return registrationModule.surname(update, user, sourceText);
             case REGISTRATION_PHONE_NUMBERS:
                 return registrationModule.phoneNumber(update, user, sourceText);
             default:

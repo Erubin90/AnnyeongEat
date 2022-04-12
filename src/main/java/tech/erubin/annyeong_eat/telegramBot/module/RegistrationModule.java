@@ -10,6 +10,7 @@ import tech.erubin.annyeong_eat.entity.User;
 import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.abstractClass.AbstractModule;
+import tech.erubin.annyeong_eat.telegramBot.buttons.InlineButtons;
 import tech.erubin.annyeong_eat.telegramBot.buttons.ReplyButtons;
 import tech.erubin.annyeong_eat.telegramBot.enums.ClientStates;
 import tech.erubin.annyeong_eat.telegramBot.handler.CheckMessage;
@@ -20,17 +21,19 @@ import java.util.Set;
 public class RegistrationModule extends AbstractModule {
     private final CafeServiceImpl cafeService;
     private final ReplyButtons replyButtons;
+    private final InlineButtons inlineButtons;
     private final CheckMessage checkMessage;
 
     public RegistrationModule(OrderServiceImpl orderService, UserServiceImpl userService,
                               ClientStatesServiceImpl userStatesService, OrderStatesServiceImpl orderStatesService,
                               EmployeeServiceImpl employeeService, CafeServiceImpl cafeService,
                               ReplyButtons replyButtons, CheckMessage checkMessage,
-                              @Lazy AnnyeongEatWebHook webHook) {
+                              @Lazy AnnyeongEatWebHook webHook, InlineButtons inlineButtons) {
         super(orderService, userService, userStatesService, orderStatesService, employeeService, webHook);
         this.cafeService = cafeService;
         this.replyButtons = replyButtons;
         this.checkMessage = checkMessage;
+        this.inlineButtons = inlineButtons;
     }
 
     public SendMessage start(Update update, User user) {
@@ -67,18 +70,6 @@ public class RegistrationModule extends AbstractModule {
             user.setName(sourceText);
             userService.save(user);
             userStatesService.createAndSave(user, ClientStates.REGISTRATION_SURNAME.getState());
-        }
-        return message(update, replyKeyboard, text);
-    }
-
-    public SendMessage surname(Update update, User user, String sourceText) {
-        String text = checkMessage.checkSurname(sourceText);
-        ReplyKeyboard replyKeyboard = new ReplyKeyboardRemove(true);
-        if (!text.contains(errorTrigger)) {
-            text = surnameNoError;
-            user.setSurname(sourceText);
-            userService.save(user);
-            userStatesService.createAndSave(user, ClientStates.REGISTRATION_PHONE_NUMBERS.getState());
         }
         return message(update, replyKeyboard, text);
     }

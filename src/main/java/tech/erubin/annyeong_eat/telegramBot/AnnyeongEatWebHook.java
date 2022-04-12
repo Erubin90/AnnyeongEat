@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -30,6 +29,7 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
     private final String botToken;
     private final String botPath;
 
+    private final String posterToken;
     private final MessageHandler messageHandler;
     private final CallbackQueryHandler callbackQueryHandler;
 
@@ -55,28 +55,27 @@ public class AnnyeongEatWebHook extends TelegramWebhookBot {
     public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
         BotApiMethod<?> botApiMethod = null;
         try {
-            Thread.sleep(34);
             if (update.hasMessage()) {
-                botApiMethod = messageHandler.handleUpdate(update);
+                botApiMethod = messageHandler.handleUpdate(update, posterToken);
             }
             else if (update.hasCallbackQuery()) {
-                botApiMethod = callbackQueryHandler.handleUpdate(update.getCallbackQuery());
+                botApiMethod = callbackQueryHandler.handleUpdate(update.getCallbackQuery(), posterToken);
             }
         }
         catch (Exception e) {
             e.printStackTrace();
-            String errorText = e.getMessage() != null? e.getMessage() : "Произошла ошибка но текс ошибки не выявлен. Посмотри логи";
+            String errorText = e.getMessage() != null ? e.getMessage() : "Произошла ошибка но текс ошибки не выявлен. Посмотри логи";
             List<Employee> developerList = departmentService.getDeveloperList();
             sendMessageDepartment(developerList, Departments.DEVELOPER, errorText, null);
         }
         return botApiMethod;
     }
 
-    public boolean sendPhoto(CallbackQuery callback, String text, String imgPath, InlineKeyboardMarkup inlineKeyboardMarkup){
+    public boolean sendPhoto(String chatId, String text, String imgPath, InlineKeyboardMarkup inlineKeyboardMarkup){
         InputFile inputFile = new InputFile(imgPath);
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setPhoto(inputFile);
-        sendPhoto.setChatId(String.valueOf(callback.getMessage().getChatId()));
+        sendPhoto.setChatId(chatId);
         sendPhoto.setCaption(text);
         sendPhoto.setReplyMarkup(inlineKeyboardMarkup);
         try {

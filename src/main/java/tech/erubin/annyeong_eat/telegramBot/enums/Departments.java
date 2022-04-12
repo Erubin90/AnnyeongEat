@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public enum Departments {
     OPERATOR("Оператор"),
+    WAITER("Офицант"),
     ADMINISTRATOR("Администратор"),
     COURIER("Курьер"),
     TAXI("Такси"),

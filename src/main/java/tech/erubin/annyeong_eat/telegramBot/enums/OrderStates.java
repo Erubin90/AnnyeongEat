@@ -20,6 +20,7 @@ public enum OrderStates {
     END_COOK("заказ готов к отправке"),
     START_DELIVERY("курьер забрал заказ"),
     END_DELIVERY("курьер доставил заказ"),
+    END_ORDER("стол оплачен"),
     UNKNOWN(Strings.EMPTY);
     
     private final String state;

@@ -24,10 +24,10 @@ public enum ClientStates {
     ORDER_CAFE("выбор кафе"),
     ORDER_CAFE_MENU("выбор блюд"),
     ORDER_METHOD_OF_OBTAINING("способ получения"),
-    ORDER_COMMENT("оставить комментарий"),
     DELIVERY_ADDRESS("указание адреса"),
     DELIVERY_PHONE_NUMBER("указание номера"),
     DELIVERY_PAYMENT_METHOD("способ оплаты"),
+    ORDER_COMMENT("оставить комментарий"),
     DELIVERY_CONFIRMATION("подтверждение заказа"),
 
     UNKNOWN(Strings.EMPTY);

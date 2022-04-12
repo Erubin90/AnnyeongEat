@@ -12,20 +12,23 @@ import java.util.stream.Collectors;
 public enum EmployeeStates {
     OPERATOR_MAIN_MENU("главное меню Оператора"),
     OPERATOR_CHOOSING_CAFE("выбор кафе"),
-    OPERATOR_CHOOSING_TABLE("выбор стола"),
-    OPERATOR_CAFE_MENU("выбор блюд"),
-    OPERATOR_PAYMENT_METHOD("указание способа оплаты"),
-    OPERATOR_COMMENT("оставить комментарий"),
-    OPERATOR_CONFIRMATION("подтверждение заказа"),
+
+    WAITER_MAIN_MENU("главное меню Официанта"),
 
     ADMINISTRATOR_MAIN_MENU("главное меню Администратора"),
 
     COURIER_MAIN_MENU("главное меню Курьер"),
-    COURIER_WEEKEND("выходной"),
     COURIER_FREE("свободен"),
     COURIER_BUSY("на заказе"),
+
     DEVELOPER_MAIN_MENU("главное меню Разработчик"),
 
+    CHOOSING_TABLE("выбор стола"),
+    CAFE_MENU("выбор блюд"),
+    PAYMENT_METHOD("указание способа оплаты"),
+    COMMENT("оставить комментарий"),
+    CONFIRMATION("подтверждение заказа"),
+    WEEKEND("выходной"),
     UNKNOWN(Strings.EMPTY);
 
     private final String state;

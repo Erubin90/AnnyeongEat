@@ -30,7 +30,7 @@ public class CallbackQueryHandler extends AbstractHandler {
     private final EmployeeStateServiceImpl employeeStateService;
     private final ClientStatesServiceImpl clientStateService;
 
-    public BotApiMethod<?> handleUpdate(CallbackQuery callback) {
+    public BotApiMethod<?> handleUpdate(CallbackQuery callback, String posterToken) {
         String userId = callback.getFrom().getId().toString();
         String[] idList = callback.getData().split("/");
 
@@ -72,7 +72,7 @@ public class CallbackQueryHandler extends AbstractHandler {
         switch (employeeStates) {
             case OPERATOR_MAIN_MENU:
                 return operatorModule.callbackOperatorMainMenu(callback, order, dish, tag);
-            case OPERATOR_CAFE_MENU:
+            case CAFE_MENU:
                 return orderModule.callbackOrderCafeMenu(callback, order, dish, tag);
             case COURIER_MAIN_MENU:
                 return courierModule.callbackCourierMainMenu(callback, order, tag);

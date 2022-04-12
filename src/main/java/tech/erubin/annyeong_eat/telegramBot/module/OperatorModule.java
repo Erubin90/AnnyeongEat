@@ -71,7 +71,7 @@ public class OperatorModule extends AbstractModule {
                 replyKeyboard = replyButtons.operatorChoosingTable(cafe);
                 orderService.save(order);
                 orderStatesService.createAndSave(order, OrderStates.START_REGISTRATION.getState());
-                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CHOOSING_TABLE.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.CHOOSING_TABLE.getState());
             }
         }
         else {
@@ -178,7 +178,7 @@ public class OperatorModule extends AbstractModule {
                 order.setPriceDelivery(0);
                 order.setPhoneNumber("");
                 orderService.save(order);
-                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CAFE_MENU.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.CAFE_MENU.getState());
             }
             else {
                 text = noTable;
@@ -194,7 +194,7 @@ public class OperatorModule extends AbstractModule {
             order.setPriceDelivery(0);
             order.setPhoneNumber("");
             orderService.save(order);
-            employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CAFE_MENU.getState());
+            employeeStateService.createAndSave(user, EmployeeStates.CAFE_MENU.getState());
         }
         else if (soursText.equals(replyButtons.getBack())) {
             List<Cafe> cafeId = employeeService.getCafeByUserId(user);
@@ -236,12 +236,6 @@ public class OperatorModule extends AbstractModule {
             default:
                 return answerCallbackQuery(callback, notWork);
         }
-    }
-
-    private OrderStates getOrderEnum(Order order) {
-        int size = order.getOrderStateList().size() - 1;
-        OrderState orderState = order.getOrderStateList().get(size);
-        return OrderStates.orderState(orderState);
     }
 
     private BotApiMethod<?> callbackOrderAndRegistration(CallbackQuery callback, Order order, String tag) {

@@ -72,7 +72,7 @@ public class OrderModule extends AbstractModule {
             if (isEmployee) {
                 text = choosingTable;
                 replyKeyboard = replyButtons.operatorChoosingTable(cafe);
-                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CHOOSING_TABLE.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.CHOOSING_TABLE.getState());
             }
             else {
                 text = hello + " " + sourceText;
@@ -118,7 +118,7 @@ public class OrderModule extends AbstractModule {
                 text = choosingTable;
                 Cafe cafe = order.getCafeId();
                 replyKeyboard = replyButtons.operatorChoosingTable(cafe);
-                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CHOOSING_TABLE.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.CHOOSING_TABLE.getState());
             }
             else {
                 text = backToChoosingCafe;
@@ -136,7 +136,7 @@ public class OrderModule extends AbstractModule {
                 if (isEmployee) {
                     text = nextToPaymentMethod;
                     replyKeyboard = replyButtons.userOrderPayment();
-                    employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_PAYMENT_METHOD.getState());
+                    employeeStateService.createAndSave(user, EmployeeStates.PAYMENT_METHOD.getState());
                 }
                 else {
                     text = nextToObtaining;
@@ -258,7 +258,7 @@ public class OrderModule extends AbstractModule {
             replyKeyboard = replyButtons.userComment();
             orderService.save(order);
             if (isEmployee) {
-                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_COMMENT.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.COMMENT.getState());
             }
             else {
                 userStatesService.createAndSave(user, ClientStates.ORDER_COMMENT.getState());
@@ -270,7 +270,7 @@ public class OrderModule extends AbstractModule {
             replyKeyboard = replyButtons.userComment();
             orderService.save(order);
             if (isEmployee) {
-                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_COMMENT.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.COMMENT.getState());
             }
             else {
                 userStatesService.createAndSave(user, ClientStates.ORDER_COMMENT.getState());
@@ -280,7 +280,7 @@ public class OrderModule extends AbstractModule {
             text = backToPhoneNumber;
             replyKeyboard = replyButtons.userOrderPhoneNumber(user);
             if (isEmployee) {
-                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CAFE_MENU.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.CAFE_MENU.getState());
             }
             else {
                 userStatesService.createAndSave(user, ClientStates.DELIVERY_PHONE_NUMBER.getState());
@@ -301,7 +301,7 @@ public class OrderModule extends AbstractModule {
             text = backToPaymentMethod;
             replyKeyboard = replyButtons.userOrderPayment();
             if (isEmployee) {
-                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_PAYMENT_METHOD.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.PAYMENT_METHOD.getState());
             }
             else {
                 userStatesService.createAndSave(user, ClientStates.DELIVERY_PAYMENT_METHOD.getState());
@@ -316,7 +316,7 @@ public class OrderModule extends AbstractModule {
                     orderService.save(order);
                 }
                 if (isEmployee) {
-                    employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_CONFIRMATION.getState());
+                    employeeStateService.createAndSave(user, EmployeeStates.CONFIRMATION.getState());
                 } else {
                     userStatesService.createAndSave(user, ClientStates.DELIVERY_CONFIRMATION.getState());
                 }
@@ -352,7 +352,7 @@ public class OrderModule extends AbstractModule {
             text = backToComment;
             replyKeyboard = replyButtons.userComment();
             if (isEmployee) {
-                employeeStateService.createAndSave(user, EmployeeStates.OPERATOR_COMMENT.getState());
+                employeeStateService.createAndSave(user, EmployeeStates.COMMENT.getState());
             }
             else {
                 userStatesService.createAndSave(user, ClientStates.ORDER_COMMENT.getState());
@@ -366,42 +366,43 @@ public class OrderModule extends AbstractModule {
     }
 
     public BotApiMethod<?> callbackOrderCafeMenu(CallbackQuery callback, Order order, Dish dish, String tag) {
-        String callbackText = error;
+        String text = error;
         InlineKeyboardMarkup inlineMarkup;
         ChequeDish chequeDish = chequeDishService.getChequeByOrderAndDish(order, dish);
         int count = chequeDish.getCountDishes();
         if (tag.equals("m+") || tag.equals("b+")) {
             count++;
-            callbackText = dish.getName() + " " + addDish;
+            text = dish.getName() + " " + addDish;
         }
         else if (tag.equals("m-") || tag.equals("b-")) {
             if (count >= 0) {
                 if (count > 0) {
                     count--;
-                    callbackText = dish.getName() + " " + subDish;
+                    text = dish.getName() + " " + subDish;
                 }
                 else {
-                    callbackText = dish.getName() + " " + emptyDish;
+                    text = dish.getName() + " " + emptyDish;
                 }
             }
         }
         else if (tag.equals("mx") || tag.equals("bx")) {
-            callbackText = count + " " + dish.getName() + " " + subDish;
+            text = count + " " + dish.getName() + " " + subDish;
             count = 0;
         }
         chequeDishService.saveOrDeleteChequeDish(chequeDish, count);
         if (tag.equals(String.valueOf(dish.getId()))) {
-            callbackText = getDishText(dish);
+            text = getDishText(dish);
             inlineMarkup = inlineButtons.clientCheque(chequeDish);
-            if (!webHook.sendPhoto(callback, callbackText, dish.getLinkPhoto(), inlineMarkup)) {
-                callbackText = error;
+            String chatId = callback.getMessage().getChatId().toString();
+            if (!webHook.sendPhoto(chatId, text, dish.getLinkPhoto(), inlineMarkup)) {
+                text = error;
             }
         }
         else if (tag.equals("m+") || tag.equals("mx") || tag.equals("m-")) {
             inlineMarkup = inlineButtons.clientCheque(chequeDish);
             EditMessageReplyMarkup editMessageReplyMarkup = editMessageReplyMarkup(callback, inlineMarkup);
             if (!webHook.updateMarkups(editMessageReplyMarkup, count)) {
-                callbackText = error;
+                text = error;
             }
         }
         else if (tag.equals("b+") || tag.equals("bx") || tag.equals("b-")) {
@@ -409,10 +410,10 @@ public class OrderModule extends AbstractModule {
             String editText = getChequeText(order, false);
             EditMessageText editMessageText = editMessageText(callback, editText, inlineMarkup);
             if (!webHook.updateText(editMessageText)) {
-                callbackText = error;
+                text = error;
             }
         }
-        return answerCallbackQuery(callback, callbackText);
+        return answerCallbackQuery(callback, text);
     }
 
     private String getDishText(Dish dish) {

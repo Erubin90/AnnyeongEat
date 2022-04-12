@@ -16,6 +16,7 @@ import tech.erubin.annyeong_eat.entity.*;
 import tech.erubin.annyeong_eat.service.*;
 import tech.erubin.annyeong_eat.telegramBot.AnnyeongEatWebHook;
 import tech.erubin.annyeong_eat.telegramBot.enums.Departments;
+import tech.erubin.annyeong_eat.telegramBot.enums.OrderStates;
 
 import java.util.List;
 
@@ -185,11 +186,20 @@ public abstract class AbstractModule {
 
     protected SendMessage message(Update update, ReplyKeyboard replyKeyboard, String text) {
         String chatId = update.getMessage().getChatId().toString();
-        SendMessage sendMessage = new SendMessage();
+        var sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(text);
         sendMessage.setReplyMarkup(replyKeyboard);
         return sendMessage;
+    }
+
+    protected EditMessageText editMessage(CallbackQuery callback, InlineKeyboardMarkup inline, String text) {
+        var editMessage = new EditMessageText();
+        editMessage.setMessageId(callback.getMessage().getMessageId());
+        editMessage.setChatId(callback.getMessage().getChatId().toString());
+        editMessage.setText(text);
+        editMessage.setReplyMarkup(inline);
+        return editMessage;
     }
 
     protected AnswerCallbackQuery answerCallbackQuery(CallbackQuery callback, String text) {
@@ -228,8 +238,7 @@ public abstract class AbstractModule {
             if (isEmployee) {
                 fullOrder.append("Имя: ")
                         .append(order.getUserId().getName())
-                        .append("\n")
-                        .append("Адрес: ");
+                        .append("\nАдрес: ");
                 String address = order.getAddress();
                 if (address.equals("-")) {
                     fullOrder.append(order.getCafeId().getAddress());
@@ -237,8 +246,7 @@ public abstract class AbstractModule {
                 else {
                     fullOrder.append(order.getAddress());
                 }
-                fullOrder.append("\n")
-                        .append("Номер: ")
+                fullOrder.append("\nНомер: ")
                         .append(order.getPhoneNumber())
                         .append("\n\n")
                         .append(getTextToChequeText(order, isEmployee))
@@ -273,13 +281,11 @@ public abstract class AbstractModule {
         }
         text.append("\nСумма заказа: ")
                 .append(sumCheque)
-                .append("₽\n")
-                .append("Сумма доставки: ");
+                .append("₽\nСумма доставки: ");
         if (priceDelivery >= 0) {
             double sumOrder = sumCheque + priceDelivery;
             text.append(priceDelivery)
-                    .append("₽\n")
-                    .append("Итоговая сумма заказа: ")
+                    .append("₽\nИтоговая сумма заказа: ")
                     .append(sumOrder)
                     .append("₽\n");
         }
@@ -299,7 +305,7 @@ public abstract class AbstractModule {
         }
         text.append("Комментарий: ")
                 .append(order.getComment())
-                .append("\n\n");
+                .append("\n");
         return text;
     }
 
@@ -318,8 +324,7 @@ public abstract class AbstractModule {
                     .append(dish.getPrice())
                     .append(" = ")
                     .append(chequeDish.getCountDishes() * dish.getPrice())
-                    .append("₽\n")
-                    .append("\n");
+                    .append("₽\n\n");
             if (chequeDish.getChequeDishOptionallyList() != null) {
                 List<ChequeDishOptionally> dishOptionallyList = chequeDish.getChequeDishOptionallyList();
                 for (ChequeDishOptionally chequeDishOptionally : dishOptionallyList) {
@@ -349,5 +354,11 @@ public abstract class AbstractModule {
             }
         }
         return sumCheque;
+    }
+
+    protected OrderStates getOrderEnum(Order order) {
+        int size = order.getOrderStateList().size() - 1;
+        OrderState orderState = order.getOrderStateList().get(size);
+        return OrderStates.orderState(orderState);
     }
 }
